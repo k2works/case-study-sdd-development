@@ -22,6 +22,6 @@
       "@presentation/*": ["./src/presentation/*"]
     }
   },
-  "include": ["src/**/*", "prisma/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
