@@ -29,9 +29,9 @@
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| [バックエンドアーキテクチャ](./design/architecture_backend.md) | 未着手 |
-| [フロントエンドアーキテクチャ](./design/architecture_frontend.md) | 未着手 |
-| [インフラストラクチャ](./design/architecture_infrastructure.md) | 未着手 |
+| [バックエンドアーキテクチャ](./design/architecture_backend.md) | 完了 |
+| [フロントエンドアーキテクチャ](./design/architecture_frontend.md) | 完了 |
+| [インフラストラクチャ](./design/architecture_infrastructure.md) | 完了 |
 | [データモデル設計](./design/data-model.md) | 未着手 |
 | [ドメインモデル設計](./design/domain-model.md) | 未着手 |
 | [UI 設計](./design/ui-design.md) | 未着手 |
