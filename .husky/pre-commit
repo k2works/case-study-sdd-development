@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# バックエンドの変更があればテストを実行
+if git diff --cached --name-only | grep -q "^apps/backend/"; then
+  echo "Running backend tests..."
+  (cd apps/backend && npx vitest run)
+fi
+
+# フロントエンドの変更があればテストを実行
+if git diff --cached --name-only | grep -q "^apps/frontend/"; then
+  echo "Running frontend tests..."
+  (cd apps/frontend && npx vitest run)
+fi

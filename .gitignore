@@ -20,6 +20,9 @@ Thumbs.db
 dist/
 build/
 
+# Prisma
+apps/backend/src/generated/
+
 # Logs
 *.log
 npm-debug.log*
