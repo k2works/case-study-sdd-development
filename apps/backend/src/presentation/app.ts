@@ -1,10 +1,14 @@
 import express from 'express';
 import { createItemRoutes } from './routes/item-routes.js';
 import { createProductRoutes } from './routes/product-routes.js';
+import { createOrderRoutes } from './routes/order-routes.js';
 import { ItemUseCase } from '../application/item/item-usecase.js';
 import { ProductUseCase } from '../application/product/product-usecase.js';
+import { OrderUseCase } from '../application/order/order-usecase.js';
 import { PrismaItemRepository } from '../infrastructure/prisma/item-repository-prisma.js';
 import { PrismaProductRepository } from '../infrastructure/prisma/product-repository-prisma.js';
+import { PrismaOrderRepository } from '../infrastructure/prisma/order-repository-prisma.js';
+import { PrismaStockLotRepository } from '../infrastructure/prisma/stock-lot-repository-prisma.js';
 import { prisma } from '../infrastructure/prisma/client.js';
 
 const app = express();
@@ -25,5 +29,11 @@ app.use('/api', createItemRoutes(itemUseCase));
 const productRepository = new PrismaProductRepository(prisma);
 const productUseCase = new ProductUseCase(productRepository);
 app.use('/api', createProductRoutes(productUseCase));
+
+// 受注 API
+const orderRepository = new PrismaOrderRepository(prisma);
+const stockLotRepository = new PrismaStockLotRepository(prisma);
+const orderUseCase = new OrderUseCase(orderRepository, productRepository, stockLotRepository);
+app.use('/api', createOrderRoutes(orderUseCase));
 
 export { app };
