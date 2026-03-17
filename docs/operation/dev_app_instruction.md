@@ -147,6 +147,19 @@ npm install
 
 PostgreSQL のみ Docker で起動し、backend / frontend はローカルで実行します。
 
+#### 環境変数の設定
+
+バックエンドがデータベースに接続するために、`apps/backend/.env` ファイルを作成します。
+
+```bash
+# apps/backend/.env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/fleur_memoire_dev"
+```
+
+> **Note**: `.env` ファイルは `.gitignore` に含まれているため、リポジトリにはコミットされません。各開発者が手動で作成する必要があります。
+
+#### 起動手順
+
 ```bash
 # データベースを起動
 docker compose -f apps/docker-compose.yml up -d db
@@ -477,25 +490,28 @@ cd apps/backend && npm install
 cd ../frontend && npm install
 cd ../..
 
-# 3. データベース起動
+# 3. 環境変数ファイルの作成
+echo 'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/fleur_memoire_dev"' > apps/backend/.env
+
+# 4. データベース起動
 cd apps && docker compose up -d db && cd ..
 
-# 4. マイグレーション実行
+# 5. マイグレーション実行
 cd apps/backend && npx prisma migrate dev && cd ../..
 
-# 5. シードデータ投入
+# 6. シードデータ投入
 cd apps/backend && npx prisma db seed && cd ../..
 
-# 6. バックエンドテスト実行
+# 7. バックエンドテスト実行
 cd apps/backend && npm test && cd ../..
 
-# 7. フロントエンドテスト実行
+# 8. フロントエンドテスト実行
 cd apps/frontend && npm test && cd ../..
 
-# 8. バックエンド起動
+# 9. バックエンド起動
 cd apps/backend && npm run dev
 
-# 9. フロントエンド起動（別ターミナル）
+# 10. フロントエンド起動（別ターミナル）
 cd apps/frontend && npm run dev
 ```
 
@@ -553,6 +569,21 @@ Error: connect ECONNREFUSED 127.0.0.1:5432
 cd apps
 docker compose ps
 docker compose up -d db
+```
+
+### SASL 認証エラー（DATABASE_URL 未設定）
+
+**問題**: バックエンド起動時に `SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string` エラー
+
+```
+Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+```
+
+**解決策**: `apps/backend/.env` ファイルが存在することを確認
+
+```bash
+# .env ファイルを作成
+echo 'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/fleur_memoire_dev"' > apps/backend/.env
 ```
 
 ### Prisma マイグレーションエラー
