@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import App from './App';
 
 vi.stubGlobal('fetch', vi.fn(() =>
-  Promise.resolve({ json: () => Promise.resolve([]) }),
+  Promise.resolve({ ok: true, json: () => Promise.resolve([]) }),
 ));
 
 describe('App', () => {
@@ -33,5 +33,12 @@ describe('App', () => {
     expect(screen.getByRole('tablist', { name: '管理メニュー' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: '商品管理' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: '単品管理' })).toBeInTheDocument();
+  });
+
+  it('管理画面に受注管理タブが表示される', async () => {
+    render(<App />);
+    await userEvent.click(screen.getByText('管理画面'));
+
+    expect(screen.getByRole('tab', { name: '受注管理' })).toBeInTheDocument();
   });
 });

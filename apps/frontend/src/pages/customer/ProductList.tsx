@@ -5,9 +5,10 @@ import type { ItemDto } from '../../types/item';
 interface Props {
   fetchProducts: () => Promise<ProductDto[]>;
   fetchItems: () => Promise<ItemDto[]>;
+  onOrder?: (product: { id: number; name: string; price: number }) => void;
 }
 
-export function ProductList({ fetchProducts, fetchItems }: Readonly<Props>) {
+export function ProductList({ fetchProducts, fetchItems, onOrder }: Readonly<Props>) {
   const [products, setProducts] = useState<ProductDto[]>([]);
   const [items, setItems] = useState<ItemDto[]>([]);
 
@@ -46,7 +47,11 @@ export function ProductList({ fetchProducts, fetchItems }: Readonly<Props>) {
               ¥{product.price.toLocaleString()}（税込）
             </p>
             <div className="product-card__actions">
-              <button className="btn btn--primary" type="button">
+              <button
+                className="btn btn--primary"
+                type="button"
+                onClick={() => onOrder?.({ id: product.id, name: product.name, price: product.price })}
+              >
                 注文する
               </button>
             </div>
