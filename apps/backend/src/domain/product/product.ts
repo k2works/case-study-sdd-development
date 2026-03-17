@@ -17,13 +17,13 @@ export interface ProductProps {
 export type NewProductProps = Omit<ProductProps, 'productId'>;
 
 export class Product {
-  readonly productId: ProductId;
+  readonly productId: ProductId | null;
   readonly name: ProductName;
   readonly price: Price;
   readonly compositions: ProductComposition[];
 
   static createNew(props: NewProductProps): Product {
-    return new Product({ ...props, productId: undefined as unknown as ProductId });
+    return new Product({ ...props, productId: null as unknown as ProductId });
   }
 
   constructor(props: ProductProps) {

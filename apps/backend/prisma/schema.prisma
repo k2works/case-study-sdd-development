@@ -15,7 +15,8 @@ model Supplier {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  items Item[]
+  items          Item[]
+  purchaseOrders PurchaseOrder[]
 
   @@map("suppliers")
 }
@@ -31,9 +32,10 @@ model Item {
   createdAt            DateTime @default(now()) @map("created_at")
   updatedAt            DateTime @updatedAt @map("updated_at")
 
-  supplier     Supplier             @relation(fields: [supplierId], references: [supplierId])
-  compositions ProductComposition[]
-  stocks       Stock[]
+  supplier       Supplier             @relation(fields: [supplierId], references: [supplierId])
+  compositions   ProductComposition[]
+  stocks         Stock[]
+  purchaseOrders PurchaseOrder[]
 
   @@map("items")
 }
@@ -104,4 +106,22 @@ model Stock {
   order Order? @relation(fields: [orderId], references: [orderId])
 
   @@map("stocks")
+}
+
+// 発注
+model PurchaseOrder {
+  purchaseOrderId     Int      @id @default(autoincrement()) @map("purchase_order_id")
+  itemId              Int      @map("item_id")
+  supplierId          Int      @map("supplier_id")
+  quantity            Int
+  orderDate           DateTime @map("order_date") @db.Date
+  expectedArrivalDate DateTime @map("expected_arrival_date") @db.Date
+  status              String   @db.VarChar(20)
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  item     Item     @relation(fields: [itemId], references: [itemId])
+  supplier Supplier @relation(fields: [supplierId], references: [supplierId])
+
+  @@map("purchase_orders")
 }

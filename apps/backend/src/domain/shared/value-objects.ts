@@ -79,7 +79,15 @@ export class CustomerId {
 }
 
 export class DeliveryDate {
-  constructor(public readonly value: Date) {}
+  constructor(public readonly value: Date) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dateOnly = new Date(value);
+    dateOnly.setHours(0, 0, 0, 0);
+    if (dateOnly < today) {
+      throw new Error('DeliveryDate は過去の日付にできません');
+    }
+  }
 }
 
 export class ShippingDate {
@@ -131,6 +139,28 @@ export class StockStatus {
   constructor(public readonly value: StockStatusValue) {
     if (!VALID_STOCK_STATUSES.includes(value)) {
       throw new Error(`StockStatus は ${VALID_STOCK_STATUSES.join(', ')} のいずれかでなければなりません`);
+    }
+  }
+}
+
+export class PurchaseOrderId {
+  constructor(public readonly value: number) {
+    if (value <= 0) throw new Error('PurchaseOrderId は正の整数でなければなりません');
+  }
+
+  equals(other: PurchaseOrderId): boolean {
+    return this.value === other.value;
+  }
+}
+
+export type PurchaseOrderStatusValue = '発注済み' | '入荷済み';
+
+const VALID_PURCHASE_ORDER_STATUSES: PurchaseOrderStatusValue[] = ['発注済み', '入荷済み'];
+
+export class PurchaseOrderStatus {
+  constructor(public readonly value: PurchaseOrderStatusValue) {
+    if (!VALID_PURCHASE_ORDER_STATUSES.includes(value)) {
+      throw new Error(`PurchaseOrderStatus は ${VALID_PURCHASE_ORDER_STATUSES.join(', ')} のいずれかでなければなりません`);
     }
   }
 }

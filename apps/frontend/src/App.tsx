@@ -1,4 +1,3 @@
-import { useState, useCallback } from 'react'
 import { ItemManagement } from './pages/staff/ItemManagement'
 import { ProductManagement } from './pages/staff/ProductManagement'
 import { ProductList } from './pages/customer/ProductList'
@@ -7,146 +6,49 @@ import { OrderConfirm } from './pages/customer/OrderConfirm'
 import { OrderComplete } from './pages/customer/OrderComplete'
 import { OrderList } from './pages/staff/OrderList'
 import { OrderDetail } from './pages/staff/OrderDetail'
-import type { OrderFormProduct, OrderFormData } from './pages/customer/OrderForm'
-import type { ItemDto, CreateItemInput } from './types/item'
-import type { ProductDto, CreateProductInput } from './types/product'
-import type { OrderDto, CreateOrderInput } from './types/order'
-import { fetchApi } from './api/client'
-
-const API_BASE = '/api';
-
-const fetchItems = async (): Promise<ItemDto[]> => {
-  const res = await fetch(`${API_BASE}/items`);
-  return res.json();
-};
-
-const createItem = async (input: CreateItemInput): Promise<ItemDto> => {
-  const res = await fetch(`${API_BASE}/items`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
-  return res.json();
-};
-
-const updateItem = async (id: number, input: CreateItemInput): Promise<ItemDto> => {
-  const res = await fetch(`${API_BASE}/items/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
-  return res.json();
-};
-
-const fetchProducts = async (): Promise<ProductDto[]> => {
-  const res = await fetch(`${API_BASE}/products`);
-  return res.json();
-};
-
-const createProduct = async (input: CreateProductInput): Promise<ProductDto> => {
-  const res = await fetch(`${API_BASE}/products`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
-  return res.json();
-};
-
-const updateProduct = async (id: number, input: CreateProductInput): Promise<ProductDto> => {
-  const res = await fetch(`${API_BASE}/products/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
-  return res.json();
-};
-
-const fetchOrders = async (status?: string): Promise<OrderDto[]> => {
-  const query = status ? `?status=${encodeURIComponent(status)}` : '';
-  return fetchApi<OrderDto[]>(`/orders${query}`);
-};
-
-const fetchOrder = async (id: number): Promise<OrderDto> => {
-  return fetchApi<OrderDto>(`/orders/${id}`);
-};
-
-const createOrder = async (input: CreateOrderInput): Promise<OrderDto> => {
-  return fetchApi<OrderDto>('/orders', {
-    method: 'POST',
-    body: JSON.stringify(input),
-  });
-};
-
-type View = 'customer' | 'staff';
-type CustomerPage = 'list' | 'order-form' | 'order-confirm' | 'order-complete';
-type StaffTab = 'products' | 'items' | 'orders';
+import { fetchItems, createItem, updateItem } from './api/items'
+import { fetchProducts, createProduct, updateProduct } from './api/products'
+import { fetchOrders, fetchOrder, createOrder } from './api/orders'
+import { useNavigation } from './hooks/useNavigation'
+import { useOrderFlow } from './hooks/useOrderFlow'
 
 function App() {
-  const [view, setView] = useState<View>('customer');
-  const [customerPage, setCustomerPage] = useState<CustomerPage>('list');
-  const [staffTab, setStaffTab] = useState<StaffTab>('products');
+  const {
+    view,
+    customerPage,
+    setCustomerPage,
+    staffTab,
+    setStaffTab,
+    detailOrderId,
+    handleViewChange,
+    handleOrderDetail,
+    handleBackFromDetail,
+    resetCustomerFlow,
+  } = useNavigation();
 
-  // 注文フローの状態管理
-  const [selectedProduct, setSelectedProduct] = useState<OrderFormProduct | null>(null);
-  const [orderFormData, setOrderFormData] = useState<OrderFormData | null>(null);
-  const [completedOrder, setCompletedOrder] = useState<OrderDto | null>(null);
+  const {
+    selectedProduct,
+    orderFormData,
+    completedOrder,
+    handleOrder,
+    handleOrderConfirm,
+    handleOrderSubmit,
+    handleBackToList,
+    handleBackToForm,
+    resetOrderFlow,
+  } = useOrderFlow({ createOrder, setCustomerPage });
 
-  // 受注詳細の状態管理
-  const [detailOrderId, setDetailOrderId] = useState<number | null>(null);
-
-  const handleOrder = useCallback((product: OrderFormProduct) => {
-    setSelectedProduct(product);
-    setCustomerPage('order-form');
-  }, []);
-
-  const handleOrderConfirm = useCallback((data: OrderFormData) => {
-    setOrderFormData(data);
-    setCustomerPage('order-confirm');
-  }, []);
-
-  const handleOrderSubmit = useCallback(async () => {
-    if (!selectedProduct || !orderFormData) return;
-
-    const input: CreateOrderInput = {
-      customerId: 1, // 仮の得意先 ID
-      productId: selectedProduct.id,
-      destinationName: orderFormData.destinationName,
-      destinationAddress: orderFormData.destinationAddress,
-      destinationPhone: orderFormData.destinationPhone,
-      deliveryDate: orderFormData.deliveryDate,
-      message: orderFormData.message || undefined,
-    };
-
-    const order = await createOrder(input);
-    setCompletedOrder(order);
-    setCustomerPage('order-complete');
-  }, [selectedProduct, orderFormData]);
-
-  const handleBackToList = useCallback(() => {
-    setSelectedProduct(null);
-    setOrderFormData(null);
-    setCompletedOrder(null);
-    setCustomerPage('list');
-  }, []);
-
-  const handleBackToForm = useCallback(() => {
-    setCustomerPage('order-form');
-  }, []);
-
-  const handleViewChange = useCallback((newView: View) => {
-    setView(newView);
+  const handleViewChangeWithReset = (newView: 'customer' | 'staff') => {
+    handleViewChange(newView);
     if (newView === 'customer') {
-      handleBackToList();
+      resetOrderFlow();
     }
-  }, [handleBackToList]);
+  };
 
-  const handleOrderDetail = useCallback((orderId: number) => {
-    setDetailOrderId(orderId);
-  }, []);
-
-  const handleBackFromDetail = useCallback(() => {
-    setDetailOrderId(null);
-  }, []);
+  const handleBackToListWithReset = () => {
+    resetOrderFlow();
+    resetCustomerFlow();
+  };
 
   const renderCustomerContent = () => {
     switch (customerPage) {
@@ -155,7 +57,7 @@ function App() {
         return (
           <OrderForm
             product={selectedProduct}
-            onBack={handleBackToList}
+            onBack={handleBackToListWithReset}
             onConfirm={handleOrderConfirm}
           />
         );
@@ -175,7 +77,7 @@ function App() {
           <OrderComplete
             order={completedOrder}
             productName={selectedProduct.name}
-            onTop={handleBackToList}
+            onTop={handleBackToListWithReset}
           />
         );
       default:
@@ -268,7 +170,7 @@ function App() {
         <nav className="app-nav" aria-label="メインナビゲーション">
           <button
             className={`nav-button${view === 'customer' ? ' nav-button--active' : ''}`}
-            onClick={() => handleViewChange('customer')}
+            onClick={() => handleViewChangeWithReset('customer')}
             disabled={view === 'customer'}
             aria-current={view === 'customer' ? 'page' : undefined}
           >
@@ -276,7 +178,7 @@ function App() {
           </button>
           <button
             className={`nav-button${view === 'staff' ? ' nav-button--active' : ''}`}
-            onClick={() => handleViewChange('staff')}
+            onClick={() => handleViewChangeWithReset('staff')}
             disabled={view === 'staff'}
             aria-current={view === 'staff' ? 'page' : undefined}
           >
