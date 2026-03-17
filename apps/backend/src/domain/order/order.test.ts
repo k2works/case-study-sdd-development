@@ -28,8 +28,9 @@ describe('Order', () => {
 
   it('正しいプロパティで生成できる', () => {
     const order = createOrder();
+    expect(order.orderId).not.toBeNull();
 
-    expect(order.orderId.value).toBe(1);
+    expect(order.orderId!.value).toBe(1);
     expect(order.customerId.value).toBe(10);
     expect(order.productId.value).toBe(100);
     expect(order.price.value).toBe(5500);

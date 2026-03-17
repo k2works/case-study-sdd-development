@@ -1,6 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('S03: 商品一覧を閲覧する', () => {
+  test.beforeEach(async ({ request }) => {
+    await request.post('http://localhost:8080/api/test/reset');
+  });
+
   test.describe('受入基準: 登録されている花束の一覧が表示される', () => {
     test('花束一覧ページが表示される', async ({ page }) => {
       await page.goto('/');
@@ -42,7 +46,7 @@ test.describe('S03: 商品一覧を閲覧する', () => {
       await page.getByLabel('仕入先ID').fill('1');
       await page.getByRole('button', { name: '保存する' }).click();
 
-      await expect(page.getByRole('cell', { name: '赤バラ' })).toBeVisible();
+      await expect(page.getByRole('cell', { name: '赤バラ' }).first()).toBeVisible();
 
       // 商品管理に切り替え
       await page.getByRole('tab', { name: '商品管理' }).click();

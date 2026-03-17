@@ -6,6 +6,11 @@ export class InMemoryItemRepository implements ItemRepository {
   private readonly items: Map<number, Item> = new Map();
   private nextId = 1;
 
+  clear(): void {
+    this.items.clear();
+    this.nextId = 1;
+  }
+
   async findById(id: ItemId): Promise<Item | null> {
     return this.items.get(id.value) ?? null;
   }

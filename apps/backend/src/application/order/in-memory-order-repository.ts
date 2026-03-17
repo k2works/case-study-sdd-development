@@ -6,6 +6,11 @@ export class InMemoryOrderRepository implements OrderRepository {
   private readonly orders: Map<number, Order> = new Map();
   private nextId = 1;
 
+  clear(): void {
+    this.orders.clear();
+    this.nextId = 1;
+  }
+
   async findById(id: OrderId): Promise<Order | null> {
     return this.orders.get(id.value) ?? null;
   }

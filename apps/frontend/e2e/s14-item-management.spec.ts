@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('S14: 単品（花）を管理する', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, request }) => {
+    await request.post('http://localhost:8080/api/test/reset');
     await page.goto('/');
     await page.getByRole('button', { name: '管理画面' }).click();
     await page.getByRole('tab', { name: '単品管理' }).click();

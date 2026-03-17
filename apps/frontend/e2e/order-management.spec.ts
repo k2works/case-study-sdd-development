@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type APIRequestContext } from '@playwright/test';
 
 /**
  * 注文フロー全体を画面操作で実行し、受注データを作成するヘルパー
@@ -6,6 +6,7 @@ import { test, expect, type Page } from '@playwright/test';
  */
 async function createOrderViaUI(
   page: Page,
+  request: APIRequestContext,
   options: {
     itemName?: string;
     productName?: string;
@@ -34,7 +35,16 @@ async function createOrderViaUI(
   await page.getByLabel('発注リードタイム').fill('2');
   await page.getByLabel('仕入先ID').fill('1');
   await page.getByRole('button', { name: '保存する' }).click();
-  await expect(page.getByRole('cell', { name: itemName })).toBeVisible();
+  await expect(page.getByRole('cell', { name: itemName }).first()).toBeVisible();
+
+  const items = await request.get('http://localhost:8080/api/items').then((response) => response.json());
+  const item = items.find((entry: { id: number; name: string }) => entry.name === itemName);
+  if (!item) {
+    throw new Error(`${itemName} の単品 ID を取得できませんでした`);
+  }
+  await request.post('http://localhost:8080/api/test/stock-lots', {
+    data: { itemId: item.id, quantity: 100 },
+  });
 
   // 商品を登録
   await page.getByRole('tab', { name: '商品管理' }).click();
@@ -74,10 +84,14 @@ function getDeliveryDate(): string {
 }
 
 test.describe('S07: 受注一覧を確認する', () => {
+  test.beforeEach(async ({ request }) => {
+    await request.post('http://localhost:8080/api/test/reset');
+  });
+
   test.describe('受入基準: 受注一覧が表示される', () => {
-    test('管理画面の受注管理タブで受注一覧テーブルが表示される', async ({ page }) => {
+    test('管理画面の受注管理タブで受注一覧テーブルが表示される', async ({ page, request }) => {
       // 注文を作成
-      await createOrderViaUI(page);
+      await createOrderViaUI(page, request);
 
       // 管理画面の受注管理タブへ
       await page.getByRole('button', { name: 'トップページに戻る' }).click();
@@ -100,9 +114,9 @@ test.describe('S07: 受注一覧を確認する', () => {
   });
 
   test.describe('受入基準: 受注の状態でフィルタリングできる', () => {
-    test('状態フィルタを「注文済み」に変更するとフィルタされた結果が表示される', async ({ page }) => {
+    test('状態フィルタを「注文済み」に変更するとフィルタされた結果が表示される', async ({ page, request }) => {
       // 注文を作成
-      await createOrderViaUI(page);
+      await createOrderViaUI(page, request);
 
       // 管理画面の受注管理タブへ
       await page.getByRole('button', { name: 'トップページに戻る' }).click();
@@ -123,9 +137,9 @@ test.describe('S07: 受注一覧を確認する', () => {
   });
 
   test.describe('受入基準: 受注詳細を確認できる', () => {
-    test('「詳細」ボタンをクリックすると受注詳細が表示される', async ({ page }) => {
+    test('「詳細」ボタンをクリックすると受注詳細が表示される', async ({ page, request }) => {
       const deliveryDate = getDeliveryDate();
-      await createOrderViaUI(page, { destinationName: '田中花子', deliveryDate });
+      await createOrderViaUI(page, request, { destinationName: '田中花子', deliveryDate });
 
       // 管理画面の受注管理タブへ
       await page.getByRole('button', { name: 'トップページに戻る' }).click();

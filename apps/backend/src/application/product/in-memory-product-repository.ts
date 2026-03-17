@@ -6,6 +6,11 @@ export class InMemoryProductRepository implements ProductRepository {
   private readonly products: Map<number, Product> = new Map();
   private nextId = 1;
 
+  clear(): void {
+    this.products.clear();
+    this.nextId = 1;
+  }
+
   async findById(id: ProductId): Promise<Product | null> {
     return this.products.get(id.value) ?? null;
   }

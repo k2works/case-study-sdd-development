@@ -9,6 +9,8 @@ import { InMemoryItemRepository } from './application/item/in-memory-item-reposi
 import { InMemoryProductRepository } from './application/product/in-memory-product-repository.js';
 import { InMemoryOrderRepository } from './application/order/in-memory-order-repository.js';
 import { InMemoryStockLotRepository } from './application/stock/in-memory-stock-lot-repository.js';
+import { StockLot } from './domain/stock/stock-lot.js';
+import { ItemId, Quantity } from './domain/shared/value-objects.js';
 
 const app = express();
 
@@ -30,6 +32,44 @@ const orderRepository = new InMemoryOrderRepository();
 const stockLotRepository = new InMemoryStockLotRepository();
 const orderUseCase = new OrderUseCase(orderRepository, productRepository, stockLotRepository);
 app.use('/api', createOrderRoutes(orderUseCase));
+
+app.post('/api/test/reset', (_req, res) => {
+  itemRepository.clear();
+  productRepository.clear();
+  orderRepository.clear();
+  stockLotRepository.clear();
+  res.status(204).send();
+});
+
+app.post('/api/test/stock-lots', async (req, res) => {
+  const itemId = Number(req.body.itemId);
+  const quantity = Number(req.body.quantity ?? 100);
+
+  if (!Number.isInteger(itemId) || itemId <= 0) {
+    res.status(400).json({ error: 'itemId は正の整数で指定してください' });
+    return;
+  }
+
+  if (!Number.isInteger(quantity) || quantity <= 0) {
+    res.status(400).json({ error: 'quantity は正の整数で指定してください' });
+    return;
+  }
+
+  const lot = await stockLotRepository.save(
+    StockLot.createNew({
+      itemId: new ItemId(itemId),
+      quantity: new Quantity(quantity),
+      arrivalDate: new Date('2026-03-15'),
+      expiryDate: new Date('2026-03-30'),
+    }),
+  );
+
+  res.status(201).json({
+    id: lot.stockId?.value ?? null,
+    itemId: lot.itemId.value,
+    quantity: lot.quantity.value,
+  });
+});
 
 const PORT = process.env.PORT || 8080;
 

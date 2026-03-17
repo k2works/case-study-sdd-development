@@ -65,11 +65,12 @@ describe('StockLot', () => {
   it('ロットを分割できる', () => {
     const lot = createStockLot({ quantity: new Quantity(50) });
     const [allocated, remaining] = lot.split(new Quantity(20));
+    expect(remaining).not.toBeNull();
 
     expect(allocated.quantity.value).toBe(20);
-    expect(remaining.quantity.value).toBe(30);
+    expect(remaining!.quantity.value).toBe(30);
     expect(allocated.stockId).toBeNull();
-    expect(remaining.stockId).toBeNull();
+    expect(remaining!.stockId).toBeNull();
   });
 
   it('全量と同じ数量で分割すると残りがない', () => {

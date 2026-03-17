@@ -1,10 +1,10 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type APIRequestContext } from '@playwright/test';
 
 /**
  * 商品と単品を画面操作で事前登録するヘルパー
  * InMemory リポジトリのため各テストでデータ投入が必要
  */
-async function setupProductViaUI(page: Page) {
+async function setupProductViaUI(page: Page, request: APIRequestContext) {
   await page.goto('/');
   await page.getByRole('button', { name: '管理画面' }).click();
 
@@ -19,7 +19,16 @@ async function setupProductViaUI(page: Page) {
   await page.getByLabel('発注リードタイム').fill('2');
   await page.getByLabel('仕入先ID').fill('1');
   await page.getByRole('button', { name: '保存する' }).click();
-  await expect(page.getByRole('cell', { name: '赤バラ' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: '赤バラ' }).first()).toBeVisible();
+
+  const items = await request.get('http://localhost:8080/api/items').then((response) => response.json());
+  const item = items.find((entry: { id: number; name: string }) => entry.name === '赤バラ');
+  if (!item) {
+    throw new Error('赤バラ の単品 ID を取得できませんでした');
+  }
+  await request.post('http://localhost:8080/api/test/stock-lots', {
+    data: { itemId: item.id, quantity: 100 },
+  });
 
   // 商品を登録
   await page.getByRole('tab', { name: '商品管理' }).click();
@@ -45,9 +54,13 @@ function getDeliveryDate(): string {
 }
 
 test.describe('S01: 花束を注文する', () => {
+  test.beforeEach(async ({ request }) => {
+    await request.post('http://localhost:8080/api/test/reset');
+  });
+
   test.describe('受入基準: 商品一覧から注文画面に遷移できる', () => {
-    test('商品一覧で「注文する」ボタンをクリックすると注文入力画面に遷移する', async ({ page }) => {
-      await setupProductViaUI(page);
+    test('商品一覧で「注文する」ボタンをクリックすると注文入力画面に遷移する', async ({ page, request }) => {
+      await setupProductViaUI(page, request);
 
       await page.getByRole('button', { name: '注文する' }).click();
 
@@ -58,8 +71,8 @@ test.describe('S01: 花束を注文する', () => {
   });
 
   test.describe('受入基準: 注文内容を入力して確認画面に遷移できる', () => {
-    test('届け先情報を入力して確認画面へ進むと入力内容が表示される', async ({ page }) => {
-      await setupProductViaUI(page);
+    test('届け先情報を入力して確認画面へ進むと入力内容が表示される', async ({ page, request }) => {
+      await setupProductViaUI(page, request);
       await page.getByRole('button', { name: '注文する' }).click();
       await expect(page.getByRole('heading', { name: '注文入力' })).toBeVisible();
 
@@ -84,8 +97,8 @@ test.describe('S01: 花束を注文する', () => {
   });
 
   test.describe('受入基準: 注文を確定して完了画面が表示される', () => {
-    test('確認画面で注文を確定すると完了画面に注文番号が表示される', async ({ page }) => {
-      await setupProductViaUI(page);
+    test('確認画面で注文を確定すると完了画面に注文番号が表示される', async ({ page, request }) => {
+      await setupProductViaUI(page, request);
       await page.getByRole('button', { name: '注文する' }).click();
 
       const deliveryDate = getDeliveryDate();
@@ -109,9 +122,9 @@ test.describe('S01: 花束を注文する', () => {
   });
 
   test.describe('受入基準: 注文フロー全体が正常に動作する', () => {
-    test('商品選択から注文完了まで一連のフローが完了する', async ({ page }) => {
+    test('商品選択から注文完了まで一連のフローが完了する', async ({ page, request }) => {
       // 1. 商品を事前登録
-      await setupProductViaUI(page);
+      await setupProductViaUI(page, request);
 
       // 2. 商品一覧から注文画面へ
       await expect(page.getByText('ローズブーケ')).toBeVisible();

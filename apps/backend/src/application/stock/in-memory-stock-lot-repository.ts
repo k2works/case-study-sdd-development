@@ -6,6 +6,11 @@ export class InMemoryStockLotRepository implements StockLotRepository {
   private readonly stockLots: Map<number, StockLot> = new Map();
   private nextId = 1;
 
+  clear(): void {
+    this.stockLots.clear();
+    this.nextId = 1;
+  }
+
   async findById(id: StockId): Promise<StockLot | null> {
     return this.stockLots.get(id.value) ?? null;
   }

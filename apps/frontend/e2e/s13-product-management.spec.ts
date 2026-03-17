@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('S13: 商品（花束）を管理する', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, request }) => {
+    await request.post('http://localhost:8080/api/test/reset');
     await page.goto('/');
     await page.getByRole('button', { name: '管理画面' }).click();
     // 商品管理タブはデフォルトで選択済み
