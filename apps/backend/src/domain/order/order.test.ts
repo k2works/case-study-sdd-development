@@ -93,4 +93,46 @@ describe('Order', () => {
 
     expect(order.status.value).toBe('注文済み');
   });
+
+  describe('不正な状態遷移', () => {
+    it('出荷準備中から prepareShipment() はエラー', () => {
+      const order = createOrder({ status: new OrderStatus('出荷準備中') });
+      expect(() => order.prepareShipment()).toThrow();
+    });
+
+    it('出荷済みから prepareShipment() はエラー', () => {
+      const order = createOrder({ status: new OrderStatus('出荷済み') });
+      expect(() => order.prepareShipment()).toThrow();
+    });
+
+    it('出荷済みから ship() はエラー', () => {
+      const order = createOrder({ status: new OrderStatus('出荷済み') });
+      expect(() => order.ship()).toThrow();
+    });
+
+    it('注文済みから ship() はエラー（出荷準備中を経由しないと出荷できない）', () => {
+      const order = createOrder({ status: new OrderStatus('注文済み') });
+      expect(() => order.ship()).toThrow();
+    });
+
+    it('キャンセルから prepareShipment() はエラー', () => {
+      const order = createOrder({ status: new OrderStatus('キャンセル') });
+      expect(() => order.prepareShipment()).toThrow();
+    });
+
+    it('キャンセルから ship() はエラー', () => {
+      const order = createOrder({ status: new OrderStatus('キャンセル') });
+      expect(() => order.ship()).toThrow();
+    });
+
+    it('キャンセルから cancel() はエラー', () => {
+      const order = createOrder({ status: new OrderStatus('キャンセル') });
+      expect(() => order.cancel()).toThrow();
+    });
+
+    it('出荷準備中から cancel() はエラー', () => {
+      const order = createOrder({ status: new OrderStatus('出荷準備中') });
+      expect(() => order.cancel()).toThrow();
+    });
+  });
 });

@@ -60,8 +60,8 @@ export class Order {
   }
 
   cancel(): Order {
-    if (this.status.value === '出荷済み') {
-      throw new Error('出荷済みの受注はキャンセルできません');
+    if (this.status.value !== '注文済み') {
+      throw new Error('注文済みの受注のみキャンセルできます');
     }
     return new Order({ ...this, status: new OrderStatus('キャンセル') });
   }

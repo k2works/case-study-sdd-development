@@ -114,6 +114,44 @@ describe('OrderUseCase', () => {
 
       await expect(useCase.createOrder(validInput)).rejects.toThrow('在庫が不足しています');
     });
+
+    it('在庫不足時に受注が保存されない', async () => {
+      // 商品を登録（赤バラ3本 + カスミソウ5本）
+      await productRepository.save(
+        new Product({
+          productId: new ProductId(1),
+          name: new ProductName('ローズブーケ'),
+          price: new Price(5500),
+          compositions: [
+            new ProductComposition(new ItemId(1), new Quantity(3)),
+            new ProductComposition(new ItemId(2), new Quantity(5)),
+          ],
+        }),
+      );
+
+      // 赤バラは十分だがカスミソウの在庫がない
+      await stockLotRepository.save(
+        StockLot.createNew({
+          itemId: new ItemId(1),
+          quantity: new Quantity(10),
+          arrivalDate: new Date('2026-03-15'),
+          expiryDate: new Date('2026-04-05'),
+        }),
+      );
+
+      await expect(useCase.createOrder(validInput)).rejects.toThrow('在庫が不足しています');
+
+      // 受注が保存されていないことを確認
+      const orders = await orderRepository.findAll();
+      expect(orders).toHaveLength(0);
+
+      // 在庫が引当されていないことを確認
+      const roseStocks = await stockLotRepository.findByItemIdAndStatus(
+        new ItemId(1),
+        new StockStatus('引当済み'),
+      );
+      expect(roseStocks).toHaveLength(0);
+    });
   });
 
   describe('findById', () => {

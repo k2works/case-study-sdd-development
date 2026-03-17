@@ -17,6 +17,11 @@ import {
   OrderStatusValue,
 } from '../../domain/shared/value-objects.js';
 
+interface AllocationPlan {
+  lot: StockLot;
+  allocateQty: number;
+}
+
 export interface CreateOrderInput {
   customerId: number;
   productId: number;
@@ -41,18 +46,10 @@ export class OrderUseCase {
       throw new Error('商品が見つかりません');
     }
 
-    // 2. 各構成の単品に対して在庫の十分性を検証
-    const activeStatus = new StockStatus('有効');
-    for (const composition of product.compositions) {
-      const lots = await this.stockLotRepository.findByItemIdAndStatus(composition.itemId, activeStatus);
-      const totalAvailable = lots.reduce((sum, lot) => sum + lot.quantity.value, 0);
+    // 2. 在庫チェックと引当ロットの事前準備（まだ保存しない）
+    const allocationPlans = await this.prepareAllocations(product.compositions);
 
-      if (totalAvailable < composition.quantity.value) {
-        throw new Error(`在庫が不足しています（単品ID: ${composition.itemId.value}）`);
-      }
-    }
-
-    // 3. 受注を作成
+    // 3. 受注を作成・保存
     const order = Order.createNew({
       customerId: new CustomerId(input.customerId),
       productId: new ProductId(input.productId),
@@ -68,47 +65,58 @@ export class OrderUseCase {
 
     const savedOrder = await this.orderRepository.save(order);
 
-    // 4. 在庫ロットを引当（split してロット分割）
-    for (const composition of product.compositions) {
-      await this.allocateStock(composition.itemId, composition.quantity, savedOrder.orderId!);
-    }
+    // 4. 引当ロットを一括保存（orderId を確定してから）
+    await this.saveAllocations(allocationPlans, savedOrder.orderId!);
 
     return savedOrder;
   }
 
-  private async allocateStock(itemId: ItemId, requiredQty: Quantity, orderId: OrderId): Promise<void> {
+  private async prepareAllocations(
+    compositions: readonly { itemId: ItemId; quantity: Quantity }[],
+  ): Promise<AllocationPlan[]> {
     const activeStatus = new StockStatus('有効');
-    let remainingQty = requiredQty.value;
-    const lots = await this.stockLotRepository.findByItemIdAndStatus(itemId, activeStatus);
+    const plans: AllocationPlan[] = [];
 
-    for (const lot of lots) {
-      if (remainingQty <= 0) break;
+    for (const composition of compositions) {
+      const lots = await this.stockLotRepository.findByItemIdAndStatus(composition.itemId, activeStatus);
+      const totalAvailable = lots.reduce((sum, lot) => sum + lot.quantity.value, 0);
 
-      const allocateQty = Math.min(lot.quantity.value, remainingQty);
+      if (totalAvailable < composition.quantity.value) {
+        throw new Error(`在庫が不足しています（単品ID: ${composition.itemId.value}）`);
+      }
 
+      let remainingQty = composition.quantity.value;
+      for (const lot of lots) {
+        if (remainingQty <= 0) break;
+
+        const allocateQty = Math.min(lot.quantity.value, remainingQty);
+        plans.push({ lot, allocateQty });
+        remainingQty -= allocateQty;
+      }
+    }
+
+    return plans;
+  }
+
+  private async saveAllocations(plans: AllocationPlan[], orderId: OrderId): Promise<void> {
+    for (const { lot, allocateQty } of plans) {
       if (allocateQty === lot.quantity.value) {
-        // ロット全量を引当: 分割不要、そのまま引当
         const allocated = lot.allocate(orderId);
         await this.stockLotRepository.save(allocated);
       } else {
-        // ロット部分引当: 分割して引当
         const [allocatedPart, remainingPart] = lot.split(new Quantity(allocateQty));
         const allocated = allocatedPart.allocate(orderId);
 
-        // 元のロットを引当済みに上書き（数量を引当分に変更）
         const updatedOriginal = new StockLot({
           ...allocated,
           stockId: lot.stockId,
         });
         await this.stockLotRepository.save(updatedOriginal);
 
-        // 残りロットを新規保存
         if (remainingPart) {
           await this.stockLotRepository.save(remainingPart);
         }
       }
-
-      remainingQty -= allocateQty;
     }
   }
 
@@ -121,5 +129,10 @@ export class OrderUseCase {
       return this.orderRepository.findAll(new OrderStatus(status as OrderStatusValue));
     }
     return this.orderRepository.findAll();
+  }
+
+  async getProductName(productId: ProductId): Promise<string> {
+    const product = await this.productRepository.findById(productId);
+    return product?.name.value ?? '';
   }
 }
