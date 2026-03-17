@@ -7,8 +7,8 @@ vi.stubGlobal('fetch', vi.fn(() =>
 ));
 
 describe('App', () => {
-  it('管理画面のタイトルが表示される', () => {
+  it('タイトルが表示される', () => {
     render(<App />);
-    expect(screen.getByText('フレール・メモワール 管理画面')).toBeInTheDocument();
+    expect(screen.getByText('フレール・メモワール WEB ショップ')).toBeInTheDocument();
   });
 });

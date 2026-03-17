@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ItemManagement } from './pages/staff/ItemManagement'
 import { ProductManagement } from './pages/staff/ProductManagement'
+import { ProductList } from './pages/customer/ProductList'
 import type { ItemDto, CreateItemInput } from './types/item'
 import type { ProductDto, CreateProductInput } from './types/product'
 
@@ -52,16 +53,19 @@ const updateProduct = async (id: number, input: CreateProductInput): Promise<Pro
   return res.json();
 };
 
-type Tab = 'items' | 'products';
+type Tab = 'catalog' | 'items' | 'products';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('items');
+  const [activeTab, setActiveTab] = useState<Tab>('catalog');
 
   return (
     <div>
       <nav>
-        <strong>フレール・メモワール 管理画面</strong>
+        <strong>フレール・メモワール WEB ショップ</strong>
         <div>
+          <button onClick={() => setActiveTab('catalog')} disabled={activeTab === 'catalog'}>
+            花束一覧
+          </button>
           <button onClick={() => setActiveTab('items')} disabled={activeTab === 'items'}>
             単品管理
           </button>
@@ -71,6 +75,12 @@ function App() {
         </div>
       </nav>
       <main>
+        {activeTab === 'catalog' && (
+          <ProductList
+            fetchProducts={fetchProducts}
+            fetchItems={fetchItems}
+          />
+        )}
         {activeTab === 'items' && (
           <ItemManagement
             fetchItems={fetchItems}
