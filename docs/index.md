@@ -20,7 +20,7 @@
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| [要件定義書（RDRA 2.0）](./requirements/requirements_definition.md) | 未着手 |
+| [要件定義書（RDRA 2.0）](./requirements/requirements_definition.md) | 完了 |
 | [ビジネスユースケース](./requirements/business_usecase.md) | 未着手 |
 | [システムユースケース](./requirements/system_usecase.md) | 未着手 |
 | [ユーザーストーリー](./requirements/user_story.md) | 未着手 |
