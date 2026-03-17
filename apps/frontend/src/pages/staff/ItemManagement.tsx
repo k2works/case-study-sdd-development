@@ -1,0 +1,163 @@
+import { useState, useEffect } from 'react';
+import type { ItemDto, CreateItemInput } from '../../types/item';
+
+interface Props {
+  fetchItems: () => Promise<ItemDto[]>;
+  createItem: (input: CreateItemInput) => Promise<ItemDto>;
+  updateItem: (id: number, input: CreateItemInput) => Promise<ItemDto>;
+}
+
+interface FormData {
+  name: string;
+  qualityRetentionDays: number;
+  purchaseUnit: number;
+  leadTimeDays: number;
+  supplierId: number;
+}
+
+const emptyForm: FormData = {
+  name: '',
+  qualityRetentionDays: 0,
+  purchaseUnit: 0,
+  leadTimeDays: 0,
+  supplierId: 0,
+};
+
+export function ItemManagement({ fetchItems, createItem, updateItem }: Props) {
+  const [items, setItems] = useState<ItemDto[]>([]);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState<FormData>(emptyForm);
+
+  useEffect(() => {
+    fetchItems().then(setItems);
+  }, [fetchItems]);
+
+  const handleNew = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setShowForm(true);
+  };
+
+  const handleEdit = (item: ItemDto) => {
+    setEditingId(item.id);
+    setForm({
+      name: item.name,
+      qualityRetentionDays: item.qualityRetentionDays,
+      purchaseUnit: item.purchaseUnit,
+      leadTimeDays: item.leadTimeDays,
+      supplierId: item.supplierId,
+    });
+    setShowForm(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const input: CreateItemInput = {
+      name: form.name,
+      qualityRetentionDays: form.qualityRetentionDays,
+      purchaseUnit: form.purchaseUnit,
+      leadTimeDays: form.leadTimeDays,
+      supplierId: form.supplierId,
+    };
+
+    if (editingId) {
+      await updateItem(editingId, input);
+    } else {
+      await createItem(input);
+    }
+
+    setShowForm(false);
+    setForm(emptyForm);
+    const updated = await fetchItems();
+    setItems(updated);
+  };
+
+  return (
+    <div>
+      <h2>単品管理</h2>
+      <button onClick={handleNew}>新規登録</button>
+
+      <table>
+        <thead>
+          <tr>
+            <th>単品ID</th>
+            <th>単品名</th>
+            <th>品質維持日数</th>
+            <th>購入単位</th>
+            <th>リードタイム</th>
+            <th>仕入先</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item) => (
+            <tr key={item.id}>
+              <td>{item.id}</td>
+              <td>{item.name}</td>
+              <td>{item.qualityRetentionDays}日</td>
+              <td>{item.purchaseUnit}本</td>
+              <td>{item.leadTimeDays}日</td>
+              <td>{item.supplierId}</td>
+              <td>
+                <button onClick={() => handleEdit(item)}>編集</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {showForm && (
+        <form onSubmit={handleSubmit}>
+          <h3>{editingId ? '単品編集' : '単品登録'}</h3>
+          <div>
+            <label htmlFor="item-name">単品名</label>
+            <input
+              id="item-name"
+              type="text"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+          </div>
+          <div>
+            <label htmlFor="item-quality">品質維持可能日数</label>
+            <input
+              id="item-quality"
+              type="number"
+              value={form.qualityRetentionDays}
+              onChange={(e) => setForm({ ...form, qualityRetentionDays: Number(e.target.value) })}
+            />
+          </div>
+          <div>
+            <label htmlFor="item-unit">購入単位</label>
+            <input
+              id="item-unit"
+              type="number"
+              value={form.purchaseUnit}
+              onChange={(e) => setForm({ ...form, purchaseUnit: Number(e.target.value) })}
+            />
+          </div>
+          <div>
+            <label htmlFor="item-lead">発注リードタイム</label>
+            <input
+              id="item-lead"
+              type="number"
+              value={form.leadTimeDays}
+              onChange={(e) => setForm({ ...form, leadTimeDays: Number(e.target.value) })}
+            />
+          </div>
+          <div>
+            <label htmlFor="item-supplier">仕入先ID</label>
+            <input
+              id="item-supplier"
+              type="number"
+              value={form.supplierId}
+              onChange={(e) => setForm({ ...form, supplierId: Number(e.target.value) })}
+            />
+          </div>
+          <button type="submit">保存する</button>
+        </form>
+      )}
+    </div>
+  );
+}
