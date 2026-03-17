@@ -7,7 +7,7 @@ interface Props {
   fetchItems: () => Promise<ItemDto[]>;
 }
 
-export function ProductList({ fetchProducts, fetchItems }: Props) {
+export function ProductList({ fetchProducts, fetchItems }: Readonly<Props>) {
   const [products, setProducts] = useState<ProductDto[]>([]);
   const [items, setItems] = useState<ItemDto[]>([]);
 

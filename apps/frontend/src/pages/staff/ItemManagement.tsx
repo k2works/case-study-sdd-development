@@ -23,7 +23,7 @@ const emptyForm: FormData = {
   supplierId: 0,
 };
 
-export function ItemManagement({ fetchItems, createItem, updateItem }: Props) {
+export function ItemManagement({ fetchItems, createItem, updateItem }: Readonly<Props>) {
   const [items, setItems] = useState<ItemDto[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -51,7 +51,7 @@ export function ItemManagement({ fetchItems, createItem, updateItem }: Props) {
     setShowForm(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const input: CreateItemInput = {
       name: form.name,

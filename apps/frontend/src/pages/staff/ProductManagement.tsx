@@ -17,7 +17,7 @@ interface FormData {
 
 const emptyForm: FormData = { name: '', price: 0, compositions: [] };
 
-export function ProductManagement({ fetchProducts, createProduct, updateProduct, fetchItems }: Props) {
+export function ProductManagement({ fetchProducts, createProduct, updateProduct, fetchItems }: Readonly<Props>) {
   const [products, setProducts] = useState<ProductDto[]>([]);
   const [items, setItems] = useState<ItemDto[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -72,7 +72,7 @@ export function ProductManagement({ fetchProducts, createProduct, updateProduct,
     setForm({ ...form, compositions: updated });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const input: CreateProductInput = {
       name: form.name,
@@ -157,7 +157,7 @@ export function ProductManagement({ fetchProducts, createProduct, updateProduct,
           <div className="form-group">
             <h4>商品構成</h4>
             {form.compositions.map((comp, index) => (
-              <div key={index} className="composition-row">
+              <div key={`comp-${comp.itemId}-${index}`} className="composition-row">
                 <select
                   className="form-select"
                   value={comp.itemId}
