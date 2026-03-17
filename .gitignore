@@ -20,6 +20,9 @@ Thumbs.db
 dist/
 build/
 
+# Coverage
+coverage/
+
 # Prisma
 apps/backend/src/generated/
 
@@ -37,3 +40,6 @@ npm-debug.log*
 
 tmp
 .agents
+
+# Claude
+.claude/agent-memory/
