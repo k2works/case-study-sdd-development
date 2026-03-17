@@ -8,9 +8,9 @@ export default defineConfig({
     fileParallelism: false,
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'html'],
+      reporter: ['text', 'html', 'lcov'],
       include: ['src/**/*.ts'],
-      exclude: ['src/**/*.test.ts', 'src/generated/**', 'src/index.ts'],
+      exclude: ['src/**/*.test.ts', 'src/generated/**', 'src/index.ts', 'src/test-server.ts'],
     },
   },
 });
