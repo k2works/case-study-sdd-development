@@ -32,3 +32,32 @@ export class SupplierId {
     if (value <= 0) throw new Error('SupplierId は正の整数でなければなりません');
   }
 }
+
+export class ProductId {
+  constructor(public readonly value: number) {
+    if (value <= 0) throw new Error('ProductId は正の整数でなければなりません');
+  }
+
+  equals(other: ProductId): boolean {
+    return this.value === other.value;
+  }
+}
+
+export class ProductName {
+  constructor(public readonly value: string) {
+    if (value.length === 0) throw new Error('ProductName は空にできません');
+    if (value.length > 100) throw new Error('ProductName は100文字以内でなければなりません');
+  }
+}
+
+export class Price {
+  constructor(public readonly value: number) {
+    if (value <= 0) throw new Error('Price は正の整数でなければなりません');
+  }
+}
+
+export class Quantity {
+  constructor(public readonly value: number) {
+    if (value <= 0) throw new Error('Quantity は正の整数でなければなりません');
+  }
+}

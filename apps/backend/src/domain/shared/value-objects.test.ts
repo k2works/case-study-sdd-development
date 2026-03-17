@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ItemId, ItemName, Days, PurchaseUnit, SupplierId } from './value-objects.js';
+import { ItemId, ItemName, Days, PurchaseUnit, SupplierId, ProductId, ProductName, Price, Quantity } from './value-objects.js';
 
 describe('ItemId', () => {
   it('正の整数で生成できる', () => {
@@ -69,5 +69,50 @@ describe('SupplierId', () => {
 
   it('0以下の値はエラー', () => {
     expect(() => new SupplierId(0)).toThrow();
+  });
+});
+
+describe('ProductId', () => {
+  it('正の整数で生成できる', () => {
+    expect(new ProductId(1).value).toBe(1);
+  });
+
+  it('0以下の値はエラー', () => {
+    expect(() => new ProductId(0)).toThrow();
+  });
+});
+
+describe('ProductName', () => {
+  it('空でない文字列で生成できる', () => {
+    expect(new ProductName('ローズブーケ').value).toBe('ローズブーケ');
+  });
+
+  it('空文字列はエラー', () => {
+    expect(() => new ProductName('')).toThrow();
+  });
+
+  it('100文字を超える文字列はエラー', () => {
+    expect(() => new ProductName('あ'.repeat(101))).toThrow();
+  });
+});
+
+describe('Price', () => {
+  it('正の整数で生成できる', () => {
+    expect(new Price(5500).value).toBe(5500);
+  });
+
+  it('0以下の値はエラー', () => {
+    expect(() => new Price(0)).toThrow();
+    expect(() => new Price(-100)).toThrow();
+  });
+});
+
+describe('Quantity', () => {
+  it('正の整数で生成できる', () => {
+    expect(new Quantity(3).value).toBe(3);
+  });
+
+  it('0以下の値はエラー', () => {
+    expect(() => new Quantity(0)).toThrow();
   });
 });
