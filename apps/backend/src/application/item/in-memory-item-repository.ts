@@ -3,7 +3,7 @@ import { ItemRepository } from '../../domain/item/item-repository.js';
 import { ItemId } from '../../domain/shared/value-objects.js';
 
 export class InMemoryItemRepository implements ItemRepository {
-  private items: Map<number, Item> = new Map();
+  private readonly items: Map<number, Item> = new Map();
   private nextId = 1;
 
   async findById(id: ItemId): Promise<Item | null> {
