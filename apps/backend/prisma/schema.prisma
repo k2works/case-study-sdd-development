@@ -33,6 +33,7 @@ model Item {
 
   supplier     Supplier             @relation(fields: [supplierId], references: [supplierId])
   compositions ProductComposition[]
+  stocks       Stock[]
 
   @@map("items")
 }
@@ -47,6 +48,7 @@ model Product {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   compositions ProductComposition[]
+  orders       Order[]
 
   @@map("products")
 }
@@ -62,4 +64,44 @@ model ProductComposition {
 
   @@id([productId, itemId])
   @@map("product_compositions")
+}
+
+// 受注
+model Order {
+  orderId            Int      @id @default(autoincrement()) @map("order_id")
+  customerId         Int      @map("customer_id")
+  productId          Int      @map("product_id")
+  price              Int
+  destinationName    String   @map("destination_name") @db.VarChar(100)
+  destinationAddress String   @map("destination_address") @db.VarChar(255)
+  destinationPhone   String   @map("destination_phone") @db.VarChar(20)
+  deliveryDate       DateTime @map("delivery_date") @db.Date
+  shippingDate       DateTime @map("shipping_date") @db.Date
+  message            String?  @db.VarChar(500)
+  status             String   @db.VarChar(20)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [productId])
+  stocks  Stock[]
+
+  @@map("orders")
+}
+
+// 在庫ロット
+model Stock {
+  stockId     Int      @id @default(autoincrement()) @map("stock_id")
+  itemId      Int      @map("item_id")
+  quantity    Int
+  arrivalDate DateTime @map("arrival_date") @db.Date
+  expiryDate  DateTime @map("expiry_date") @db.Date
+  status      String   @db.VarChar(20)
+  orderId     Int?     @map("order_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  item  Item   @relation(fields: [itemId], references: [itemId])
+  order Order? @relation(fields: [orderId], references: [orderId])
+
+  @@map("stocks")
 }
