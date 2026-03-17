@@ -51,7 +51,7 @@ export function ItemManagement({ fetchItems, createItem, updateItem }: Readonly<
     setShowForm(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const input: CreateItemInput = {
       name: form.name,

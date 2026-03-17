@@ -1,6 +1,6 @@
 import { StockLot } from '../../domain/stock/stock-lot.js';
 import { StockLotRepository } from '../../domain/stock/stock-lot-repository.js';
-import { StockId, ItemId, StockStatus, Quantity } from '../../domain/shared/value-objects.js';
+import { StockId, ItemId, StockStatus } from '../../domain/shared/value-objects.js';
 
 export class InMemoryStockLotRepository implements StockLotRepository {
   private readonly stockLots: Map<number, StockLot> = new Map();

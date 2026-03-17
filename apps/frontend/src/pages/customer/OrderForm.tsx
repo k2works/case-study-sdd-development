@@ -33,7 +33,7 @@ export function OrderForm({ product, onBack, onConfirm }: Readonly<Props>) {
   const [destinationPhone, setDestinationPhone] = useState('');
   const [message, setMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     onConfirm({
       deliveryDate,

@@ -72,7 +72,7 @@ export function ProductManagement({ fetchProducts, createProduct, updateProduct,
     setForm({ ...form, compositions: updated });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const input: CreateProductInput = {
       name: form.name,
