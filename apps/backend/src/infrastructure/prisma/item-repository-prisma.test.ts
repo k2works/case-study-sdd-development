@@ -20,6 +20,17 @@ describe('PrismaItemRepository（統合テスト）', () => {
     repository = new PrismaItemRepository(prisma);
     await prisma.productComposition.deleteMany();
     await prisma.item.deleteMany();
+    // テスト用仕入先を作成（外部キー制約を満たすため）
+    await prisma.supplier.upsert({
+      where: { supplierId: 1 },
+      update: {},
+      create: { supplierId: 1, name: 'テスト仕入先A', phone: '03-1234-5678' },
+    });
+    await prisma.supplier.upsert({
+      where: { supplierId: 2 },
+      update: {},
+      create: { supplierId: 2, name: 'テスト仕入先B', phone: '03-9876-5432' },
+    });
   });
 
   it('単品を保存して取得できる', async () => {

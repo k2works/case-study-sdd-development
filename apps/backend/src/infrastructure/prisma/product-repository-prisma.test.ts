@@ -21,6 +21,12 @@ describe('PrismaProductRepository（統合テスト）', () => {
     await prisma.productComposition.deleteMany();
     await prisma.product.deleteMany();
     await prisma.item.deleteMany();
+    // テスト用仕入先を作成（外部キー制約を満たすため）
+    await prisma.supplier.upsert({
+      where: { supplierId: 1 },
+      update: {},
+      create: { supplierId: 1, name: 'テスト仕入先A', phone: '03-1234-5678' },
+    });
     // テスト用単品を作成（upsert で冪等に）
     await prisma.item.upsert({
       where: { itemId: 1 },
