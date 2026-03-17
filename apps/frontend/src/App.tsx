@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { ItemManagement } from './pages/staff/ItemManagement'
 import { ProductManagement } from './pages/staff/ProductManagement'
 import { ProductList } from './pages/customer/ProductList'
@@ -6,11 +7,16 @@ import { OrderConfirm } from './pages/customer/OrderConfirm'
 import { OrderComplete } from './pages/customer/OrderComplete'
 import { OrderList } from './pages/staff/OrderList'
 import { OrderDetail } from './pages/staff/OrderDetail'
+import { StockForecast } from './pages/staff/StockForecast'
+import { PurchaseOrderForm } from './pages/staff/PurchaseOrderForm'
 import { fetchItems, createItem, updateItem } from './api/items'
 import { fetchProducts, createProduct, updateProduct } from './api/products'
 import { fetchOrders, fetchOrder, createOrder } from './api/orders'
+import { fetchStockForecast } from './api/stock-forecast'
+import { createPurchaseOrder } from './api/purchase-orders'
 import { useNavigation } from './hooks/useNavigation'
 import { useOrderFlow } from './hooks/useOrderFlow'
+import type { ItemDto } from './types/item'
 
 function App() {
   const {
@@ -37,6 +43,20 @@ function App() {
     handleBackToForm,
     resetOrderFlow,
   } = useOrderFlow({ createOrder, setCustomerPage });
+
+  const [purchaseOrderItem, setPurchaseOrderItem] = useState<ItemDto | null>(null);
+
+  const handlePurchaseOrder = (item: ItemDto) => {
+    setPurchaseOrderItem(item);
+  };
+
+  const handlePurchaseOrderBack = () => {
+    setPurchaseOrderItem(null);
+  };
+
+  const handlePurchaseOrderComplete = () => {
+    setPurchaseOrderItem(null);
+  };
 
   const handleViewChangeWithReset = (newView: 'customer' | 'staff') => {
     handleViewChange(newView);
@@ -135,6 +155,16 @@ function App() {
           >
             受注管理
           </button>
+          <button
+            className={`staff-tab${staffTab === 'stock-forecast' ? ' staff-tab--active' : ''}`}
+            role="tab"
+            aria-selected={staffTab === 'stock-forecast'}
+            aria-controls="panel-stock-forecast"
+            onClick={() => { setStaffTab('stock-forecast'); setPurchaseOrderItem(null); }}
+            disabled={staffTab === 'stock-forecast'}
+          >
+            在庫推移
+          </button>
         </div>
         <div role="tabpanel" id={`panel-${staffTab}`}>
           {staffTab === 'products' && (
@@ -157,6 +187,22 @@ function App() {
               fetchOrders={fetchOrders}
               onDetail={handleOrderDetail}
             />
+          )}
+          {staffTab === 'stock-forecast' && (
+            purchaseOrderItem ? (
+              <PurchaseOrderForm
+                item={purchaseOrderItem}
+                createPurchaseOrder={createPurchaseOrder}
+                onBack={handlePurchaseOrderBack}
+                onComplete={handlePurchaseOrderComplete}
+              />
+            ) : (
+              <StockForecast
+                fetchItems={fetchItems}
+                fetchForecast={fetchStockForecast}
+                onPurchaseOrder={handlePurchaseOrder}
+              />
+            )
           )}
         </div>
       </>
