@@ -117,17 +117,17 @@
 gantt
     title 計画スケジュール
     dateFormat  YYYY-MM-DD
-    section Phase 1 (MVP)
-    IT1: 環境構築+マスタ管理  :crit, p1-1, 2026-03-24, 7d
-    IT2: 受注+在庫推移        :crit, p1-2, after p1-1, 7d
+    section Phase 1 MVP
+    IT1 環境構築とマスタ管理  :crit, p1-1, 2026-03-24, 7d
+    IT2 受注と在庫推移        :crit, p1-2, after p1-1, 7d
     Release 1.0 MVP           :milestone, m1, after p1-2, 0d
     section Phase 2
-    IT3: 仕入+入荷+出荷       :crit, p2-1, after p1-2, 7d
-    IT4: 得意先+届け先コピー  :crit, p2-2, after p2-1, 7d
+    IT3 仕入と入荷と出荷      :crit, p2-1, after p1-2, 7d
+    IT4 得意先と届け先コピー  :crit, p2-2, after p2-1, 7d
     Release 1.1               :milestone, m2, after p2-2, 0d
     section Phase 3
-    IT5: 届け日変更           :crit, p3-1, after p2-2, 7d
-    IT6: キャンセル+バッファ  :crit, p3-2, after p3-1, 7d
+    IT5 届け日変更            :crit, p3-1, after p2-2, 7d
+    IT6 キャンセルとバッファ  :crit, p3-2, after p3-1, 7d
     Release 1.2               :milestone, m3, after p3-2, 0d
 ```
 
