@@ -45,12 +45,13 @@
 | ドキュメント | 状態 |
 | :--- | :--- |
 | [リリース計画](./development/release_plan.md) | 完了 |
+| [イテレーション 1 計画](./development/iteration_plan-1.md) | 完了 |
 
 ### 運用 (`operation/`)
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| [アプリケーション開発環境セットアップ手順書](./operation/dev_app_instruction.md) | 未着手 |
+| [アプリケーション開発環境セットアップ手順書](./operation/dev_app_instruction.md) | 完了 |
 
 ### ADR (`adr/`)
 
