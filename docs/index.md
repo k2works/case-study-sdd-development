@@ -38,7 +38,7 @@
 | [テスト戦略](./design/test_strategy.md) | 完了 |
 | [非機能要件](./design/non_functional.md) | 完了 |
 | [運用要件](./design/operation.md) | 完了 |
-| [技術スタック選定](./design/tech_stack.md) | 未着手 |
+| [技術スタック選定](./design/tech_stack.md) | 完了 |
 
 ### 開発 (`development/`)
 
