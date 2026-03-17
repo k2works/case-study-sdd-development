@@ -10,12 +10,16 @@ interface Props {
 
 export function OrderConfirm({ product, formData, onBack, onSubmit }: Readonly<Props>) {
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     setSubmitting(true);
+    setError(null);
     try {
       await onSubmit();
-    } catch {
+    } catch (e) {
+      const message = e instanceof Error ? e.message : '注文の送信に失敗しました。もう一度お試しください。';
+      setError(message);
       setSubmitting(false);
     }
   };
@@ -49,6 +53,12 @@ export function OrderConfirm({ product, formData, onBack, onSubmit }: Readonly<P
           <dd>{formData.message}</dd>
         </dl>
       </div>
+
+      {error && (
+        <div className="error-message" role="alert">
+          {error}
+        </div>
+      )}
 
       <div className="form-actions">
         <button className="btn" type="button" onClick={onBack}>修正する</button>

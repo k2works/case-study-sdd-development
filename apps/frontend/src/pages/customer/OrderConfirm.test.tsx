@@ -121,4 +121,63 @@ describe('OrderConfirm', () => {
       expect(screen.getByRole('button', { name: '送信中...' })).toBeDisabled();
     });
   });
+
+  it('API が失敗した場合にエラーメッセージが表示される', async () => {
+    mockOnSubmit.mockRejectedValue(new Error('注文の送信に失敗しました。もう一度お試しください。'));
+
+    render(
+      <OrderConfirm
+        product={mockProduct}
+        formData={mockFormData}
+        onBack={mockOnBack}
+        onSubmit={mockOnSubmit}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: '注文を確定する' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        '注文の送信に失敗しました。もう一度お試しください。',
+      );
+    });
+  });
+
+  it('API が失敗した場合にボタンが再度クリック可能になる', async () => {
+    mockOnSubmit.mockRejectedValue(new Error('エラー'));
+
+    render(
+      <OrderConfirm
+        product={mockProduct}
+        formData={mockFormData}
+        onBack={mockOnBack}
+        onSubmit={mockOnSubmit}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: '注文を確定する' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '注文を確定する' })).toBeEnabled();
+    });
+  });
+
+  it('在庫不足エラーの場合にバックエンドのメッセージが表示される', async () => {
+    mockOnSubmit.mockRejectedValue(new Error('在庫が不足しています'));
+
+    render(
+      <OrderConfirm
+        product={mockProduct}
+        formData={mockFormData}
+        onBack={mockOnBack}
+        onSubmit={mockOnSubmit}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: '注文を確定する' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('在庫が不足しています');
+    });
+  });
 });
