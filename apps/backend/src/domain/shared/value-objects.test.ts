@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ItemId, ItemName, Days, PurchaseUnit, SupplierId, ProductId, ProductName, Price, Quantity } from './value-objects.js';
+import { ItemId, ItemName, Days, PurchaseUnit, SupplierId, ProductId, ProductName, Price, Quantity, OrderId, CustomerId, DeliveryDate, ShippingDate, OrderStatus, Message, StockId, StockStatus } from './value-objects.js';
 
 describe('ItemId', () => {
   it('正の整数で生成できる', () => {
@@ -114,5 +114,107 @@ describe('Quantity', () => {
 
   it('0以下の値はエラー', () => {
     expect(() => new Quantity(0)).toThrow();
+  });
+});
+
+describe('OrderId', () => {
+  it('正の整数で生成できる', () => {
+    expect(new OrderId(1).value).toBe(1);
+  });
+
+  it('0以下の値はエラー', () => {
+    expect(() => new OrderId(0)).toThrow();
+    expect(() => new OrderId(-1)).toThrow();
+  });
+
+  it('同じ値を持つ OrderId は等しい', () => {
+    expect(new OrderId(1).equals(new OrderId(1))).toBe(true);
+    expect(new OrderId(1).equals(new OrderId(2))).toBe(false);
+  });
+});
+
+describe('CustomerId', () => {
+  it('正の整数で生成できる', () => {
+    expect(new CustomerId(1).value).toBe(1);
+  });
+
+  it('0以下の値はエラー', () => {
+    expect(() => new CustomerId(0)).toThrow();
+  });
+});
+
+describe('DeliveryDate', () => {
+  it('日付で生成できる', () => {
+    const date = new Date('2026-04-01');
+    expect(new DeliveryDate(date).value).toEqual(date);
+  });
+});
+
+describe('ShippingDate', () => {
+  it('配送日の前日で生成できる', () => {
+    const deliveryDate = new DeliveryDate(new Date('2026-04-01'));
+    const shippingDate = ShippingDate.fromDeliveryDate(deliveryDate);
+    expect(shippingDate.value).toEqual(new Date('2026-03-31'));
+  });
+});
+
+describe('OrderStatus', () => {
+  it('有効なステータスで生成できる', () => {
+    expect(new OrderStatus('注文済み').value).toBe('注文済み');
+    expect(new OrderStatus('出荷準備中').value).toBe('出荷準備中');
+    expect(new OrderStatus('出荷済み').value).toBe('出荷済み');
+    expect(new OrderStatus('キャンセル').value).toBe('キャンセル');
+  });
+
+  it('無効なステータスはエラー', () => {
+    expect(() => new OrderStatus('不明' as never)).toThrow();
+  });
+});
+
+describe('Message', () => {
+  it('空文字列で生成できる', () => {
+    expect(new Message('').value).toBe('');
+  });
+
+  it('500文字以内で生成できる', () => {
+    const msg = 'あ'.repeat(500);
+    expect(new Message(msg).value).toBe(msg);
+  });
+
+  it('500文字を超えるとエラー', () => {
+    expect(() => new Message('あ'.repeat(501))).toThrow();
+  });
+
+  it('null/undefined は空文字列として扱う', () => {
+    expect(new Message(null as unknown as string).value).toBe('');
+    expect(new Message(undefined as unknown as string).value).toBe('');
+  });
+});
+
+describe('StockId', () => {
+  it('正の整数で生成できる', () => {
+    expect(new StockId(1).value).toBe(1);
+  });
+
+  it('0以下の値はエラー', () => {
+    expect(() => new StockId(0)).toThrow();
+  });
+
+  it('同じ値を持つ StockId は等しい', () => {
+    expect(new StockId(1).equals(new StockId(1))).toBe(true);
+    expect(new StockId(1).equals(new StockId(2))).toBe(false);
+  });
+});
+
+describe('StockStatus', () => {
+  it('有効なステータスで生成できる', () => {
+    expect(new StockStatus('有効').value).toBe('有効');
+    expect(new StockStatus('引当済み').value).toBe('引当済み');
+    expect(new StockStatus('消費済み').value).toBe('消費済み');
+    expect(new StockStatus('期限切れ').value).toBe('期限切れ');
+  });
+
+  it('無効なステータスはエラー', () => {
+    expect(() => new StockStatus('不明' as never)).toThrow();
   });
 });
