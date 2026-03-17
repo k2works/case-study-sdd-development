@@ -15,6 +15,12 @@ export class InMemoryStockLotRepository implements StockLotRepository {
     return this.stockLots.get(id.value) ?? null;
   }
 
+  async findByItemId(itemId: ItemId): Promise<StockLot[]> {
+    return Array.from(this.stockLots.values()).filter(
+      (lot) => lot.itemId.value === itemId.value,
+    );
+  }
+
   async findByItemIdAndStatus(itemId: ItemId, status: StockStatus): Promise<StockLot[]> {
     return Array.from(this.stockLots.values()).filter(
       (lot) => lot.itemId.value === itemId.value && lot.status.value === status.value,
