@@ -51,6 +51,7 @@ package "商品集約" as agg_product #E3F2FD {
   class 商品 <<集約ルート>> {
     - productId: ProductId
     - name: ProductName
+    - price: Price
     + addComposition(item, quantity)
     + getCompositions()
   }
@@ -77,6 +78,7 @@ package "受注集約" as agg_order #FFE0E0 {
     - orderId: OrderId
     - customerId: CustomerId
     - productId: ProductId
+    - price: Price
     - destination: 届け先スナップショット
     - deliveryDate: DeliveryDate
     - shippingDate: ShippingDate
@@ -108,8 +110,9 @@ package "在庫集約" as agg_stock #F3E5F5 {
     - quantity: Quantity
     - arrivalDate: Date
     - expiryDate: Date
+    - orderId: OrderId | null
     - status: StockStatus
-    + allocate()
+    + allocate(orderId: OrderId)
     + consume()
     + markAsExpired()
   }
@@ -149,6 +152,7 @@ package "在庫集約" as agg_stock #F3E5F5 {
 | Quantity | value: int | > 0 |
 | PurchaseUnit | value: int | > 0 |
 | Days | value: int | >= 0 |
+| Price | value: int | > 0（税込価格、円） |
 | OrderStatus | value: enum | 注文済み/出荷準備中/出荷済み/キャンセル |
 | PurchaseOrderStatus | value: enum | 発注済み/入荷済み |
 | StockStatus | value: enum | 有効/引当済み/消費済み/廃棄対象 |

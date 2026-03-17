@@ -150,5 +150,43 @@ outport <|-- db_adapter
 | 入荷 | POST | /api/arrivals | UC07 |
 | 出荷 | GET | /api/shipments?date={date} | UC08 |
 | 出荷 | POST | /api/shipments | UC09 |
+| 注文履歴 | GET | /api/customers/{id}/orders | UC01 |
+| 注文キャンセル | PUT | /api/orders/{id}/cancel | UC01 |
 | 得意先 | GET | /api/customers | - |
 | 得意先 | POST | /api/customers | - |
+
+## 認証・認可
+
+### 認証方式
+
+| 項目 | 方針 |
+| :--- | :--- |
+| 方式 | セッションベース認証 |
+| セッションストア | データベース（PostgreSQL） |
+| セッション有効期限 | 24 時間 |
+
+### ロール
+
+| ロール | 対象 | アクセス可能画面 |
+| :--- | :--- | :--- |
+| customer | 得意先 | 商品一覧、注文画面、注文確認、注文完了、注文履歴 |
+| staff | スタッフ | 受注一覧、在庫推移、発注、入荷登録、出荷一覧、商品管理、単品管理 |
+
+### API アクセス制御
+
+| エンドポイント | customer | staff |
+| :--- | :--- | :--- |
+| GET /api/products | ○ | ○ |
+| POST /api/orders | ○ | - |
+| GET /api/orders | - | ○ |
+| GET /api/customers/{id}/orders | ○ | ○ |
+| PUT /api/orders/{id}/delivery-date | - | ○ |
+| PUT /api/orders/{id}/cancel | ○ | ○ |
+| GET /api/customers/{id}/destinations | ○ | - |
+| GET /api/stock/forecast | - | ○ |
+| POST /api/purchase-orders | - | ○ |
+| POST /api/arrivals | - | ○ |
+| GET /api/shipments | - | ○ |
+| POST /api/shipments | - | ○ |
+| POST,PUT /api/products | - | ○ |
+| POST,PUT /api/items | - | ○ |

@@ -19,7 +19,7 @@ entity "在庫" as stock
 
 customer "1" -- "0..*" destination : 届け先を持つ
 customer "1" -- "0..*" order : 注文する
-order "1" -- "1" destination : 届け先を指定する
+order "1" -- "1" destination : 届け先を\nスナップショットする
 order "0..*" -- "1" product : 商品を含む
 product "1" -- "1..*" composition : 構成される
 composition "0..*" -- "1" item : 単品を使用する
@@ -68,7 +68,10 @@ entity "受注 (orders)" as orders {
   --
   * customer_id : INTEGER <<FK>>
   * product_id : INTEGER <<FK>>
-  * destination_id : INTEGER <<FK>>
+  * price : INTEGER
+  * destination_name : VARCHAR(100)
+  * destination_address : VARCHAR(255)
+  * destination_phone : VARCHAR(20)
   * delivery_date : DATE
   * shipping_date : DATE
   message : VARCHAR(500)
@@ -81,6 +84,7 @@ entity "商品 (products)" as products {
   * product_id : SERIAL <<PK>>
   --
   * name : VARCHAR(100)
+  * price : INTEGER
   description : TEXT
   created_at : TIMESTAMP
   updated_at : TIMESTAMP
@@ -145,6 +149,7 @@ entity "在庫 (stocks)" as stocks {
   * arrival_date : DATE
   * expiry_date : DATE
   * status : VARCHAR(20)
+  order_id : INTEGER <<FK>>
   created_at : TIMESTAMP
   updated_at : TIMESTAMP
 }
@@ -152,7 +157,6 @@ entity "在庫 (stocks)" as stocks {
 customers "1" -- "0..*" destinations
 customers "1" -- "0..*" orders
 orders "0..*" -- "1" products
-orders "0..*" -- "1" destinations
 products "1" -- "0..*" compositions
 compositions "0..*" -- "1" items
 items "0..*" -- "1" suppliers
@@ -161,6 +165,7 @@ purchase_orders "0..*" -- "1" suppliers
 purchase_orders "1" -- "0..1" arrivals
 items "1" -- "0..*" arrivals
 items "1" -- "0..*" stocks
+stocks "0..*" -- "0..1" orders
 
 @enduml
 ```
@@ -197,7 +202,10 @@ items "1" -- "0..*" stocks
 | order_id | SERIAL | PK | 受注 ID |
 | customer_id | INTEGER | FK → customers, NOT NULL | 得意先 ID |
 | product_id | INTEGER | FK → products, NOT NULL | 商品 ID |
-| destination_id | INTEGER | FK → destinations, NOT NULL | 届け先 ID |
+| price | INTEGER | NOT NULL | 注文時点の価格（税込、円） |
+| destination_name | VARCHAR(100) | NOT NULL | 届け先名（スナップショット） |
+| destination_address | VARCHAR(255) | NOT NULL | 届け先住所（スナップショット） |
+| destination_phone | VARCHAR(20) | NOT NULL | 届け先電話（スナップショット） |
 | delivery_date | DATE | NOT NULL | 届け日 |
 | shipping_date | DATE | NOT NULL | 出荷日（= 届け日の前日） |
 | message | VARCHAR(500) | | お届けメッセージ |
@@ -207,6 +215,8 @@ items "1" -- "0..*" stocks
 
 **ビジネスルール**: `shipping_date = delivery_date - 1 day`
 
+**ビジネスルール**: 注文時点の届け先情報をスナップショットとして保存
+
 **status 値**: 注文済み / 出荷準備中 / 出荷済み / キャンセル
 
 ### 商品 (products)
@@ -215,6 +225,7 @@ items "1" -- "0..*" stocks
 | :--- | :--- | :--- | :--- |
 | product_id | SERIAL | PK | 商品 ID |
 | name | VARCHAR(100) | NOT NULL | 商品名（花束名） |
+| price | INTEGER | NOT NULL | 税込価格（円） |
 | description | TEXT | | 商品説明 |
 | created_at | TIMESTAMP | DEFAULT NOW() | 作成日時 |
 | updated_at | TIMESTAMP | DEFAULT NOW() | 更新日時 |
@@ -289,6 +300,7 @@ items "1" -- "0..*" stocks
 | arrival_date | DATE | NOT NULL | 入荷日（品質維持期限の起算日） |
 | expiry_date | DATE | NOT NULL | 品質維持期限日 |
 | status | VARCHAR(20) | NOT NULL, DEFAULT '有効' | 在庫状態 |
+| order_id | INTEGER | FK → orders, NULL | 引当時の受注 ID（有効/廃棄対象の場合は NULL） |
 | created_at | TIMESTAMP | DEFAULT NOW() | 作成日時 |
 | updated_at | TIMESTAMP | DEFAULT NOW() | 更新日時 |
 
@@ -317,5 +329,6 @@ items "1" -- "0..*" stocks
 | orders | (status) | 状態別フィルタリング |
 | stocks | (item_id, status) | 単品別の有効在庫検索 |
 | stocks | (expiry_date) | 品質維持期限による廃棄対象検索 |
+| stocks | (order_id) | 受注別の引当在庫検索 |
 | purchase_orders | (status, expected_arrival_date) | 入荷予定の検索 |
 | destinations | (customer_id) | 届け先コピー機能 |
