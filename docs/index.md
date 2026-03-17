@@ -86,6 +86,7 @@
 - [Codex CLI MCP アプリケーション開発フロー](./reference/CodexCLIMCPアプリケーション開発フロー.md)
 - [Codex CLI MCP サーバー設定手順](./reference/CodexCLIMCPサーバー設定手順.md)
 - [SonarQube ローカル環境セットアップ手順書](./reference/SonarQubeローカル環境セットアップ手順書.md)
+- [運用スクリプト作成ガイド](./reference/運用スクリプト作成ガイド.md)
 - [Vim 操作マニュアル](./reference/Vim操作マニュアル.md)
 
 ### テンプレート (`template/`)
@@ -102,4 +103,8 @@
 - [イテレーション計画](./template/イテレーション計画.md)
 - [イテレーション完了報告書](./template/イテレーション完了報告書.md)
 - [リリース計画](./template/リリース計画.md)
+- [アプリケーション開発環境セットアップ手順書](./template/アプリケーション開発環境セットアップ手順書.md)
+- [開発環境セットアップ手順書](./template/開発環境セットアップ手順書.md)
+- [AWS ステージング環境セットアップ手順書](./template/AWSステージング環境セットアップ手順書.md)
+- [AWS プロダクション環境セットアップ手順書](./template/AWSプロダクション環境セットアップ手順書.md)
 - [README](./template/README.md)
