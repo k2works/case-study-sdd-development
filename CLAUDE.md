@@ -62,9 +62,11 @@
 | スキル | 用途 |
 | :--- | :--- |
 | `operating-setup` | 環境構築（段階的セットアップ） |
+| `operating-script` | 運用スクリプト（Gulp タスク）作成 |
 | `operating-provision` | IaC プロビジョニング（Terraform） |
 | `operating-cicd` | CI/CD パイプライン構築 |
 | `operating-deploy` | デプロイ・ロールバック |
+| `operating-qt` | コード品質管理（SonarQube） |
 | `operating-backup` | バックアップ・リストア |
 | `killing-processes` | 開発プロセス強制終了 |
 
