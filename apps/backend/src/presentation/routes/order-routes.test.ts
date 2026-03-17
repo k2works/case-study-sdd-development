@@ -73,6 +73,7 @@ describe('Order API', () => {
       expect(res.body.id).toBeGreaterThan(0);
       expect(res.body.status).toBe('注文済み');
       expect(res.body.price).toBe(5500);
+      expect(res.body.productName).toBe('ローズブーケ');
       expect(res.body.destination.name).toBe('田中太郎');
     });
 
@@ -107,6 +108,7 @@ describe('Order API', () => {
 
       expect(res.status).toBe(200);
       expect(res.body).toHaveLength(1);
+      expect(res.body[0].productName).toBe('ローズブーケ');
     });
 
     it('ステータスでフィルタできる', async () => {
@@ -144,6 +146,7 @@ describe('Order API', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.id).toBe(created.body.id);
+      expect(res.body.productName).toBe('ローズブーケ');
       expect(res.body.destination.name).toBe('田中太郎');
     });
 

@@ -9,6 +9,7 @@ const mockOrders: OrderDto[] = [
     id: 1,
     customerId: 1,
     productId: 1,
+    productName: 'ローズブーケ',
     price: 5500,
     destination: { name: '山田太郎', address: '東京都渋谷区1-1-1', phone: '03-1234-5678' },
     deliveryDate: '2026-04-01',
@@ -20,6 +21,7 @@ const mockOrders: OrderDto[] = [
     id: 2,
     customerId: 2,
     productId: 2,
+    productName: 'チューリップアレンジ',
     price: 3800,
     destination: { name: '佐藤花子', address: '大阪府大阪市2-2-2', phone: '06-9876-5432' },
     deliveryDate: '2026-04-05',
@@ -84,6 +86,15 @@ describe('OrderList', () => {
 
     await waitFor(() => {
       expect(mockFetchOrders).toHaveBeenCalledWith('注文済み');
+    });
+  });
+
+  it('商品名が表示される', async () => {
+    render(<OrderList fetchOrders={mockFetchOrders} onDetail={mockOnDetail} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('ローズブーケ')).toBeInTheDocument();
+      expect(screen.getByText('チューリップアレンジ')).toBeInTheDocument();
     });
   });
 

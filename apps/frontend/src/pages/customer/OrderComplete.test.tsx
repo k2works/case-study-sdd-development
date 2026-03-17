@@ -8,6 +8,7 @@ const mockOrder: OrderDto = {
   id: 42,
   customerId: 1,
   productId: 1,
+  productName: 'ローズブーケ',
   price: 5500,
   destination: {
     name: '山田太郎',
@@ -95,6 +96,18 @@ describe('OrderComplete', () => {
     expect(screen.getByText('山田太郎')).toBeInTheDocument();
     expect(screen.getByText('東京都渋谷区1-1-1')).toBeInTheDocument();
     expect(screen.getByText('03-1234-5678')).toBeInTheDocument();
+  });
+
+  it('お届けメッセージが表示される', () => {
+    render(
+      <OrderComplete
+        order={mockOrder}
+        productName="ローズブーケ"
+        onTop={mockOnTop}
+      />,
+    );
+
+    expect(screen.getByText('お誕生日おめでとう')).toBeInTheDocument();
   });
 
   it('トップページに戻るボタンが存在する', () => {

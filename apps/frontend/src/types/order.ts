@@ -8,6 +8,7 @@ export interface OrderDto {
   id: number;
   customerId: number;
   productId: number;
+  productName: string;
   price: number;
   destination: OrderDestination;
   deliveryDate: string;

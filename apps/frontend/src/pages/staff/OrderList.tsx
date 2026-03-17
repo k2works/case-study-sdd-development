@@ -40,6 +40,7 @@ export function OrderList({ fetchOrders, onDetail }: Readonly<Props>) {
         <thead>
           <tr>
             <th>受注ID</th>
+            <th>商品</th>
             <th>届け先</th>
             <th>届け日</th>
             <th>価格</th>
@@ -51,6 +52,7 @@ export function OrderList({ fetchOrders, onDetail }: Readonly<Props>) {
           {orders.map((order) => (
             <tr key={order.id}>
               <td>{order.id}</td>
+              <td>{order.productName}</td>
               <td>{order.destination.name}</td>
               <td>{order.deliveryDate}</td>
               <td>¥{order.price.toLocaleString()}</td>

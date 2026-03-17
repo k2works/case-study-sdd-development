@@ -8,6 +8,7 @@ const mockOrder: OrderDto = {
   id: 1,
   customerId: 1,
   productId: 1,
+  productName: 'ローズブーケ',
   price: 5500,
   destination: {
     name: '山田太郎',
@@ -34,6 +35,7 @@ describe('OrderDetail', () => {
 
     await waitFor(() => {
       expect(screen.getByText('1')).toBeInTheDocument();
+      expect(screen.getByText('ローズブーケ')).toBeInTheDocument();
       expect(screen.getByText('注文済み')).toBeInTheDocument();
       expect(screen.getByText('¥5,500（税込）')).toBeInTheDocument();
       expect(screen.getByText('2026-04-01')).toBeInTheDocument();

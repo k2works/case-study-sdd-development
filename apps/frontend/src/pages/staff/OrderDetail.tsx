@@ -26,6 +26,8 @@ export function OrderDetail({ orderId, fetchOrder, onBack }: Readonly<Props>) {
         <dl className="detail-list">
           <dt>受注ID</dt>
           <dd>{order.id}</dd>
+          <dt>商品</dt>
+          <dd>{order.productName}</dd>
           <dt>状態</dt>
           <dd>{order.status}</dd>
           <dt>価格</dt>

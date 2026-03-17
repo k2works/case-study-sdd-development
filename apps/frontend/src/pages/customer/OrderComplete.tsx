@@ -27,6 +27,8 @@ export function OrderComplete({ order, productName, onTop }: Readonly<Props>) {
           <dd>{order.destination.address}</dd>
           <dt>電話番号</dt>
           <dd>{order.destination.phone}</dd>
+          <dt>お届けメッセージ</dt>
+          <dd>{order.message}</dd>
         </dl>
       </div>
 
