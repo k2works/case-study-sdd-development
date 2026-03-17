@@ -21,6 +21,14 @@ export class PrismaStockLotRepository implements StockLotRepository {
     return this.toDomain(record);
   }
 
+  async findByItemId(itemId: ItemId): Promise<StockLot[]> {
+    const records = await this.prisma.stock.findMany({
+      where: { itemId: itemId.value },
+      orderBy: { expiryDate: 'asc' },
+    });
+    return records.map((r) => this.toDomain(r));
+  }
+
   async findByItemIdAndStatus(itemId: ItemId, status: StockStatus): Promise<StockLot[]> {
     const records = await this.prisma.stock.findMany({
       where: {
