@@ -23,6 +23,9 @@ build/
 # Prisma
 apps/backend/src/generated/
 
+# SonarQube
+.scannerwork/
+
 # Logs
 *.log
 npm-debug.log*
