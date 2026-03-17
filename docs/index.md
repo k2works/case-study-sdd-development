@@ -13,8 +13,8 @@
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| [ビジネスアーキテクチャ](./analysis/business_architecture.md) | 未着手 |
-| [インセプションデッキ](./analysis/inception_deck.md) | 未着手 |
+| [ビジネスアーキテクチャ](./analysis/business_architecture.md) | 完了 |
+| [インセプションデッキ](./analysis/inception_deck.md) | 完了 |
 
 ### 要件定義 (`requirements/`)
 
