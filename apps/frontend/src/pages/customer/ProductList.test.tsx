@@ -55,12 +55,20 @@ describe('ProductList（得意先向け）', () => {
     });
   });
 
-  it('構成する花の種類と数量が表示される', async () => {
+  it('構成が説明として表示される', async () => {
     render(<ProductList fetchProducts={mockFetchProducts} fetchItems={mockFetchItems} />);
 
     await waitFor(() => {
-      expect(screen.getByText(/赤バラ × 5/)).toBeInTheDocument();
-      expect(screen.getByText(/カスミソウ × 3/)).toBeInTheDocument();
+      expect(screen.getByText('赤バラx5, カスミソウx3')).toBeInTheDocument();
+    });
+  });
+
+  it('注文するボタンが各商品に表示される', async () => {
+    render(<ProductList fetchProducts={mockFetchProducts} fetchItems={mockFetchItems} />);
+
+    await waitFor(() => {
+      const orderButtons = screen.getAllByText('注文する');
+      expect(orderButtons).toHaveLength(2);
     });
   });
 

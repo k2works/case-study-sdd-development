@@ -75,10 +75,12 @@ export function ItemManagement({ fetchItems, createItem, updateItem }: Props) {
 
   return (
     <div>
-      <h2>単品管理</h2>
-      <button onClick={handleNew}>新規登録</button>
+      <div className="toolbar">
+        <h2>単品管理</h2>
+        <button className="btn btn--primary" onClick={handleNew}>新規登録</button>
+      </div>
 
-      <table>
+      <table className="data-table" aria-label="単品一覧">
         <thead>
           <tr>
             <th>単品ID</th>
@@ -100,7 +102,7 @@ export function ItemManagement({ fetchItems, createItem, updateItem }: Props) {
               <td>{item.leadTimeDays}日</td>
               <td>{item.supplierId}</td>
               <td>
-                <button onClick={() => handleEdit(item)}>編集</button>
+                <button className="btn btn--sm" onClick={() => handleEdit(item)}>編集</button>
               </td>
             </tr>
           ))}
@@ -108,54 +110,83 @@ export function ItemManagement({ fetchItems, createItem, updateItem }: Props) {
       </table>
 
       {showForm && (
-        <form onSubmit={handleSubmit}>
+        <form className="form-section" onSubmit={handleSubmit} aria-label={editingId ? '単品編集フォーム' : '単品登録フォーム'}>
           <h3>{editingId ? '単品編集' : '単品登録'}</h3>
-          <div>
-            <label htmlFor="item-name">単品名</label>
+          <div className="form-group">
+            <label className="form-label" htmlFor="item-name">単品名</label>
             <input
+              className="form-input"
               id="item-name"
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
+              required
             />
           </div>
-          <div>
-            <label htmlFor="item-quality">品質維持可能日数</label>
-            <input
-              id="item-quality"
-              type="number"
-              value={form.qualityRetentionDays}
-              onChange={(e) => setForm({ ...form, qualityRetentionDays: Number(e.target.value) })}
-            />
+          <div className="form-group">
+            <label className="form-label" htmlFor="item-quality">品質維持可能日数</label>
+            <div className="form-input-group">
+              <input
+                className="form-input"
+                id="item-quality"
+                type="number"
+                value={form.qualityRetentionDays}
+                onChange={(e) => setForm({ ...form, qualityRetentionDays: Number(e.target.value) })}
+                min={0}
+                required
+                style={{ maxWidth: '120px' }}
+              />
+              <span className="form-suffix">日</span>
+            </div>
           </div>
-          <div>
-            <label htmlFor="item-unit">購入単位</label>
-            <input
-              id="item-unit"
-              type="number"
-              value={form.purchaseUnit}
-              onChange={(e) => setForm({ ...form, purchaseUnit: Number(e.target.value) })}
-            />
+          <div className="form-group">
+            <label className="form-label" htmlFor="item-unit">購入単位</label>
+            <div className="form-input-group">
+              <input
+                className="form-input"
+                id="item-unit"
+                type="number"
+                value={form.purchaseUnit}
+                onChange={(e) => setForm({ ...form, purchaseUnit: Number(e.target.value) })}
+                min={0}
+                required
+                style={{ maxWidth: '120px' }}
+              />
+              <span className="form-suffix">本</span>
+            </div>
           </div>
-          <div>
-            <label htmlFor="item-lead">発注リードタイム</label>
-            <input
-              id="item-lead"
-              type="number"
-              value={form.leadTimeDays}
-              onChange={(e) => setForm({ ...form, leadTimeDays: Number(e.target.value) })}
-            />
+          <div className="form-group">
+            <label className="form-label" htmlFor="item-lead">発注リードタイム</label>
+            <div className="form-input-group">
+              <input
+                className="form-input"
+                id="item-lead"
+                type="number"
+                value={form.leadTimeDays}
+                onChange={(e) => setForm({ ...form, leadTimeDays: Number(e.target.value) })}
+                min={0}
+                required
+                style={{ maxWidth: '120px' }}
+              />
+              <span className="form-suffix">日</span>
+            </div>
           </div>
-          <div>
-            <label htmlFor="item-supplier">仕入先ID</label>
+          <div className="form-group">
+            <label className="form-label" htmlFor="item-supplier">仕入先ID</label>
             <input
+              className="form-input"
               id="item-supplier"
               type="number"
               value={form.supplierId}
               onChange={(e) => setForm({ ...form, supplierId: Number(e.target.value) })}
+              min={0}
+              required
+              style={{ maxWidth: '120px' }}
             />
           </div>
-          <button type="submit">保存する</button>
+          <div className="form-actions">
+            <button className="btn btn--primary" type="submit">保存する</button>
+          </div>
         </form>
       )}
     </div>

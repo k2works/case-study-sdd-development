@@ -58,6 +58,36 @@ describe('ProductManagement', () => {
     });
   });
 
+  it('構成がUI設計に沿った形式で表示される', async () => {
+    render(
+      <ProductManagement
+        fetchProducts={mockFetchProducts}
+        createProduct={mockCreateProduct}
+        updateProduct={mockUpdateProduct}
+        fetchItems={mockFetchItems}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('赤バラx5')).toBeInTheDocument();
+    });
+  });
+
+  it('テーブルにaria-labelが設定されている', async () => {
+    render(
+      <ProductManagement
+        fetchProducts={mockFetchProducts}
+        createProduct={mockCreateProduct}
+        updateProduct={mockUpdateProduct}
+        fetchItems={mockFetchItems}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('table', { name: '商品一覧' })).toBeInTheDocument();
+    });
+  });
+
   it('新規登録ボタンでフォームが表示される', async () => {
     render(
       <ProductManagement

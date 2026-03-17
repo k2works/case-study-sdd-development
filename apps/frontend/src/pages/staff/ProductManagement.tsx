@@ -31,6 +31,9 @@ export function ProductManagement({ fetchProducts, createProduct, updateProduct,
 
   const getItemName = (itemId: number) => items.find((i) => i.id === itemId)?.name ?? `ID:${itemId}`;
 
+  const formatComposition = (product: ProductDto) =>
+    product.compositions.map((c) => `${getItemName(c.itemId)}x${c.quantity}`).join(',');
+
   const formatPrice = (price: number) => `¥${price.toLocaleString()}`;
 
   const handleNew = () => {
@@ -91,10 +94,12 @@ export function ProductManagement({ fetchProducts, createProduct, updateProduct,
 
   return (
     <div>
-      <h2>商品管理</h2>
-      <button onClick={handleNew}>新規登録</button>
+      <div className="toolbar">
+        <h2>商品管理</h2>
+        <button className="btn btn--primary" onClick={handleNew}>新規登録</button>
+      </div>
 
-      <table>
+      <table className="data-table" aria-label="商品一覧">
         <thead>
           <tr>
             <th>商品ID</th>
@@ -110,16 +115,9 @@ export function ProductManagement({ fetchProducts, createProduct, updateProduct,
               <td>{product.id}</td>
               <td>{product.name}</td>
               <td>{formatPrice(product.price)}</td>
+              <td>{formatComposition(product)}</td>
               <td>
-                {product.compositions.map((c, i) => (
-                  <span key={i}>
-                    {getItemName(c.itemId)} × {c.quantity}
-                    {i < product.compositions.length - 1 ? '、' : ''}
-                  </span>
-                ))}
-              </td>
-              <td>
-                <button onClick={() => handleEdit(product)}>編集</button>
+                <button className="btn btn--sm" onClick={() => handleEdit(product)}>編集</button>
               </td>
             </tr>
           ))}
@@ -127,33 +125,44 @@ export function ProductManagement({ fetchProducts, createProduct, updateProduct,
       </table>
 
       {showForm && (
-        <form onSubmit={handleSubmit}>
+        <form className="form-section" onSubmit={handleSubmit} aria-label={editingId ? '商品編集フォーム' : '商品登録フォーム'}>
           <h3>{editingId ? '商品編集' : '商品登録'}</h3>
-          <div>
-            <label htmlFor="product-name">商品名</label>
+          <div className="form-group">
+            <label className="form-label" htmlFor="product-name">商品名</label>
             <input
+              className="form-input"
               id="product-name"
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
+              required
             />
           </div>
-          <div>
-            <label htmlFor="product-price">価格（税込）</label>
-            <input
-              id="product-price"
-              type="number"
-              value={form.price}
-              onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
-            />
+          <div className="form-group">
+            <label className="form-label" htmlFor="product-price">価格（税込）</label>
+            <div className="form-input-group">
+              <input
+                className="form-input"
+                id="product-price"
+                type="number"
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+                min={0}
+                required
+                style={{ maxWidth: '200px' }}
+              />
+              <span className="form-suffix">円</span>
+            </div>
           </div>
-          <div>
+          <div className="form-group">
             <h4>商品構成</h4>
             {form.compositions.map((comp, index) => (
-              <div key={index}>
+              <div key={index} className="composition-row">
                 <select
+                  className="form-select"
                   value={comp.itemId}
                   onChange={(e) => handleCompositionChange(index, 'itemId', Number(e.target.value))}
+                  aria-label={`構成 ${index + 1} の単品`}
                 >
                   {items.map((item) => (
                     <option key={item.id} value={item.id}>
@@ -161,22 +170,28 @@ export function ProductManagement({ fetchProducts, createProduct, updateProduct,
                     </option>
                   ))}
                 </select>
-                <input
-                  type="number"
-                  value={comp.quantity}
-                  min={1}
-                  onChange={(e) => handleCompositionChange(index, 'quantity', Number(e.target.value))}
-                />
-                <button type="button" onClick={() => handleRemoveComposition(index)}>
+                <div className="form-input-group">
+                  <input
+                    className="form-input composition-quantity"
+                    type="number"
+                    value={comp.quantity}
+                    min={1}
+                    onChange={(e) => handleCompositionChange(index, 'quantity', Number(e.target.value))}
+                    aria-label={`構成 ${index + 1} の数量`}
+                  />
+                </div>
+                <button className="btn btn--danger btn--sm" type="button" onClick={() => handleRemoveComposition(index)}>
                   削除
                 </button>
               </div>
             ))}
-            <button type="button" onClick={handleAddComposition}>
+            <button className="btn btn--sm" type="button" onClick={handleAddComposition}>
               構成を追加
             </button>
           </div>
-          <button type="submit">保存する</button>
+          <div className="form-actions">
+            <button className="btn btn--primary" type="submit">保存する</button>
+          </div>
         </form>
       )}
     </div>

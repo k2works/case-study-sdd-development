@@ -34,6 +34,20 @@ describe('ItemManagement', () => {
     });
   });
 
+  it('テーブルにaria-labelが設定されている', async () => {
+    render(
+      <ItemManagement
+        fetchItems={mockFetchItems}
+        createItem={mockCreateItem}
+        updateItem={mockUpdateItem}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('table', { name: '単品一覧' })).toBeInTheDocument();
+    });
+  });
+
   it('新規登録ボタンでフォームが表示される', async () => {
     render(
       <ItemManagement
@@ -120,5 +134,26 @@ describe('ItemManagement', () => {
 
     expect(screen.getByLabelText('単品名')).toHaveValue('赤バラ');
     expect(screen.getByLabelText('品質維持可能日数')).toHaveValue(7);
+  });
+
+  it('フォームに単位サフィックスが表示される', async () => {
+    render(
+      <ItemManagement
+        fetchItems={mockFetchItems}
+        createItem={mockCreateItem}
+        updateItem={mockUpdateItem}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('赤バラ')).toBeInTheDocument();
+    });
+
+    await userEvent.click(screen.getByText('新規登録'));
+
+    const suffixes = document.querySelectorAll('.form-suffix');
+    const suffixTexts = Array.from(suffixes).map((el) => el.textContent);
+    expect(suffixTexts).toContain('日');
+    expect(suffixTexts).toContain('本');
   });
 });
