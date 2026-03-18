@@ -36,6 +36,7 @@ model Item {
   compositions   ProductComposition[]
   stocks         Stock[]
   purchaseOrders PurchaseOrder[]
+  arrivals       Arrival[]
 
   @@map("items")
 }
@@ -120,8 +121,24 @@ model PurchaseOrder {
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
 
-  item     Item     @relation(fields: [itemId], references: [itemId])
-  supplier Supplier @relation(fields: [supplierId], references: [supplierId])
+  item     Item      @relation(fields: [itemId], references: [itemId])
+  supplier Supplier  @relation(fields: [supplierId], references: [supplierId])
+  arrivals Arrival[]
 
   @@map("purchase_orders")
+}
+
+// 入荷（IT4 で追加）
+model Arrival {
+  arrivalId       Int      @id @default(autoincrement()) @map("arrival_id")
+  itemId          Int      @map("item_id")
+  purchaseOrderId Int      @map("purchase_order_id")
+  quantity        Int
+  arrivalDate     DateTime @map("arrival_date") @db.Date
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  item          Item          @relation(fields: [itemId], references: [itemId])
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [purchaseOrderId])
+
+  @@map("arrivals")
 }

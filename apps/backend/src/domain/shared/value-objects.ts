@@ -89,7 +89,20 @@ export class CustomerId {
 }
 
 export class DeliveryDate {
-  constructor(public readonly value: Date) {}
+  constructor(
+    public readonly value: Date,
+    options?: { skipValidation?: boolean },
+  ) {
+    if (!options?.skipValidation) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dateOnly = new Date(value);
+      dateOnly.setHours(0, 0, 0, 0);
+      if (dateOnly <= today) {
+        throw new Error('DeliveryDate は過去の日付にできません');
+      }
+    }
+  }
 }
 
 export class ShippingDate {

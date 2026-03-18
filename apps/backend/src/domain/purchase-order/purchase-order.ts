@@ -8,7 +8,7 @@ import {
 } from '../shared/value-objects.js';
 
 export interface PurchaseOrderProps {
-  purchaseOrderId: PurchaseOrderId;
+  purchaseOrderId: PurchaseOrderId | null;
   itemId: ItemId;
   supplierId: SupplierId;
   quantity: Quantity;
@@ -26,7 +26,7 @@ export interface NewPurchaseOrderProps {
 }
 
 export class PurchaseOrder {
-  readonly purchaseOrderId: PurchaseOrderId;
+  readonly purchaseOrderId: PurchaseOrderId | null;
   readonly itemId: ItemId;
   readonly supplierId: SupplierId;
   readonly quantity: Quantity;
@@ -41,7 +41,7 @@ export class PurchaseOrder {
     expectedArrivalDate.setDate(expectedArrivalDate.getDate() + props.leadTimeDays);
 
     return new PurchaseOrder({
-      purchaseOrderId: undefined as unknown as PurchaseOrderId,
+      purchaseOrderId: null,
       itemId: props.itemId,
       supplierId: props.supplierId,
       quantity: new Quantity(adjustedQuantity),

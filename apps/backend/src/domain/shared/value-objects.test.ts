@@ -144,9 +144,28 @@ describe('CustomerId', () => {
 });
 
 describe('DeliveryDate', () => {
-  it('日付で生成できる', () => {
-    const date = new Date('2026-04-01');
-    expect(new DeliveryDate(date).value).toEqual(date);
+  it('未来の日付で生成できる', () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    expect(new DeliveryDate(tomorrow).value).toEqual(tomorrow);
+  });
+
+  it('過去の日付はエラー', () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    expect(() => new DeliveryDate(yesterday)).toThrow('DeliveryDate は過去の日付にできません');
+  });
+
+  it('当日の日付はエラー', () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    expect(() => new DeliveryDate(today)).toThrow('DeliveryDate は過去の日付にできません');
+  });
+
+  it('skipValidation で過去日付も許可される（DB からの復元用）', () => {
+    const pastDate = new Date('2020-01-01');
+    expect(new DeliveryDate(pastDate, { skipValidation: true }).value).toEqual(pastDate);
   });
 });
 

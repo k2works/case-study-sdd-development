@@ -1,7 +1,7 @@
 import { ItemId, ItemName, Days, PurchaseUnit, SupplierId } from '../shared/value-objects.js';
 
 export interface ItemProps {
-  itemId: ItemId;
+  itemId: ItemId | null;
   name: ItemName;
   qualityRetentionDays: Days;
   purchaseUnit: PurchaseUnit;
@@ -12,7 +12,7 @@ export interface ItemProps {
 export type NewItemProps = Omit<ItemProps, 'itemId'>;
 
 export class Item {
-  readonly itemId: ItemId;
+  readonly itemId: ItemId | null;
   readonly name: ItemName;
   readonly qualityRetentionDays: Days;
   readonly purchaseUnit: PurchaseUnit;
@@ -20,7 +20,7 @@ export class Item {
   readonly supplierId: SupplierId;
 
   static createNew(props: NewItemProps): Item {
-    return new Item({ ...props, itemId: undefined as unknown as ItemId });
+    return new Item({ ...props, itemId: null });
   }
 
   constructor(props: ItemProps) {
