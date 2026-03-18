@@ -140,7 +140,7 @@ export function StockForecast({ fetchForecast, onPurchaseOrder }: Readonly<Props
           ))}
         </tbody>
       </table>
-      <p className="legend">※ <strong className="shortage">太字赤</strong> = 欠品警告（在庫予定数 ≤ 0）　※ <span className="expiry-warning">黄色背景</span> = 品質維持日数超過の在庫あり</p>
+      <p className="legend">※ <strong className="shortage">太字赤</strong> = 欠品警告（在庫予定数 ≤ 0） ※ <span className="expiry-warning">黄色背景</span> = 品質維持日数超過の在庫あり</p>
     </div>
   );
 }

@@ -9,11 +9,13 @@ import { OrderComplete } from './pages/customer/OrderComplete'
 import { OrderList } from './pages/staff/OrderList'
 import { OrderDetail } from './pages/staff/OrderDetail'
 import { StockForecast } from './pages/staff/StockForecast'
+import { PurchaseOrderForm } from './pages/staff/PurchaseOrderForm'
 import type { OrderFormProduct, OrderFormData } from './pages/customer/OrderForm'
 import type { ItemDto, CreateItemInput } from './types/item'
 import type { ProductDto, CreateProductInput } from './types/product'
 import type { OrderDto, CreateOrderInput } from './types/order'
 import type { StockForecastItem } from './types/stock-forecast'
+import type { PurchaseOrderInput, PurchaseOrderResult, ItemInfo } from './types/purchase-order'
 import { fetchApi } from './api/client'
 
 const API_BASE = '/api';
@@ -94,7 +96,7 @@ const fetchStockForecast = async (
 
 type View = 'customer' | 'staff';
 type CustomerPage = 'list' | 'order-form' | 'order-confirm' | 'order-complete';
-type StaffTab = 'products' | 'items' | 'orders' | 'stock-forecast';
+type StaffTab = 'products' | 'items' | 'orders' | 'stock-forecast' | 'purchase-order';
 
 function App() {
   const [view, setView] = useState<View>('customer');
@@ -108,6 +110,7 @@ function App() {
 
   // 受注詳細の状態管理
   const [detailOrderId, setDetailOrderId] = useState<number | null>(null);
+  const [purchaseItemId, setPurchaseItemId] = useState<number | null>(null);
 
   const handleOrder = useCallback((product: OrderFormProduct) => {
     setSelectedProduct(product);
@@ -162,6 +165,27 @@ function App() {
   const handleBackFromDetail = useCallback(() => {
     setDetailOrderId(null);
   }, []);
+
+  const fetchItemInfo = async (itemId: number): Promise<ItemInfo> => {
+    const items = await fetchItems();
+    const item = items.find(i => i.id === itemId);
+    if (!item) throw new Error('単品が見つかりません');
+    return {
+      itemId: item.id,
+      itemName: item.name,
+      purchaseUnit: item.purchaseUnit,
+      leadTimeDays: item.leadTimeDays,
+      supplierId: item.supplierId,
+      supplierName: `仕入先 ${item.supplierId}`,
+    };
+  };
+
+  const createPurchaseOrder = async (input: PurchaseOrderInput): Promise<PurchaseOrderResult> => {
+    return fetchApi<PurchaseOrderResult>('/purchase-orders', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  };
 
   const renderCustomerContent = () => {
     switch (customerPage) {
@@ -284,6 +308,25 @@ function App() {
           {staffTab === 'stock-forecast' && (
             <StockForecast
               fetchForecast={fetchStockForecast}
+              onPurchaseOrder={(itemId) => {
+                setPurchaseItemId(itemId);
+                setStaffTab('purchase-order');
+              }}
+            />
+          )}
+          {staffTab === 'purchase-order' && purchaseItemId && (
+            <PurchaseOrderForm
+              itemId={purchaseItemId}
+              fetchItemInfo={fetchItemInfo}
+              createPurchaseOrder={createPurchaseOrder}
+              onBack={() => {
+                setPurchaseItemId(null);
+                setStaffTab('stock-forecast');
+              }}
+              onSuccess={() => {
+                setPurchaseItemId(null);
+                setStaffTab('stock-forecast');
+              }}
             />
           )}
         </div>

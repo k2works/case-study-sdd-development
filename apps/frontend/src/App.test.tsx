@@ -27,6 +27,34 @@ const mockOrder = {
 };
 
 const mockOrders = [mockOrder];
+const mockStockForecast = [
+  {
+    itemId: 1,
+    itemName: '赤バラ',
+    qualityRetentionDays: 7,
+    forecasts: [
+      {
+        date: '2026-03-18',
+        currentStock: 20,
+        expectedArrival: 0,
+        allocated: 5,
+        expired: 0,
+        availableStock: 15,
+        isShortage: false,
+        isExpiryWarning: false,
+      },
+    ],
+  },
+];
+const mockPurchaseOrder = {
+  purchaseOrderId: 200,
+  itemId: 1,
+  supplierId: 1,
+  quantity: 100,
+  orderDate: '2026-03-18T00:00:00.000Z',
+  expectedArrivalDate: '2026-03-21T00:00:00.000Z',
+  status: '発注済み',
+};
 
 /**
  * URL パターンに基づいてレスポンスを返す fetch mock。
@@ -40,8 +68,12 @@ function setupFetchMock(overrides?: { createOrder?: unknown }) {
     if (typeof url === 'string') {
       if (url.match(/\/api\/orders\/\d+$/)) {
         data = mockOrder;
+      } else if (url.includes('/api/stock/forecast')) {
+        data = mockStockForecast;
       } else if (url.includes('/api/orders') && options?.method === 'POST') {
         data = overrides?.createOrder ?? mockOrder;
+      } else if (url.includes('/api/purchase-orders') && options?.method === 'POST') {
+        data = mockPurchaseOrder;
       } else if (url.includes('/api/orders')) {
         data = mockOrders;
       } else if (url.includes('/api/products')) {
@@ -291,6 +323,47 @@ describe('App', () => {
 
       await waitFor(() => {
         expect(screen.getByRole('heading', { name: '受注管理' })).toBeInTheDocument();
+      });
+    });
+
+    it('在庫推移の発注ボタンで発注画面に遷移できる', async () => {
+      setupFetchMock();
+      render(<App />);
+      await userEvent.click(screen.getByText('管理画面'));
+      await userEvent.click(screen.getByRole('tab', { name: '在庫推移' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: '発注' })).toBeInTheDocument();
+      });
+
+      await userEvent.click(screen.getByRole('button', { name: '発注' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('heading', { name: '発注画面' })).toBeInTheDocument();
+      });
+      expect(screen.getByText('赤バラ')).toBeInTheDocument();
+    });
+
+    it('発注画面の戻るボタンで在庫推移に戻れる', async () => {
+      setupFetchMock();
+      render(<App />);
+      await userEvent.click(screen.getByText('管理画面'));
+      await userEvent.click(screen.getByRole('tab', { name: '在庫推移' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: '発注' })).toBeInTheDocument();
+      });
+
+      await userEvent.click(screen.getByRole('button', { name: '発注' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('heading', { name: '発注画面' })).toBeInTheDocument();
+      });
+
+      await userEvent.click(screen.getByRole('button', { name: '戻る' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('heading', { name: '在庫推移' })).toBeInTheDocument();
       });
     });
   });
