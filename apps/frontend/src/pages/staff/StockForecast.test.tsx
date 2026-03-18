@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { StockForecast } from './StockForecast';
 import type { StockForecastItem } from '../../types/stock-forecast';
 
@@ -146,6 +147,88 @@ describe('StockForecast', () => {
       // 2026-04-08 は水曜日
       expect(screen.getByRole('columnheader', { name: '04-08(水)' })).toBeInTheDocument();
     });
+  });
+
+  it('開始日を変更すると再取得される', async () => {
+    render(
+      <StockForecast
+        fetchForecast={mockFetchForecast}
+        onPurchaseOrder={mockOnPurchaseOrder}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('開始日')).toBeInTheDocument();
+    });
+
+    const user = userEvent.setup();
+    const fromInput = screen.getByLabelText('開始日');
+    await user.clear(fromInput);
+    await user.type(fromInput, '2026-04-10');
+
+    await waitFor(() => {
+      expect(mockFetchForecast).toHaveBeenCalledWith('2026-04-10', expect.any(String), undefined);
+    });
+  });
+
+  it('終了日を変更すると再取得される', async () => {
+    render(
+      <StockForecast
+        fetchForecast={mockFetchForecast}
+        onPurchaseOrder={mockOnPurchaseOrder}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('終了日')).toBeInTheDocument();
+    });
+
+    const user = userEvent.setup();
+    const toInput = screen.getByLabelText('終了日');
+    await user.clear(toInput);
+    await user.type(toInput, '2026-04-20');
+
+    await waitFor(() => {
+      expect(mockFetchForecast).toHaveBeenCalledWith(expect.any(String), '2026-04-20', undefined);
+    });
+  });
+
+  it('単品フィルタを変更すると再取得される', async () => {
+    render(
+      <StockForecast
+        fetchForecast={mockFetchForecast}
+        onPurchaseOrder={mockOnPurchaseOrder}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('単品')).toBeInTheDocument();
+    });
+
+    const user = userEvent.setup();
+    await user.selectOptions(screen.getByLabelText('単品'), '1');
+
+    await waitFor(() => {
+      expect(mockFetchForecast).toHaveBeenCalledWith(expect.any(String), expect.any(String), 1);
+    });
+  });
+
+  it('発注ボタンをクリックすると onPurchaseOrder が呼ばれる', async () => {
+    render(
+      <StockForecast
+        fetchForecast={mockFetchForecast}
+        onPurchaseOrder={mockOnPurchaseOrder}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '発注' })).toBeInTheDocument();
+    });
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: '発注' }));
+
+    expect(mockOnPurchaseOrder).toHaveBeenCalledWith(1);
   });
 
   it('凡例に欠品警告と品質維持日数超過の説明が表示される', async () => {
