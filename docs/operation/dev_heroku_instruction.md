@@ -16,25 +16,61 @@ SQLite（エフェメラル）を使用し、dyno 再起動のたびにクリー
 
 ### アーキテクチャ
 
-```text
-開発 PC                          Heroku
-┌────────────────┐              ┌──────────────────────────┐
-│ docker build   │              │  Container (web dyno)    │
-│ Dockerfile.web │──push──────▶│  ┌──────────────────────┐ │
-│                │              │  │ Express Server       │ │
-└────────────────┘              │  │  /api/* → API routes │ │
-                                │  │  /*     → SPA (React)│ │
-                                │  │  SQLite (ephemeral)  │ │
-                                │  └──────────────────────┘ │
-                                └──────────────────────────┘
+```plantuml
+@startuml
+
+title デモ環境構成図
+
+node "開発 PC" {
+  component "Docker Build\n(Dockerfile.web)" as build
+}
+
+cloud "Heroku Container Registry" {
+  artifact "web:latest" as img
+}
+
+node "Heroku (web dyno)" {
+  package "Container" {
+    component "Express Server" as express
+    component "/api/* → API routes" as api
+    component "/* → SPA (React)" as spa
+    database "SQLite\n(ephemeral)" as db
+  }
+}
+
+actor "ブラウザ" as browser
+
+build --> img : container:push
+img --> express : container:release
+express --> api
+express --> spa
+api --> db
+browser --> express : HTTPS
+
+@enduml
 ```
 
 ### デプロイフロー
 
-```text
-1. heroku container:login          # Registry 認証
-2. heroku container:push web       # ビルド＆プッシュ
-3. heroku container:release web    # リリース
+```plantuml
+@startuml
+
+title デプロイフロー
+
+|開発 PC|
+start
+:heroku container:login\n（Registry 認証）;
+
+:heroku container:push web\n（ビルド＆プッシュ）;
+
+|Heroku|
+:heroku container:release web\n（リリース）;
+
+:start-demo.sh 実行\n（migrate + seed + サーバー起動）;
+
+stop
+
+@enduml
 ```
 
 ---
