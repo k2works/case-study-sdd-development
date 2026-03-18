@@ -100,6 +100,7 @@ nav:
   - 運用:
       - 概要: operation/index.md
       - アプリケーション開発環境セットアップ: operation/dev_app_instruction.md
+      - デモ環境セットアップ（Heroku）: operation/dev_heroku_instruction.md
   - リファレンス:
       - 概要: reference/index.md
       - よいソフトウェアとは: reference/よいソフトウェアとは.md

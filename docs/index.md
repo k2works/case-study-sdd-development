@@ -60,6 +60,7 @@
 | ドキュメント | 状態 |
 | :--- | :--- |
 | [アプリケーション開発環境セットアップ手順書](./operation/dev_app_instruction.md) | 完了 |
+| [デモ環境セットアップ手順書（Heroku Container）](./operation/dev_heroku_instruction.md) | 完了 |
 
 ### ADR (`adr/`)
 

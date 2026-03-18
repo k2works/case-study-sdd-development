@@ -7,6 +7,7 @@
 ### 環境セットアップ
 
 - [アプリケーション開発環境セットアップ手順書](./dev_app_instruction.md) - ローカル開発環境の構築手順
+- [デモ環境セットアップ手順書（Heroku Container）](./dev_heroku_instruction.md) - Heroku コンテナデモ環境の構築手順
 
 ### 運用コマンド
 
