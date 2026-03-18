@@ -1,4 +1,4 @@
-import { ItemId } from '../shared/value-objects.js';
+import { ItemId, PurchaseOrderId } from '../shared/value-objects.js';
 import { PurchaseOrder } from './purchase-order.js';
 
 export interface PurchaseOrderRecord {
@@ -12,6 +12,7 @@ export interface PurchaseOrderRecord {
 }
 
 export interface PurchaseOrderRepository {
+  findById(id: PurchaseOrderId): Promise<PurchaseOrder | null>;
   findByStatus(status: string): Promise<PurchaseOrderRecord[]>;
   findByItemIdAndStatus(itemId: ItemId, status: string): Promise<PurchaseOrderRecord[]>;
   save(purchaseOrder: PurchaseOrder): Promise<PurchaseOrder>;

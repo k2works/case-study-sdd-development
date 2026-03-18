@@ -18,6 +18,7 @@ describe('PrismaItemRepository（統合テスト）', () => {
 
   beforeEach(async () => {
     repository = new PrismaItemRepository(prisma);
+    await prisma.arrival.deleteMany();
     await prisma.purchaseOrder.deleteMany();
     await prisma.productComposition.deleteMany();
     await prisma.item.deleteMany();

@@ -3,7 +3,13 @@ import type {
   PurchaseOrderRepository,
 } from '../../domain/purchase-order/purchase-order-repository.js';
 import { PurchaseOrder } from '../../domain/purchase-order/purchase-order.js';
-import { ItemId, PurchaseOrderId } from '../../domain/shared/value-objects.js';
+import {
+  ItemId,
+  PurchaseOrderId,
+  PurchaseOrderStatus,
+  Quantity,
+  SupplierId,
+} from '../../domain/shared/value-objects.js';
 
 export class InMemoryPurchaseOrderRepository implements PurchaseOrderRepository {
   private records: PurchaseOrderRecord[] = [];
@@ -17,6 +23,20 @@ export class InMemoryPurchaseOrderRepository implements PurchaseOrderRepository 
   addRecord(record: PurchaseOrderRecord): void {
     this.records.push(record);
     this.nextId = Math.max(this.nextId, record.purchaseOrderId + 1);
+  }
+
+  async findById(id: PurchaseOrderId): Promise<PurchaseOrder | null> {
+    const record = this.records.find((r) => r.purchaseOrderId === id.value);
+    if (!record) return null;
+    return new PurchaseOrder({
+      purchaseOrderId: new PurchaseOrderId(record.purchaseOrderId),
+      itemId: new ItemId(record.itemId),
+      supplierId: new SupplierId(record.supplierId),
+      quantity: new Quantity(record.quantity),
+      orderDate: record.orderDate,
+      expectedArrivalDate: record.expectedArrivalDate,
+      status: new PurchaseOrderStatus(record.status as '発注済み' | '入荷済み'),
+    });
   }
 
   async findByStatus(status: string): Promise<PurchaseOrderRecord[]> {
