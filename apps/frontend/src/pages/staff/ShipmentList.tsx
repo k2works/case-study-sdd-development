@@ -76,7 +76,7 @@ export function ShipmentList({
         <p>該当日の出荷対象はありません。</p>
       )}
 
-      {(result?.targets.length ?? 0) > 0 && (
+      {result && result.targets.length > 0 && (
         <>
           <table className="data-table">
             <thead>

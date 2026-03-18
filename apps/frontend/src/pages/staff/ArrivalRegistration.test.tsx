@@ -35,7 +35,7 @@ describe('ArrivalRegistration', () => {
   let fetchPurchaseOrders: ReturnType<typeof vi.fn<() => Promise<PurchaseOrderRecord[]>>>;
   let fetchItems: ReturnType<typeof vi.fn<() => Promise<ItemDto[]>>>;
   let registerArrival: ReturnType<typeof vi.fn<(input: RegisterArrivalInput) => Promise<RegisterArrivalResult>>>;
-  let onSuccess: ReturnType<typeof vi.fn>;
+  let onSuccess: ReturnType<typeof vi.fn<() => void>>;
 
   beforeEach(() => {
     vi.clearAllMocks();

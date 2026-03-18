@@ -9,7 +9,7 @@ import {
 } from './useApi';
 
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
+(globalThis as Record<string, unknown>).fetch = mockFetch;
 
 describe('useApi - Customer API', () => {
   beforeEach(() => {
