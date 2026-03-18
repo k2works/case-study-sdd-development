@@ -423,9 +423,14 @@ export default function (gulp, options = {}) {
 
   // ──────────────────────────────────────────────
   // release:deploy:* (release + deploy)
+  // deploy:prd タスクが定義されている場合のみ登録
   // ──────────────────────────────────────────────
 
-  gulp.task('release:deploy:patch', gulp.series('release:patch', 'deploy:prd'));
-  gulp.task('release:deploy:minor', gulp.series('release:minor', 'deploy:prd'));
-  gulp.task('release:deploy:major', gulp.series('release:major', 'deploy:prd'));
+  try {
+    gulp.task('release:deploy:patch', gulp.series('release:patch', 'deploy:prd'));
+    gulp.task('release:deploy:minor', gulp.series('release:minor', 'deploy:prd'));
+    gulp.task('release:deploy:major', gulp.series('release:major', 'deploy:prd'));
+  } catch {
+    // deploy:prd が未定義の場合はスキップ
+  }
 }
