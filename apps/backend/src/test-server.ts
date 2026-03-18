@@ -56,7 +56,7 @@ const arrivalUseCase = new ArrivalUseCase(
 );
 app.use('/api', createArrivalRoutes(arrivalUseCase, purchaseOrderRepository));
 
-const shipmentUseCase = new ShipmentUseCase(orderRepository, productRepository, itemRepository);
+const shipmentUseCase = new ShipmentUseCase(orderRepository, productRepository, itemRepository, stockLotRepository);
 app.use('/api', createShipmentRoutes(shipmentUseCase));
 
 const stockForecastUseCase = new StockForecastUseCase(

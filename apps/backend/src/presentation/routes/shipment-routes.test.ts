@@ -6,6 +6,7 @@ import { ShipmentUseCase } from '../../application/shipment/shipment-usecase.js'
 import { InMemoryOrderRepository } from '../../application/order/in-memory-order-repository.js';
 import { InMemoryProductRepository } from '../../application/product/in-memory-product-repository.js';
 import { InMemoryItemRepository } from '../../application/item/in-memory-item-repository.js';
+import { InMemoryStockLotRepository } from '../../application/stock/in-memory-stock-lot-repository.js';
 import { Order } from '../../domain/order/order.js';
 import { Product, ProductComposition } from '../../domain/product/product.js';
 import { Item } from '../../domain/item/item.js';
@@ -34,7 +35,8 @@ describe('shipment-routes', () => {
     const orderRepository = new InMemoryOrderRepository();
     const productRepository = new InMemoryProductRepository();
     const itemRepository = new InMemoryItemRepository();
-    const useCase = new ShipmentUseCase(orderRepository, productRepository, itemRepository);
+    const stockLotRepository = new InMemoryStockLotRepository();
+    const useCase = new ShipmentUseCase(orderRepository, productRepository, itemRepository, stockLotRepository);
 
     app = express();
     app.use(express.json());
@@ -94,5 +96,30 @@ describe('shipment-routes', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.targets).toHaveLength(0);
+  });
+
+  it('POST /api/shipments で出荷を記録できる', async () => {
+    const res = await request(app)
+      .post('/api/shipments')
+      .send({ orderId: 1 });
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe('出荷を記録しました');
+  });
+
+  it('POST /api/shipments で存在しない受注は 404', async () => {
+    const res = await request(app)
+      .post('/api/shipments')
+      .send({ orderId: 999 });
+
+    expect(res.status).toBe(404);
+  });
+
+  it('POST /api/shipments で orderId が不正な場合 400', async () => {
+    const res = await request(app)
+      .post('/api/shipments')
+      .send({ orderId: 0 });
+
+    expect(res.status).toBe(400);
   });
 });

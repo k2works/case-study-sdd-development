@@ -64,7 +64,7 @@ const arrivalUseCase = new ArrivalUseCase(
 app.use('/api', createArrivalRoutes(arrivalUseCase, purchaseOrderRepository));
 
 // 出荷 API
-const shipmentUseCase = new ShipmentUseCase(orderRepository, productRepository, itemRepository);
+const shipmentUseCase = new ShipmentUseCase(orderRepository, productRepository, itemRepository, stockLotRepository);
 app.use('/api', createShipmentRoutes(shipmentUseCase));
 
 // 在庫推移 API

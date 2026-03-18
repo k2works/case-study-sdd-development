@@ -26,5 +26,27 @@ export function createShipmentRoutes(shipmentUseCase: ShipmentUseCase): Router {
     }
   });
 
+  // 出荷記録
+  router.post('/shipments', async (req, res) => {
+    const { orderId } = req.body;
+
+    if (typeof orderId !== 'number' || !Number.isInteger(orderId) || orderId <= 0) {
+      res.status(400).json({ error: 'orderId は正の整数で指定してください' });
+      return;
+    }
+
+    try {
+      await shipmentUseCase.recordShipment(orderId);
+      res.status(200).json({ message: '出荷を記録しました' });
+    } catch (e) {
+      const message = (e as Error).message;
+      if (message === '受注が見つかりません') {
+        res.status(404).json({ error: message });
+        return;
+      }
+      res.status(400).json({ error: message });
+    }
+  });
+
   return router;
 }

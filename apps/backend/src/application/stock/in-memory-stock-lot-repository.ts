@@ -1,6 +1,6 @@
 import { StockLot } from '../../domain/stock/stock-lot.js';
 import { StockLotRepository } from '../../domain/stock/stock-lot-repository.js';
-import { StockId, ItemId, StockStatus } from '../../domain/shared/value-objects.js';
+import { StockId, ItemId, StockStatus, OrderId } from '../../domain/shared/value-objects.js';
 
 export class InMemoryStockLotRepository implements StockLotRepository {
   private readonly stockLots: Map<number, StockLot> = new Map();
@@ -18,6 +18,12 @@ export class InMemoryStockLotRepository implements StockLotRepository {
   async findByItemIdAndStatus(itemId: ItemId, status: StockStatus): Promise<StockLot[]> {
     return Array.from(this.stockLots.values()).filter(
       (lot) => lot.itemId.value === itemId.value && lot.status.value === status.value,
+    );
+  }
+
+  async findByOrderId(orderId: OrderId): Promise<StockLot[]> {
+    return Array.from(this.stockLots.values()).filter(
+      (lot) => lot.orderId !== null && lot.orderId.value === orderId.value,
     );
   }
 
