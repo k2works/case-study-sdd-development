@@ -128,6 +128,7 @@ nav:
       - Vim 操作マニュアル: reference/Vim操作マニュアル.md
   - ADR:
       - 概要: adr/index.md
+      - ADR-001 発注トランザクション方針: adr/001-purchase-order-transaction-strategy.md
   - テンプレート:
       - 概要: template/index.md
       - まずこれを読もうリスト: template/まずこれを読もうリスト.md
