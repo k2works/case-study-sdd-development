@@ -131,6 +131,7 @@ nav:
   - ADR:
       - 概要: adr/index.md
       - ADR-001 発注トランザクション方針: adr/001-purchase-order-transaction-strategy.md
+      - ADR-002 デモ環境 SQLite 切り替え: adr/002-demo-environment-sqlite.md
   - テンプレート:
       - 概要: template/index.md
       - まずこれを読もうリスト: template/まずこれを読もうリスト.md

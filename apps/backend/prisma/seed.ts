@@ -1,14 +1,28 @@
 import 'dotenv/config';
-import pg from 'pg';
-import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/client.js';
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const dbProvider = process.env.DB_PROVIDER || 'postgresql';
+
+let prisma: PrismaClient;
+let pgPool: InstanceType<typeof import('pg').Pool> | null = null;
+
+if (dbProvider === 'sqlite') {
+  const path = await import('node:path');
+  const { PrismaBetterSqlite3 } = await import('@prisma/adapter-better-sqlite3');
+  const dbPath = process.env.SQLITE_DB_PATH || './prisma/dev.db';
+  const url = `file:${path.resolve(dbPath)}`;
+  const adapter = new PrismaBetterSqlite3({ url });
+  prisma = new PrismaClient({ adapter });
+} else {
+  const pg = await import('pg');
+  const { PrismaPg } = await import('@prisma/adapter-pg');
+  pgPool = new pg.default.Pool({ connectionString: process.env.DATABASE_URL });
+  const adapter = new PrismaPg(pgPool);
+  prisma = new PrismaClient({ adapter });
+}
 
 async function main() {
-  console.log('Seeding database...');
+  console.log(`Seeding database (${dbProvider})...`);
 
   // 既存データを削除（外部キー制約の順序で）
   await prisma.purchaseOrder.deleteMany();
@@ -19,13 +33,18 @@ async function main() {
   await prisma.item.deleteMany();
   await prisma.supplier.deleteMany();
 
-  // シーケンスをリセット
-  await prisma.$executeRawUnsafe(`ALTER SEQUENCE suppliers_supplier_id_seq RESTART WITH 1`);
-  await prisma.$executeRawUnsafe(`ALTER SEQUENCE items_item_id_seq RESTART WITH 1`);
-  await prisma.$executeRawUnsafe(`ALTER SEQUENCE products_product_id_seq RESTART WITH 1`);
-  await prisma.$executeRawUnsafe(`ALTER SEQUENCE orders_order_id_seq RESTART WITH 1`);
-  await prisma.$executeRawUnsafe(`ALTER SEQUENCE stocks_stock_id_seq RESTART WITH 1`);
-  await prisma.$executeRawUnsafe(`ALTER SEQUENCE purchase_orders_purchase_order_id_seq RESTART WITH 1`);
+  // シーケンスをリセット（PostgreSQL のみ）
+  if (dbProvider === 'postgresql') {
+    await prisma.$executeRawUnsafe(`ALTER SEQUENCE suppliers_supplier_id_seq RESTART WITH 1`);
+    await prisma.$executeRawUnsafe(`ALTER SEQUENCE items_item_id_seq RESTART WITH 1`);
+    await prisma.$executeRawUnsafe(`ALTER SEQUENCE products_product_id_seq RESTART WITH 1`);
+    await prisma.$executeRawUnsafe(`ALTER SEQUENCE orders_order_id_seq RESTART WITH 1`);
+    await prisma.$executeRawUnsafe(`ALTER SEQUENCE stocks_stock_id_seq RESTART WITH 1`);
+    await prisma.$executeRawUnsafe(`ALTER SEQUENCE purchase_orders_purchase_order_id_seq RESTART WITH 1`);
+  } else {
+    // SQLite: autoincrement カウンタをリセット
+    await prisma.$executeRawUnsafe(`DELETE FROM sqlite_sequence`);
+  }
 
   console.log('Existing data cleared.');
 
@@ -176,11 +195,11 @@ async function main() {
 main()
   .then(async () => {
     await prisma.$disconnect();
-    await pool.end();
+    if (pgPool) await pgPool.end();
   })
   .catch(async (e) => {
     console.error(e);
     await prisma.$disconnect();
-    await pool.end();
+    if (pgPool) await pgPool.end();
     process.exit(1);
   });

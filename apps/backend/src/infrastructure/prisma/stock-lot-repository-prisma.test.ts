@@ -20,6 +20,7 @@ describe('PrismaStockLotRepository（統合テスト）', () => {
     repository = new PrismaStockLotRepository(prisma);
     await prisma.purchaseOrder.deleteMany();
     await prisma.stock.deleteMany();
+    await prisma.order.deleteMany();
     await prisma.productComposition.deleteMany();
     await prisma.product.deleteMany();
     await prisma.item.deleteMany();

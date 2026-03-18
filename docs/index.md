@@ -68,6 +68,7 @@
 | ADR | 決定内容 | ステータス |
 | :--- | :--- | :--- |
 | [ADR-001](./adr/001-purchase-order-transaction-strategy.md) | 発注作成時のトランザクション方針 | 承認済み |
+| [ADR-002](./adr/002-demo-environment-sqlite.md) | デモ環境 DB を SQLite に切り替え | 承認済み |
 
 ### リファレンス (`reference/`)
 

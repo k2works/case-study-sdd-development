@@ -13,7 +13,10 @@
     "lint": "eslint src/",
     "format": "prettier --write src/",
     "type-check": "tsc --noEmit",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:generate:sqlite": "prisma generate --schema=./prisma/schema.sqlite.prisma",
+    "prisma:migrate:sqlite": "prisma migrate dev --schema=./prisma/schema.sqlite.prisma --name init",
+    "start:demo": "bash scripts/start-demo.sh"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -22,7 +25,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/adapter-better-sqlite3": "^7.5.0",
     "@prisma/adapter-pg": "^7.5.0",
+    "better-sqlite3": "^12.8.0",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "pg": "^8.20.0",
@@ -31,6 +36,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@prisma/client": "^7.5.0",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
     "@types/pg": "^8.18.0",
