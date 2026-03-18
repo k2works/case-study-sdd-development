@@ -8,6 +8,7 @@ import { cleanDockerEnv, isDockerAvailable, openUrl } from './shared.js';
 // ============================================
 
 const HEROKU_APP = process.env.HEROKU_DEMO_APP || 'case-study-sdd-development';
+const HEROKU_URL = process.env.HEROKU_DEMO_URL || 'https://case-study-sdd-development-9ccecd92a04d.herokuapp.com/';
 const DOCKERFILE = 'Dockerfile.web';
 const LOCAL_IMAGE = 'fleur-memoire-demo';
 const LOCAL_PORT = 3000;
@@ -95,7 +96,7 @@ export default function (gulp) {
     done();
   });
 
-  gulp.task('demo:open', (done) => {
+  gulp.task('demo:open:local', (done) => {
     openUrl(`http://localhost:${LOCAL_PORT}`);
     done();
   });
@@ -154,8 +155,8 @@ export default function (gulp) {
     done();
   });
 
-  gulp.task('demo:open:heroku', (done) => {
-    heroku('open');
+  gulp.task('demo:open', (done) => {
+    openUrl(HEROKU_URL);
     done();
   });
 
@@ -181,7 +182,7 @@ export default function (gulp) {
     demo:build            Docker イメージをローカルビルド
     demo:run              ローカルでデモコンテナを起動 (localhost:${LOCAL_PORT})
     demo:stop             ローカルのデモコンテナを停止
-    demo:open             ローカルデモをブラウザで開く
+    demo:open:local       ローカルデモをブラウザで開く
     demo:local            ビルド＆起動（ローカル一括）
 
   Heroku デプロイ:
@@ -194,7 +195,7 @@ export default function (gulp) {
     demo:status           dyno ステータスを確認
     demo:logs             リアルタイムログを表示
     demo:restart          dyno を再起動（DB リセット）
-    demo:open:heroku      デモサイトをブラウザで開く
+    demo:open             デモサイトをブラウザで開く
 
   セットアップ:
     demo:setup            初回セットアップ（ログイン→プッシュ→リリース）
