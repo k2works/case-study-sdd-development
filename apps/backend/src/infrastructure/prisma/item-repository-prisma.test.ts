@@ -18,6 +18,7 @@ describe('PrismaItemRepository（統合テスト）', () => {
 
   beforeEach(async () => {
     repository = new PrismaItemRepository(prisma);
+    await prisma.arrival.deleteMany();
     await prisma.purchaseOrder.deleteMany();
     await prisma.productComposition.deleteMany();
     await prisma.item.deleteMany();
@@ -44,10 +45,10 @@ describe('PrismaItemRepository（統合テスト）', () => {
     });
 
     const saved = await repository.save(item);
-    expect(saved.itemId.value).toBeGreaterThan(0);
+    expect(saved.itemId!.value).toBeGreaterThan(0);
     expect(saved.name.value).toBe('赤バラ');
 
-    const found = await repository.findById(saved.itemId);
+    const found = await repository.findById(saved.itemId!);
     expect(found).not.toBeNull();
     expect(found!.name.value).toBe('赤バラ');
   });
@@ -90,7 +91,7 @@ describe('PrismaItemRepository（統合テスト）', () => {
     const updated = saved.changeName(new ItemName('白バラ'));
     await repository.save(updated);
 
-    const found = await repository.findById(saved.itemId);
+    const found = await repository.findById(saved.itemId!);
     expect(found!.name.value).toBe('白バラ');
   });
 

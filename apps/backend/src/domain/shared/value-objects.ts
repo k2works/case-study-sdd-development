@@ -86,10 +86,37 @@ export class CustomerId {
   constructor(public readonly value: number) {
     if (value <= 0) throw new Error('CustomerId は正の整数でなければなりません');
   }
+
+  equals(other: CustomerId): boolean {
+    return this.value === other.value;
+  }
+}
+
+export class DestinationId {
+  constructor(public readonly value: number) {
+    if (value <= 0) throw new Error('DestinationId は正の整数でなければなりません');
+  }
+
+  equals(other: DestinationId): boolean {
+    return this.value === other.value;
+  }
 }
 
 export class DeliveryDate {
-  constructor(public readonly value: Date) {}
+  constructor(
+    public readonly value: Date,
+    options?: { skipValidation?: boolean },
+  ) {
+    if (!options?.skipValidation) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dateOnly = new Date(value);
+      dateOnly.setHours(0, 0, 0, 0);
+      if (dateOnly <= today) {
+        throw new Error('DeliveryDate は過去の日付にできません');
+      }
+    }
+  }
 }
 
 export class ShippingDate {
@@ -134,6 +161,16 @@ export class Message {
   constructor(value: string | null | undefined) {
     this.value = value ?? '';
     if (this.value.length > 500) throw new Error('Message は500文字以内でなければなりません');
+  }
+}
+
+export class ArrivalId {
+  constructor(public readonly value: number) {
+    if (value <= 0) throw new Error('ArrivalId は正の整数でなければなりません');
+  }
+
+  equals(other: ArrivalId): boolean {
+    return this.value === other.value;
   }
 }
 

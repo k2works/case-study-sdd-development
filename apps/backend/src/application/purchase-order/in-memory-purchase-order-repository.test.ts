@@ -37,7 +37,7 @@ describe('InMemoryPurchaseOrderRepository', () => {
 
     const saved = await repository.save(purchaseOrder);
 
-    expect(saved.purchaseOrderId.value).toBe(1);
+    expect(saved.purchaseOrderId!.value).toBe(1);
     await expect(repository.findByStatus('発注済み')).resolves.toEqual([
       expect.objectContaining({
         purchaseOrderId: 1,

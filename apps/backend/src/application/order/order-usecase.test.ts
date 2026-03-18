@@ -171,6 +171,40 @@ describe('OrderUseCase', () => {
     });
   });
 
+  describe('changeDeliveryDate', () => {
+    it('届け日を変更できる', async () => {
+      await setupProductAndStock();
+      const order = await useCase.createOrder(validInput);
+
+      const result = await useCase.changeDeliveryDate(order.orderId!.value, '2026-05-01');
+
+      expect(result.success).toBe(true);
+      expect(result.order).toBeDefined();
+      expect(result.order!.deliveryDate).toBe('2026-05-01');
+      expect(result.order!.shippingDate).toBe('2026-04-30');
+    });
+
+    it('存在しない受注 ID でエラー', async () => {
+      const result = await useCase.changeDeliveryDate(999, '2026-05-01');
+
+      expect(result.success).toBe(false);
+      expect(result.reason).toContain('見つかりません');
+    });
+
+    it('注文済み以外の状態では変更不可', async () => {
+      await setupProductAndStock();
+      const order = await useCase.createOrder(validInput);
+      // 出荷準備中に遷移
+      const prepared = order.prepareShipment();
+      await orderRepository.save(prepared);
+
+      const result = await useCase.changeDeliveryDate(order.orderId!.value, '2026-05-01');
+
+      expect(result.success).toBe(false);
+      expect(result.reason).toContain('注文済み');
+    });
+  });
+
   describe('findAll', () => {
     it('全件取得できる', async () => {
       await setupProductAndStock();

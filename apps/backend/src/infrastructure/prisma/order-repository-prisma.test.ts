@@ -19,12 +19,23 @@ describe('PrismaOrderRepository（統合テスト）', () => {
 
   beforeEach(async () => {
     repository = new PrismaOrderRepository(prisma);
+    await prisma.arrival.deleteMany();
     await prisma.purchaseOrder.deleteMany();
     await prisma.stock.deleteMany();
     await prisma.order.deleteMany();
     await prisma.productComposition.deleteMany();
     await prisma.product.deleteMany();
     await prisma.item.deleteMany();
+    // テスト用顧客を作成（FK 制約対応）
+    await prisma.destination.deleteMany();
+    await prisma.customer.deleteMany();
+    for (const id of [10, 20, 30]) {
+      await prisma.customer.upsert({
+        where: { customerId: id },
+        update: {},
+        create: { customerId: id, name: `テスト顧客${id}`, phone: '03-0000-0000' },
+      });
+    }
     // テスト用仕入先・商品を作成
     await prisma.supplier.upsert({
       where: { supplierId: 1 },

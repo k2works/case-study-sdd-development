@@ -46,6 +46,18 @@ export function createOrderRoutes(useCase: OrderUseCase): Router {
     res.json(responses);
   });
 
+  router.put('/orders/:id/delivery-date', async (req, res) => {
+    const id = Number(req.params.id);
+    const { newDeliveryDate } = req.body;
+
+    try {
+      const result = await useCase.changeDeliveryDate(id, newDeliveryDate);
+      res.json(result);
+    } catch (e) {
+      res.status(400).json({ error: (e as Error).message });
+    }
+  });
+
   router.get('/orders/:id', async (req, res) => {
     const order = await useCase.findById(Number(req.params.id));
     if (!order) {

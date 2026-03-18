@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.2.0] - 2026-03-18
+
+### Features
+
+- IT5 S04/S02/S05 実装完了 — 得意先管理・届け先コピー・届け日変更 (8b60d82)
+- S10 ドメイン層 — Arrival エンティティと PurchaseOrder.receive() 拡張 (121847c)
+- S10 アプリケーション・インフラ・プレゼンテーション層 — 入荷登録機能 (5e04f3d)
+- S10 P09 入荷登録画面 + ナビゲーション導線 (566809b)
+- S11 出荷対象確認 — ShipmentService + ShipmentUseCase + API (3fa541f)
+- S11/S12 P10 出荷一覧画面 + 出荷記録ボタン (9a8bb37)
+- S12 出荷記録 — recordShipment + POST /api/shipments (dd5bdbe)
+
+### Bug Fixes
+
+- arrivals テーブルの外部キー制約に対応した削除順序を修正 (d671f20)
+- SonarQube Code Smell 3 件修正 — Quality Gate PASS (6d4b10a)
+
+### Refactoring
+
+- App.tsx をカスタムフックに分割 + エラーハンドリング改善 + 仕入先名対応 (03f4465)
+- IT4 技術的負債解消（型安全化・バリデーション・スキーマ拡張） (f9808a6)
+
+### Tests
+
+- useApi の Customer/DeliveryDate API テスト追加 (0ae0a97)
+- S10/S11/S12 E2E テスト + テストサーバー修正 (abe8f9a)
+
+### Documentation
+
+- ADR-003 届け日変更時のトランザクション方針を作成 (600d5ac)
+- IT4/IT5 計画・ふりかえり・完了報告書
+- IT5 計画に XP レビュー指摘 11 件を反映
+
+### Chores
+
+- @k2works/claude-code-booster を 2.5.1 に更新 (b016594)
+
 ## [0.1.0] - 2026-03-18
 
 ### Features

@@ -40,7 +40,7 @@ describe('ProductUseCase', () => {
         compositions: [{ itemId: 1, quantity: 5 }],
       });
 
-      const found = await useCase.findById(created.productId.value);
+      const found = await useCase.findById(created.productId!.value);
       expect(found).not.toBeNull();
       expect(found!.name.value).toBe('ローズブーケ');
     });
@@ -70,7 +70,7 @@ describe('ProductUseCase', () => {
       });
 
       const updated = await useCase.update({
-        id: created.productId.value,
+        id: created.productId!.value,
         name: 'スプリングミックス',
         price: 3800,
         compositions: [{ itemId: 2, quantity: 10 }],

@@ -81,11 +81,11 @@ export class StockForecastUseCase {
     }));
 
     return items.map((item) => ({
-      itemId: item.itemId.value,
+      itemId: item.itemId!.value,
       itemName: item.name.value,
       qualityRetentionDays: item.qualityRetentionDays.value,
       forecasts: this.forecastService.calculateForecast(
-        item.itemId,
+        item.itemId!,
         fromDate,
         toDate,
         stockLotDataList,

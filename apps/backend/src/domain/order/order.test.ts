@@ -136,4 +136,43 @@ describe('Order', () => {
       expect(() => order.cancel()).toThrow();
     });
   });
+
+  describe('changeDeliveryDate', () => {
+    it('注文済みの受注の届け日を変更できる', () => {
+      const order = createOrder();
+      const newDeliveryDate = new DeliveryDate(new Date('2026-05-01'));
+      const result = order.changeDeliveryDate(newDeliveryDate);
+
+      expect(result.success).toBe(true);
+      expect(result.order!.deliveryDate.value).toEqual(new Date('2026-05-01'));
+      expect(result.order!.shippingDate.value).toEqual(new Date('2026-04-30'));
+    });
+
+    it('元のインスタンスは変更されない', () => {
+      const order = createOrder();
+      const newDeliveryDate = new DeliveryDate(new Date('2026-05-01'));
+      order.changeDeliveryDate(newDeliveryDate);
+
+      expect(order.deliveryDate.value).toEqual(new Date('2026-04-01'));
+    });
+
+    it('出荷準備中の受注は届け日を変更できない', () => {
+      const order = createOrder({ status: new OrderStatus('出荷準備中') });
+      const newDeliveryDate = new DeliveryDate(new Date('2026-05-01'));
+      const result = order.changeDeliveryDate(newDeliveryDate);
+
+      expect(result.success).toBe(false);
+      expect(result.reason).toBeDefined();
+      expect(result.order).toBeUndefined();
+    });
+
+    it('出荷日が過去になる届け日には変更できない', () => {
+      const order = createOrder();
+      const pastDeliveryDate = new DeliveryDate(new Date('2026-03-18'), { skipValidation: true });
+      const result = order.changeDeliveryDate(pastDeliveryDate);
+
+      expect(result.success).toBe(false);
+      expect(result.reason).toContain('出荷日');
+    });
+  });
 });

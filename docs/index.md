@@ -54,6 +54,12 @@
 | [イテレーション 3 計画](./development/iteration_plan-3.md) | 完了 |
 | [イテレーション 3 ふりかえり](./development/retrospective-3.md) | 完了 |
 | [イテレーション 3 完了報告書](./development/iteration_report-3.md) | 完了 |
+| [イテレーション 4 計画](./development/iteration_plan-4.md) | 完了 |
+| [イテレーション 4 ふりかえり](./development/retrospective-4.md) | 完了 |
+| [イテレーション 4 完了報告書](./development/iteration_report-4.md) | 完了 |
+| [イテレーション 5 計画](./development/iteration_plan-5.md) | 完了 |
+| [イテレーション 5 ふりかえり](./development/retrospective-5.md) | 完了 |
+| [イテレーション 5 完了報告書](./development/iteration_report-5.md) | 完了 |
 
 ### 運用 (`operation/`)
 
@@ -61,6 +67,15 @@
 | :--- | :--- |
 | [アプリケーション開発環境セットアップ手順書](./operation/dev_app_instruction.md) | 完了 |
 | [デモ環境セットアップ手順書（Heroku Container）](./operation/dev_heroku_instruction.md) | 完了 |
+
+### レビュー (`review/`)
+
+| ドキュメント | 対象 | 日付 |
+| :--- | :--- | :--- |
+| [イテレーション 3 計画レビュー](./review/iteration_plan-3_review_20260317.md) | IT3 計画 | 2026-03-17 |
+| [S08 在庫推移レビュー](./review/s08_stock_forecast_review_20260318.md) | S08 在庫推移を確認する | 2026-03-18 |
+| [S09 単品発注レビュー](./review/s09_review_20260318.md) | S09 単品を発注する | 2026-03-18 |
+| [イテレーション 5 計画レビュー](./review/iteration_plan-5_review_20260318.md) | IT5 計画 | 2026-03-18 |
 
 ### ADR (`adr/`)
 
@@ -70,6 +85,7 @@
 | :--- | :--- | :--- |
 | [ADR-001](./adr/001-purchase-order-transaction-strategy.md) | 発注作成時のトランザクション方針 | 承認済み |
 | [ADR-002](./adr/002-demo-environment-sqlite.md) | デモ環境 DB を SQLite に切り替え | 承認済み |
+| [ADR-003](./adr/003-delivery-date-change-transaction-strategy.md) | 届け日変更時のトランザクション方針 | 承認済み |
 
 ### リファレンス (`reference/`)
 

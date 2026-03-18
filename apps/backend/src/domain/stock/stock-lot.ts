@@ -76,6 +76,17 @@ export class StockLot {
     return [allocatedLot, remainingLot];
   }
 
+  deallocate(): StockLot {
+    if (this.status.value !== '引当済み') {
+      throw new Error('引当済みの在庫ロットのみ引当解除できます');
+    }
+    return new StockLot({
+      ...this,
+      status: new StockStatus('有効'),
+      orderId: null,
+    });
+  }
+
   consume(): StockLot {
     if (this.status.value !== '引当済み') {
       throw new Error('引当済みの在庫ロットのみ消費できます');

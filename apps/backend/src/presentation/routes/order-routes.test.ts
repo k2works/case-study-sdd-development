@@ -156,4 +156,38 @@ describe('Order API', () => {
       expect(res.status).toBe(404);
     });
   });
+
+  describe('PUT /api/orders/:id/delivery-date', () => {
+    it('届け日を変更できる', async () => {
+      await setupProductAndStock();
+      const created = await request(app).post('/api/orders').send({
+        customerId: 10,
+        productId: 1,
+        destinationName: '田中太郎',
+        destinationAddress: '東京都',
+        destinationPhone: '03-1234-5678',
+        deliveryDate: '2026-04-01',
+      });
+
+      const res = await request(app)
+        .put(`/api/orders/${created.body.id}/delivery-date`)
+        .send({ newDeliveryDate: '2026-05-01' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.order.deliveryDate).toBe('2026-05-01');
+      expect(res.body.order.shippingDate).toBe('2026-04-30');
+      expect(res.body.order.status).toBe('注文済み');
+    });
+
+    it('存在しない受注 ID で失敗レスポンスを返す', async () => {
+      const res = await request(app)
+        .put('/api/orders/999/delivery-date')
+        .send({ newDeliveryDate: '2026-05-01' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(false);
+      expect(res.body.reason).toBeDefined();
+    });
+  });
 });

@@ -6,16 +6,24 @@ import { createProductRoutes } from './routes/product-routes.js';
 import { createOrderRoutes } from './routes/order-routes.js';
 import { createPurchaseOrderRoutes } from './routes/purchase-order-routes.js';
 import { createStockForecastRoutes } from './routes/stock-forecast-routes.js';
+import { createArrivalRoutes } from './routes/arrival-routes.js';
+import { createShipmentRoutes } from './routes/shipment-routes.js';
+import { createCustomerRoutes } from './routes/customer-routes.js';
 import { ItemUseCase } from '../application/item/item-usecase.js';
 import { ProductUseCase } from '../application/product/product-usecase.js';
 import { OrderUseCase } from '../application/order/order-usecase.js';
 import { PurchaseOrderUseCase } from '../application/purchase-order/purchase-order-usecase.js';
 import { StockForecastUseCase } from '../application/stock/stock-forecast-usecase.js';
+import { ArrivalUseCase } from '../application/arrival/arrival-usecase.js';
+import { ShipmentUseCase } from '../application/shipment/shipment-usecase.js';
+import { CustomerUseCase } from '../application/customer/customer-usecase.js';
 import { PrismaItemRepository } from '../infrastructure/prisma/item-repository-prisma.js';
 import { PrismaProductRepository } from '../infrastructure/prisma/product-repository-prisma.js';
 import { PrismaOrderRepository } from '../infrastructure/prisma/order-repository-prisma.js';
 import { PrismaPurchaseOrderRepository } from '../infrastructure/prisma/purchase-order-repository-prisma.js';
 import { PrismaStockLotRepository } from '../infrastructure/prisma/stock-lot-repository-prisma.js';
+import { PrismaArrivalRepository } from '../infrastructure/prisma/arrival-repository-prisma.js';
+import { PrismaCustomerRepository } from '../infrastructure/prisma/customer-repository-prisma.js';
 import { prisma } from '../infrastructure/prisma/client.js';
 
 const app = express();
@@ -30,7 +38,13 @@ app.get('/api/health', (_req, res) => {
 // 単品 API
 const itemRepository = new PrismaItemRepository(prisma);
 const itemUseCase = new ItemUseCase(itemRepository);
-app.use('/api', createItemRoutes(itemUseCase));
+const supplierNameResolver = {
+  async resolve(supplierId: number): Promise<string> {
+    const supplier = await prisma.supplier.findUnique({ where: { supplierId } });
+    return supplier?.name ?? `仕入先 ${supplierId}`;
+  },
+};
+app.use('/api', createItemRoutes(itemUseCase, supplierNameResolver));
 
 // 商品 API
 const productRepository = new PrismaProductRepository(prisma);
@@ -47,6 +61,25 @@ app.use('/api', createOrderRoutes(orderUseCase));
 const purchaseOrderRepository = new PrismaPurchaseOrderRepository(prisma);
 const purchaseOrderUseCase = new PurchaseOrderUseCase(purchaseOrderRepository, itemRepository);
 app.use('/api', createPurchaseOrderRoutes(purchaseOrderUseCase));
+
+// 入荷 API
+const arrivalRepository = new PrismaArrivalRepository(prisma);
+const arrivalUseCase = new ArrivalUseCase(
+  arrivalRepository,
+  purchaseOrderRepository,
+  stockLotRepository,
+  itemRepository,
+);
+app.use('/api', createArrivalRoutes(arrivalUseCase, purchaseOrderRepository));
+
+// 出荷 API
+const shipmentUseCase = new ShipmentUseCase(orderRepository, productRepository, itemRepository, stockLotRepository);
+app.use('/api', createShipmentRoutes(shipmentUseCase));
+
+// 得意先 API
+const customerRepository = new PrismaCustomerRepository(prisma);
+const customerUseCase = new CustomerUseCase(customerRepository);
+app.use('/api', createCustomerRoutes(customerUseCase, orderUseCase));
 
 // 在庫推移 API
 const stockForecastUseCase = new StockForecastUseCase(

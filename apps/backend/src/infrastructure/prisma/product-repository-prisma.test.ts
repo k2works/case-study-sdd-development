@@ -18,6 +18,7 @@ describe('PrismaProductRepository（統合テスト）', () => {
 
   beforeEach(async () => {
     repository = new PrismaProductRepository(prisma);
+    await prisma.arrival.deleteMany();
     await prisma.purchaseOrder.deleteMany();
     await prisma.productComposition.deleteMany();
     await prisma.product.deleteMany();
@@ -52,10 +53,10 @@ describe('PrismaProductRepository（統合テスト）', () => {
     });
 
     const saved = await repository.save(product);
-    expect(saved.productId.value).toBeGreaterThan(0);
+    expect(saved.productId!.value).toBeGreaterThan(0);
     expect(saved.compositions).toHaveLength(2);
 
-    const found = await repository.findById(saved.productId);
+    const found = await repository.findById(saved.productId!);
     expect(found).not.toBeNull();
     expect(found!.name.value).toBe('ローズブーケ');
     expect(found!.compositions).toHaveLength(2);
@@ -95,7 +96,7 @@ describe('PrismaProductRepository（統合テスト）', () => {
     ]);
     await repository.save(updated);
 
-    const found = await repository.findById(saved.productId);
+    const found = await repository.findById(saved.productId!);
     expect(found!.compositions).toHaveLength(1);
     expect(found!.compositions[0].itemId.value).toBe(2);
     expect(found!.compositions[0].quantity.value).toBe(10);

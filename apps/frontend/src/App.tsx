@@ -1,4 +1,3 @@
-import { useState, useCallback } from 'react'
 import './App.css'
 import { ItemManagement } from './pages/staff/ItemManagement'
 import { ProductManagement } from './pages/staff/ProductManagement'
@@ -10,211 +9,86 @@ import { OrderList } from './pages/staff/OrderList'
 import { OrderDetail } from './pages/staff/OrderDetail'
 import { StockForecast } from './pages/staff/StockForecast'
 import { PurchaseOrderForm } from './pages/staff/PurchaseOrderForm'
-import type { OrderFormProduct, OrderFormData } from './pages/customer/OrderForm'
-import type { ItemDto, CreateItemInput } from './types/item'
-import type { ProductDto, CreateProductInput } from './types/product'
-import type { OrderDto, CreateOrderInput } from './types/order'
-import type { StockForecastItem } from './types/stock-forecast'
-import type { PurchaseOrderInput, PurchaseOrderResult, ItemInfo } from './types/purchase-order'
-import { fetchApi } from './api/client'
-
-const API_BASE = '/api';
-
-const fetchItems = async (): Promise<ItemDto[]> => {
-  const res = await fetch(`${API_BASE}/items`);
-  return res.json();
-};
-
-const createItem = async (input: CreateItemInput): Promise<ItemDto> => {
-  const res = await fetch(`${API_BASE}/items`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
-  return res.json();
-};
-
-const updateItem = async (id: number, input: CreateItemInput): Promise<ItemDto> => {
-  const res = await fetch(`${API_BASE}/items/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
-  return res.json();
-};
-
-const fetchProducts = async (): Promise<ProductDto[]> => {
-  const res = await fetch(`${API_BASE}/products`);
-  return res.json();
-};
-
-const createProduct = async (input: CreateProductInput): Promise<ProductDto> => {
-  const res = await fetch(`${API_BASE}/products`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
-  return res.json();
-};
-
-const updateProduct = async (id: number, input: CreateProductInput): Promise<ProductDto> => {
-  const res = await fetch(`${API_BASE}/products/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
-  return res.json();
-};
-
-const fetchOrders = async (status?: string): Promise<OrderDto[]> => {
-  const query = status ? `?status=${encodeURIComponent(status)}` : '';
-  return fetchApi<OrderDto[]>(`/orders${query}`);
-};
-
-const fetchOrder = async (id: number): Promise<OrderDto> => {
-  return fetchApi<OrderDto>(`/orders/${id}`);
-};
-
-const createOrder = async (input: CreateOrderInput): Promise<OrderDto> => {
-  return fetchApi<OrderDto>('/orders', {
-    method: 'POST',
-    body: JSON.stringify(input),
-  });
-};
-
-const fetchStockForecast = async (
-  fromDate: string,
-  toDate: string,
-  itemId?: number,
-): Promise<StockForecastItem[]> => {
-  const params = new URLSearchParams({ fromDate, toDate });
-  if (itemId) {
-    params.set('itemId', String(itemId));
-  }
-  return fetchApi<StockForecastItem[]>(`/stock/forecast?${params.toString()}`);
-};
-
-type View = 'customer' | 'staff';
-type CustomerPage = 'list' | 'order-form' | 'order-confirm' | 'order-complete';
-type StaffTab = 'products' | 'items' | 'orders' | 'stock-forecast' | 'purchase-order';
+import { ArrivalRegistration } from './pages/staff/ArrivalRegistration'
+import { ShipmentList } from './pages/staff/ShipmentList'
+import { CustomerManagement } from './pages/staff/CustomerManagement'
+import type { CreateOrderInput } from './types/order'
+import { useNavigation } from './hooks/useNavigation'
+import {
+  fetchItems,
+  createItem,
+  updateItem,
+  fetchProducts,
+  createProduct,
+  updateProduct,
+  fetchOrders,
+  fetchOrder,
+  createOrder,
+  fetchStockForecast,
+  fetchItemInfo,
+  createPurchaseOrder,
+  fetchPurchaseOrders,
+  registerArrival,
+  fetchShipments,
+  recordShipment,
+  fetchCustomers,
+  createCustomer,
+  updateCustomer,
+  fetchDestinations,
+  fetchOrderDestinations,
+  changeDeliveryDate,
+} from './hooks/useApi'
 
 function App() {
-  const [view, setView] = useState<View>('customer');
-  const [customerPage, setCustomerPage] = useState<CustomerPage>('list');
-  const [staffTab, setStaffTab] = useState<StaffTab>('products');
+  const nav = useNavigation();
 
-  // 注文フローの状態管理
-  const [selectedProduct, setSelectedProduct] = useState<OrderFormProduct | null>(null);
-  const [orderFormData, setOrderFormData] = useState<OrderFormData | null>(null);
-  const [completedOrder, setCompletedOrder] = useState<OrderDto | null>(null);
-
-  // 受注詳細の状態管理
-  const [detailOrderId, setDetailOrderId] = useState<number | null>(null);
-  const [purchaseItemId, setPurchaseItemId] = useState<number | null>(null);
-
-  const handleOrder = useCallback((product: OrderFormProduct) => {
-    setSelectedProduct(product);
-    setCustomerPage('order-form');
-  }, []);
-
-  const handleOrderConfirm = useCallback((data: OrderFormData) => {
-    setOrderFormData(data);
-    setCustomerPage('order-confirm');
-  }, []);
-
-  const handleOrderSubmit = useCallback(async () => {
-    if (!selectedProduct || !orderFormData) return;
+  const handleOrderSubmit = async () => {
+    if (!nav.selectedProduct || !nav.orderFormData) return;
 
     const input: CreateOrderInput = {
       customerId: 1, // 仮の得意先 ID
-      productId: selectedProduct.id,
-      destinationName: orderFormData.destinationName,
-      destinationAddress: orderFormData.destinationAddress,
-      destinationPhone: orderFormData.destinationPhone,
-      deliveryDate: orderFormData.deliveryDate,
-      message: orderFormData.message || undefined,
+      productId: nav.selectedProduct.id,
+      destinationName: nav.orderFormData.destinationName,
+      destinationAddress: nav.orderFormData.destinationAddress,
+      destinationPhone: nav.orderFormData.destinationPhone,
+      deliveryDate: nav.orderFormData.deliveryDate,
+      message: nav.orderFormData.message || undefined,
     };
 
     const order = await createOrder(input);
-    setCompletedOrder(order);
-    setCustomerPage('order-complete');
-  }, [selectedProduct, orderFormData]);
-
-  const handleBackToList = useCallback(() => {
-    setSelectedProduct(null);
-    setOrderFormData(null);
-    setCompletedOrder(null);
-    setCustomerPage('list');
-  }, []);
-
-  const handleBackToForm = useCallback(() => {
-    setCustomerPage('order-form');
-  }, []);
-
-  const handleViewChange = useCallback((newView: View) => {
-    setView(newView);
-    if (newView === 'customer') {
-      handleBackToList();
-    }
-  }, [handleBackToList]);
-
-  const handleOrderDetail = useCallback((orderId: number) => {
-    setDetailOrderId(orderId);
-  }, []);
-
-  const handleBackFromDetail = useCallback(() => {
-    setDetailOrderId(null);
-  }, []);
-
-  const fetchItemInfo = async (itemId: number): Promise<ItemInfo> => {
-    const items = await fetchItems();
-    const item = items.find(i => i.id === itemId);
-    if (!item) throw new Error('単品が見つかりません');
-    return {
-      itemId: item.id,
-      itemName: item.name,
-      purchaseUnit: item.purchaseUnit,
-      leadTimeDays: item.leadTimeDays,
-      supplierId: item.supplierId,
-      supplierName: `仕入先 ${item.supplierId}`,
-    };
-  };
-
-  const createPurchaseOrder = async (input: PurchaseOrderInput): Promise<PurchaseOrderResult> => {
-    return fetchApi<PurchaseOrderResult>('/purchase-orders', {
-      method: 'POST',
-      body: JSON.stringify(input),
-    });
+    nav.handleOrderComplete(order);
   };
 
   const renderCustomerContent = () => {
-    switch (customerPage) {
+    switch (nav.customerPage) {
       case 'order-form':
-        if (!selectedProduct) return null;
+        if (!nav.selectedProduct) return null;
         return (
           <OrderForm
-            product={selectedProduct}
-            onBack={handleBackToList}
-            onConfirm={handleOrderConfirm}
+            product={nav.selectedProduct}
+            onBack={nav.handleBackToList}
+            onConfirm={nav.handleOrderConfirm}
+            fetchCustomers={fetchCustomers}
+            fetchOrderDestinations={fetchOrderDestinations}
           />
         );
       case 'order-confirm':
-        if (!selectedProduct || !orderFormData) return null;
+        if (!nav.selectedProduct || !nav.orderFormData) return null;
         return (
           <OrderConfirm
-            product={selectedProduct}
-            formData={orderFormData}
-            onBack={handleBackToForm}
+            product={nav.selectedProduct}
+            formData={nav.orderFormData}
+            onBack={nav.handleBackToForm}
             onSubmit={handleOrderSubmit}
           />
         );
       case 'order-complete':
-        if (!completedOrder || !selectedProduct) return null;
+        if (!nav.completedOrder || !nav.selectedProduct) return null;
         return (
           <OrderComplete
-            order={completedOrder}
-            productName={selectedProduct.name}
-            onTop={handleBackToList}
+            order={nav.completedOrder}
+            productName={nav.selectedProduct.name}
+            onTop={nav.handleBackToList}
           />
         );
       default:
@@ -222,19 +96,20 @@ function App() {
           <ProductList
             fetchProducts={fetchProducts}
             fetchItems={fetchItems}
-            onOrder={handleOrder}
+            onOrder={nav.handleOrder}
           />
         );
     }
   };
 
   const renderStaffContent = () => {
-    if (detailOrderId !== null) {
+    if (nav.detailOrderId !== null) {
       return (
         <OrderDetail
-          orderId={detailOrderId}
+          orderId={nav.detailOrderId}
           fetchOrder={fetchOrder}
-          onBack={handleBackFromDetail}
+          onBack={nav.handleBackFromDetail}
+          changeDeliveryDate={changeDeliveryDate}
         />
       );
     }
@@ -243,48 +118,78 @@ function App() {
       <>
         <div className="staff-tabs" role="tablist" aria-label="管理メニュー">
           <button
-            className={`staff-tab${staffTab === 'products' ? ' staff-tab--active' : ''}`}
+            className={`staff-tab${nav.staffTab === 'products' ? ' staff-tab--active' : ''}`}
             role="tab"
-            aria-selected={staffTab === 'products'}
+            aria-selected={nav.staffTab === 'products'}
             aria-controls="panel-products"
-            onClick={() => setStaffTab('products')}
-            disabled={staffTab === 'products'}
+            onClick={() => nav.setStaffTab('products')}
+            disabled={nav.staffTab === 'products'}
           >
             商品管理
           </button>
           <button
-            className={`staff-tab${staffTab === 'items' ? ' staff-tab--active' : ''}`}
+            className={`staff-tab${nav.staffTab === 'items' ? ' staff-tab--active' : ''}`}
             role="tab"
-            aria-selected={staffTab === 'items'}
+            aria-selected={nav.staffTab === 'items'}
             aria-controls="panel-items"
-            onClick={() => setStaffTab('items')}
-            disabled={staffTab === 'items'}
+            onClick={() => nav.setStaffTab('items')}
+            disabled={nav.staffTab === 'items'}
           >
             単品管理
           </button>
           <button
-            className={`staff-tab${staffTab === 'orders' ? ' staff-tab--active' : ''}`}
+            className={`staff-tab${nav.staffTab === 'orders' ? ' staff-tab--active' : ''}`}
             role="tab"
-            aria-selected={staffTab === 'orders'}
+            aria-selected={nav.staffTab === 'orders'}
             aria-controls="panel-orders"
-            onClick={() => setStaffTab('orders')}
-            disabled={staffTab === 'orders'}
+            onClick={() => nav.setStaffTab('orders')}
+            disabled={nav.staffTab === 'orders'}
           >
             受注管理
           </button>
           <button
-            className={`staff-tab${staffTab === 'stock-forecast' ? ' staff-tab--active' : ''}`}
+            className={`staff-tab${nav.staffTab === 'customers' ? ' staff-tab--active' : ''}`}
             role="tab"
-            aria-selected={staffTab === 'stock-forecast'}
+            aria-selected={nav.staffTab === 'customers'}
+            aria-controls="panel-customers"
+            onClick={() => nav.setStaffTab('customers')}
+            disabled={nav.staffTab === 'customers'}
+          >
+            得意先
+          </button>
+          <button
+            className={`staff-tab${nav.staffTab === 'stock-forecast' ? ' staff-tab--active' : ''}`}
+            role="tab"
+            aria-selected={nav.staffTab === 'stock-forecast'}
             aria-controls="panel-stock-forecast"
-            onClick={() => setStaffTab('stock-forecast')}
-            disabled={staffTab === 'stock-forecast'}
+            onClick={() => nav.setStaffTab('stock-forecast')}
+            disabled={nav.staffTab === 'stock-forecast'}
           >
             在庫推移
           </button>
+          <button
+            className={`staff-tab${nav.staffTab === 'arrival' ? ' staff-tab--active' : ''}`}
+            role="tab"
+            aria-selected={nav.staffTab === 'arrival'}
+            aria-controls="panel-arrival"
+            onClick={() => nav.setStaffTab('arrival')}
+            disabled={nav.staffTab === 'arrival'}
+          >
+            入荷登録
+          </button>
+          <button
+            className={`staff-tab${nav.staffTab === 'shipments' ? ' staff-tab--active' : ''}`}
+            role="tab"
+            aria-selected={nav.staffTab === 'shipments'}
+            aria-controls="panel-shipments"
+            onClick={() => nav.setStaffTab('shipments')}
+            disabled={nav.staffTab === 'shipments'}
+          >
+            出荷
+          </button>
         </div>
-        <div role="tabpanel" id={`panel-${staffTab}`}>
-          {staffTab === 'products' && (
+        <div role="tabpanel" id={`panel-${nav.staffTab}`}>
+          {nav.staffTab === 'products' && (
             <ProductManagement
               fetchProducts={fetchProducts}
               createProduct={createProduct}
@@ -292,41 +197,54 @@ function App() {
               fetchItems={fetchItems}
             />
           )}
-          {staffTab === 'items' && (
+          {nav.staffTab === 'items' && (
             <ItemManagement
               fetchItems={fetchItems}
               createItem={createItem}
               updateItem={updateItem}
             />
           )}
-          {staffTab === 'orders' && (
+          {nav.staffTab === 'orders' && (
             <OrderList
               fetchOrders={fetchOrders}
-              onDetail={handleOrderDetail}
+              onDetail={nav.handleOrderDetail}
             />
           )}
-          {staffTab === 'stock-forecast' && (
+          {nav.staffTab === 'customers' && (
+            <CustomerManagement
+              fetchCustomers={fetchCustomers}
+              createCustomer={createCustomer}
+              updateCustomer={updateCustomer}
+              fetchDestinations={fetchDestinations}
+            />
+          )}
+          {nav.staffTab === 'stock-forecast' && (
             <StockForecast
               fetchForecast={fetchStockForecast}
-              onPurchaseOrder={(itemId) => {
-                setPurchaseItemId(itemId);
-                setStaffTab('purchase-order');
-              }}
+              onPurchaseOrder={nav.handlePurchaseOrder}
             />
           )}
-          {staffTab === 'purchase-order' && purchaseItemId && (
+          {nav.staffTab === 'purchase-order' && nav.purchaseItemId && (
             <PurchaseOrderForm
-              itemId={purchaseItemId}
+              itemId={nav.purchaseItemId}
               fetchItemInfo={fetchItemInfo}
               createPurchaseOrder={createPurchaseOrder}
-              onBack={() => {
-                setPurchaseItemId(null);
-                setStaffTab('stock-forecast');
-              }}
-              onSuccess={() => {
-                setPurchaseItemId(null);
-                setStaffTab('stock-forecast');
-              }}
+              onBack={nav.handleBackFromPurchaseOrder}
+              onSuccess={nav.handleBackFromPurchaseOrder}
+            />
+          )}
+          {nav.staffTab === 'shipments' && (
+            <ShipmentList
+              fetchShipments={fetchShipments}
+              recordShipment={recordShipment}
+            />
+          )}
+          {nav.staffTab === 'arrival' && (
+            <ArrivalRegistration
+              fetchPurchaseOrders={fetchPurchaseOrders}
+              fetchItems={fetchItems}
+              registerArrival={registerArrival}
+              onSuccess={() => {}}
             />
           )}
         </div>
@@ -340,26 +258,26 @@ function App() {
         <h1 className="app-title">フレール・メモワール WEB ショップ</h1>
         <nav className="app-nav" aria-label="メインナビゲーション">
           <button
-            className={`nav-button${view === 'customer' ? ' nav-button--active' : ''}`}
-            onClick={() => handleViewChange('customer')}
-            disabled={view === 'customer'}
-            aria-current={view === 'customer' ? 'page' : undefined}
+            className={`nav-button${nav.view === 'customer' ? ' nav-button--active' : ''}`}
+            onClick={() => nav.handleViewChange('customer')}
+            disabled={nav.view === 'customer'}
+            aria-current={nav.view === 'customer' ? 'page' : undefined}
           >
             花束一覧
           </button>
           <button
-            className={`nav-button${view === 'staff' ? ' nav-button--active' : ''}`}
-            onClick={() => handleViewChange('staff')}
-            disabled={view === 'staff'}
-            aria-current={view === 'staff' ? 'page' : undefined}
+            className={`nav-button${nav.view === 'staff' ? ' nav-button--active' : ''}`}
+            onClick={() => nav.handleViewChange('staff')}
+            disabled={nav.view === 'staff'}
+            aria-current={nav.view === 'staff' ? 'page' : undefined}
           >
             管理画面
           </button>
         </nav>
       </header>
       <main className="app-main">
-        {view === 'customer' && renderCustomerContent()}
-        {view === 'staff' && renderStaffContent()}
+        {nav.view === 'customer' && renderCustomerContent()}
+        {nav.view === 'staff' && renderStaffContent()}
       </main>
     </div>
   )

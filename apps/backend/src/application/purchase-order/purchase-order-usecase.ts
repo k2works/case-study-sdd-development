@@ -26,7 +26,7 @@ export class PurchaseOrderUseCase {
     }
 
     const purchaseOrder = PurchaseOrder.createNew({
-      itemId: item.itemId,
+      itemId: item.itemId!,
       quantity: new Quantity(quantity),
       purchaseUnit: item.purchaseUnit,
       leadTimeDays: item.leadTimeDays.value,
@@ -35,7 +35,7 @@ export class PurchaseOrderUseCase {
     const savedPurchaseOrder = await this.purchaseOrderRepository.save(purchaseOrder);
 
     return {
-      purchaseOrderId: savedPurchaseOrder.purchaseOrderId.value,
+      purchaseOrderId: savedPurchaseOrder.purchaseOrderId!.value,
       itemId: savedPurchaseOrder.itemId.value,
       supplierId: savedPurchaseOrder.supplierId.value,
       quantity: savedPurchaseOrder.quantity.value,

@@ -142,20 +142,46 @@ describe('PurchaseOrder', () => {
     expect(purchaseOrder.status.value).toBe('発注済み');
   });
 
-  it('receive で status が 入荷済み に遷移する', () => {
-    const purchaseOrder = createPurchaseOrder();
+  it('receive で全量入荷の場合 status が 入荷済み に遷移する', () => {
+    const purchaseOrder = createPurchaseOrder({ quantity: new Quantity(100) });
 
-    const received = purchaseOrder.receive();
+    const received = purchaseOrder.receive(100);
 
     expect(received.status.value).toBe('入荷済み');
   });
 
-  it('入荷済みから receive を呼ぶとエラーになる', () => {
+  it('receive で入荷数量 = 発注数量（境界値: ちょうど）', () => {
+    const purchaseOrder = createPurchaseOrder({ quantity: new Quantity(10) });
+
+    const received = purchaseOrder.receive(10);
+
+    expect(received.status.value).toBe('入荷済み');
+  });
+
+  it('receive で入荷数量 < 発注数量はエラー（部分入荷非対応）', () => {
+    const purchaseOrder = createPurchaseOrder({ quantity: new Quantity(10) });
+
+    expect(() => purchaseOrder.receive(9)).toThrow('入荷数量は発注数量と一致する必要があります');
+  });
+
+  it('receive で入荷数量 > 発注数量はエラー（超過入荷非対応）', () => {
+    const purchaseOrder = createPurchaseOrder({ quantity: new Quantity(10) });
+
+    expect(() => purchaseOrder.receive(11)).toThrow('入荷数量は発注数量と一致する必要があります');
+  });
+
+  it('receive で入荷数量 0 はエラー', () => {
+    const purchaseOrder = createPurchaseOrder({ quantity: new Quantity(10) });
+
+    expect(() => purchaseOrder.receive(0)).toThrow('入荷数量は発注数量と一致する必要があります');
+  });
+
+  it('入荷済みから receive を呼ぶとエラーになる（二重入荷防止）', () => {
     const purchaseOrder = createPurchaseOrder({
       status: new PurchaseOrderStatus('入荷済み'),
     });
 
-    expect(() => purchaseOrder.receive()).toThrow('既に入荷済みです');
+    expect(() => purchaseOrder.receive(10)).toThrow('既に入荷済みです');
   });
 
   it('createNew で supplierId が Item から引き継がれる', () => {

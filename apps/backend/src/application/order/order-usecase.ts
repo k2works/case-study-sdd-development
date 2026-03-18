@@ -120,6 +120,43 @@ export class OrderUseCase {
     }
   }
 
+  async changeDeliveryDate(
+    orderId: number,
+    newDeliveryDateStr: string,
+  ): Promise<{
+    success: boolean;
+    reason?: string;
+    order?: {
+      orderId: number;
+      deliveryDate: string;
+      shippingDate: string;
+      status: string;
+    };
+  }> {
+    const order = await this.orderRepository.findById(new OrderId(orderId));
+    if (!order) {
+      return { success: false, reason: '受注が見つかりません' };
+    }
+
+    const newDeliveryDate = new DeliveryDate(new Date(newDeliveryDateStr), { skipValidation: true });
+    const result = order.changeDeliveryDate(newDeliveryDate);
+
+    if (!result.success) {
+      return { success: false, reason: result.reason };
+    }
+
+    const saved = await this.orderRepository.save(result.order!);
+    return {
+      success: true,
+      order: {
+        orderId: saved.orderId!.value,
+        deliveryDate: saved.deliveryDate.value.toISOString().split('T')[0],
+        shippingDate: saved.shippingDate.value.toISOString().split('T')[0],
+        status: saved.status.value,
+      },
+    };
+  }
+
   async findById(id: number): Promise<Order | null> {
     return this.orderRepository.findById(new OrderId(id));
   }
@@ -129,6 +166,30 @@ export class OrderUseCase {
       return this.orderRepository.findAll(new OrderStatus(status as OrderStatusValue));
     }
     return this.orderRepository.findAll();
+  }
+
+  async getOrderDestinations(
+    customerId: number,
+  ): Promise<{ name: string; address: string; phone: string }[]> {
+    const orders = await this.orderRepository.findByCustomerId(new CustomerId(customerId));
+
+    // name+address+phone で重複排除
+    const seen = new Set<string>();
+    const destinations: { name: string; address: string; phone: string }[] = [];
+
+    for (const order of orders) {
+      const key = `${order.destination.name}|${order.destination.address}|${order.destination.phone}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        destinations.push({
+          name: order.destination.name,
+          address: order.destination.address,
+          phone: order.destination.phone,
+        });
+      }
+    }
+
+    return destinations;
   }
 
   async getProductName(productId: ProductId): Promise<string> {

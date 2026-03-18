@@ -23,6 +23,7 @@ const mockOrder: OrderDto = {
 
 const mockFetchOrder = vi.fn<(id: number) => Promise<OrderDto>>();
 const mockOnBack = vi.fn();
+const mockChangeDeliveryDate = vi.fn<(orderId: number, newDeliveryDate: string) => Promise<{ success: boolean; reason?: string; order?: { orderId: number; deliveryDate: string; shippingDate: string; status: string } }>>();
 
 describe('OrderDetail', () => {
   beforeEach(() => {
@@ -82,5 +83,99 @@ describe('OrderDetail', () => {
     render(<OrderDetail orderId={1} fetchOrder={mockFetchOrder} onBack={mockOnBack} />);
 
     expect(screen.getByText('読み込み中...')).toBeInTheDocument();
+  });
+
+  describe('届け日変更', () => {
+    beforeEach(() => {
+      mockChangeDeliveryDate.mockResolvedValue({
+        success: true,
+        order: { orderId: 1, deliveryDate: '2026-05-01', shippingDate: '2026-04-30', status: '注文済み' },
+      });
+    });
+
+    it('注文済みの場合、届け日変更セクションが表示される', async () => {
+      render(
+        <OrderDetail
+          orderId={1}
+          fetchOrder={mockFetchOrder}
+          onBack={mockOnBack}
+          changeDeliveryDate={mockChangeDeliveryDate}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('届け日変更')).toBeInTheDocument();
+        expect(screen.getByLabelText('新しい届け日')).toBeInTheDocument();
+      });
+    });
+
+    it('届け日を変更できる', async () => {
+      render(
+        <OrderDetail
+          orderId={1}
+          fetchOrder={mockFetchOrder}
+          onBack={mockOnBack}
+          changeDeliveryDate={mockChangeDeliveryDate}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('届け日変更')).toBeInTheDocument();
+      });
+
+      await userEvent.type(screen.getByLabelText('新しい届け日'), '2026-05-01');
+      await userEvent.click(screen.getByRole('button', { name: '届け日を変更する' }));
+
+      await waitFor(() => {
+        expect(mockChangeDeliveryDate).toHaveBeenCalledWith(1, '2026-05-01');
+      });
+    });
+
+    it('変更失敗時にエラーメッセージが表示される', async () => {
+      mockChangeDeliveryDate.mockResolvedValue({
+        success: false,
+        reason: '届け日を変更できるのは「注文済み」の受注のみです',
+      });
+
+      render(
+        <OrderDetail
+          orderId={1}
+          fetchOrder={mockFetchOrder}
+          onBack={mockOnBack}
+          changeDeliveryDate={mockChangeDeliveryDate}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('届け日変更')).toBeInTheDocument();
+      });
+
+      await userEvent.type(screen.getByLabelText('新しい届け日'), '2026-05-01');
+      await userEvent.click(screen.getByRole('button', { name: '届け日を変更する' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('届け日を変更できるのは「注文済み」の受注のみです')).toBeInTheDocument();
+      });
+    });
+
+    it('出荷準備中の場合は届け日変更セクションが表示されない', async () => {
+      const shippingOrder: OrderDto = { ...mockOrder, status: '出荷準備中' };
+      mockFetchOrder.mockResolvedValue(shippingOrder);
+
+      render(
+        <OrderDetail
+          orderId={1}
+          fetchOrder={mockFetchOrder}
+          onBack={mockOnBack}
+          changeDeliveryDate={mockChangeDeliveryDate}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('出荷準備中')).toBeInTheDocument();
+      });
+
+      expect(screen.queryByText('届け日変更')).not.toBeInTheDocument();
+    });
   });
 });

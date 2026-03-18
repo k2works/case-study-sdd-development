@@ -1,6 +1,6 @@
 import { Order } from '../../domain/order/order.js';
 import { OrderRepository } from '../../domain/order/order-repository.js';
-import { OrderId, OrderStatus } from '../../domain/shared/value-objects.js';
+import { OrderId, OrderStatus, CustomerId } from '../../domain/shared/value-objects.js';
 
 export class InMemoryOrderRepository implements OrderRepository {
   private readonly orders: Map<number, Order> = new Map();
@@ -26,6 +26,20 @@ export class InMemoryOrderRepository implements OrderRepository {
   async findByStatuses(statuses: OrderStatus[]): Promise<Order[]> {
     const statusValues = new Set(statuses.map((status) => status.value));
     return Array.from(this.orders.values()).filter((order) => statusValues.has(order.status.value));
+  }
+
+  async findByShippingDate(shippingDate: Date): Promise<Order[]> {
+    const target = shippingDate.toISOString().slice(0, 10);
+    return Array.from(this.orders.values()).filter((order) => {
+      const sd = order.shippingDate.value.toISOString().slice(0, 10);
+      return sd === target;
+    });
+  }
+
+  async findByCustomerId(customerId: CustomerId): Promise<Order[]> {
+    return Array.from(this.orders.values()).filter(
+      (order) => order.customerId.value === customerId.value,
+    );
   }
 
   async save(order: Order): Promise<Order> {

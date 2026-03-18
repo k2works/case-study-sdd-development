@@ -16,6 +16,14 @@ import {
 export class PrismaPurchaseOrderRepository implements PurchaseOrderRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
+  async findById(id: PurchaseOrderId): Promise<PurchaseOrder | null> {
+    const record = await this.prisma.purchaseOrder.findUnique({
+      where: { purchaseOrderId: id.value },
+    });
+    if (!record) return null;
+    return this.toDomain(record as PurchaseOrderRecord);
+  }
+
   async save(purchaseOrder: PurchaseOrder): Promise<PurchaseOrder> {
     if (!purchaseOrder.purchaseOrderId) {
       const record = await this.prisma.purchaseOrder.create({

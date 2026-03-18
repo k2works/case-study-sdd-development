@@ -53,7 +53,7 @@ describe('ItemUseCase', () => {
         supplierId: 1,
       });
 
-      const found = await useCase.findById(created.itemId.value);
+      const found = await useCase.findById(created.itemId!.value);
 
       expect(found).not.toBeNull();
       expect(found!.name.value).toBe('赤バラ');
@@ -99,7 +99,7 @@ describe('ItemUseCase', () => {
       });
 
       const input: UpdateItemInput = {
-        id: created.itemId.value,
+        id: created.itemId!.value,
         name: '白バラ',
         qualityRetentionDays: 7,
         purchaseUnit: 50,
