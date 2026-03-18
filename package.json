@@ -1,7 +1,6 @@
 {
-  "name": "case-study-sdd-development",
-  "version": "0.0.0",
-  "description": "仕様駆動開発（SDD）のケーススタディ",
+  "name": "",
+  "version": "0.1.0",
   "main": "index.js",
   "scripts": {
     "start": "gulp dev",
@@ -16,7 +15,8 @@
     "claude:yolo": "claude --dangerously-skip-permissions",
     "copilot:yolo": "copilot --allow-all-tools",
     "codex:yolo": "codex --yolo",
-    "gemini:yolo": "gemini --yolo"
+    "gemini:yolo": "gemini --yolo",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -36,8 +36,12 @@
   "homepage": "https://github.com/k2works/case-study-sdd-development#readme",
   "type": "module",
   "dependencies": {
-    "@k2works/claude-code-booster": "^2.1.0",
+    "@k2works/claude-code-booster": "^2.4.0",
     "dotenv": "^17.2.3",
     "gulp": "^5.0.0"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0"
   }
 }

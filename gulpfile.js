@@ -11,6 +11,9 @@ import journalTasks from './ops/scripts/journal.js';
 import vaultTasks from './ops/scripts/vault.js';
 import sshTasks from './ops/scripts/ssh.js';
 import sonarLocalTasks from './ops/scripts/sonar_local.js';
+import developTasks from './ops/scripts/develop.js';
+import deployDemoTasks from './ops/scripts/deploy_demo.js';
+import releaseTasks from './ops/scripts/release.js';
 
 // Load gulp tasks from script modules
 mkdocsTasks(gulp);
@@ -18,6 +21,9 @@ journalTasks(gulp);
 vaultTasks(gulp);
 sshTasks(gulp);
 sonarLocalTasks(gulp);
+developTasks(gulp);
+deployDemoTasks(gulp);
+releaseTasks(gulp);
 
 export const dev = gulp.series('mkdocs:serve', 'mkdocs:open');
 

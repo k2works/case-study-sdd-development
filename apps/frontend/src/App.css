@@ -1,0 +1,14 @@
+.shortage {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.expiry-warning {
+  background-color: #fff3cd;
+}
+
+.legend {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}

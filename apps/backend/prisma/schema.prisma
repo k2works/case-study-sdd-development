@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 仕入先
+model Supplier {
+  supplierId Int      @id @default(autoincrement()) @map("supplier_id")
+  name       String   @db.VarChar(100)
+  phone      String   @db.VarChar(20)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  items          Item[]
+  purchaseOrders PurchaseOrder[]
+
+  @@map("suppliers")
+}
+
+// 単品（花）
+model Item {
+  itemId               Int      @id @default(autoincrement()) @map("item_id")
+  name                 String   @db.VarChar(100)
+  qualityRetentionDays Int      @map("quality_retention_days")
+  purchaseUnit         Int      @map("purchase_unit")
+  leadTimeDays         Int      @map("lead_time_days")
+  supplierId           Int      @map("supplier_id")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  supplier       Supplier             @relation(fields: [supplierId], references: [supplierId])
+  compositions   ProductComposition[]
+  stocks         Stock[]
+  purchaseOrders PurchaseOrder[]
+
+  @@map("items")
+}
+
+// 商品（花束）
+model Product {
+  productId   Int      @id @default(autoincrement()) @map("product_id")
+  name        String   @db.VarChar(100)
+  price       Int
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  compositions ProductComposition[]
+  orders       Order[]
+
+  @@map("products")
+}
+
+// 商品構成
+model ProductComposition {
+  productId Int @map("product_id")
+  itemId    Int @map("item_id")
+  quantity  Int
+
+  product Product @relation(fields: [productId], references: [productId])
+  item    Item    @relation(fields: [itemId], references: [itemId])
+
+  @@id([productId, itemId])
+  @@map("product_compositions")
+}
+
+// 受注
+model Order {
+  orderId            Int      @id @default(autoincrement()) @map("order_id")
+  customerId         Int      @map("customer_id")
+  productId          Int      @map("product_id")
+  price              Int
+  destinationName    String   @map("destination_name") @db.VarChar(100)
+  destinationAddress String   @map("destination_address") @db.VarChar(255)
+  destinationPhone   String   @map("destination_phone") @db.VarChar(20)
+  deliveryDate       DateTime @map("delivery_date") @db.Date
+  shippingDate       DateTime @map("shipping_date") @db.Date
+  message            String?  @db.VarChar(500)
+  status             String   @db.VarChar(20)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [productId])
+  stocks  Stock[]
+
+  @@map("orders")
+}
+
+// 在庫ロット
+model Stock {
+  stockId     Int      @id @default(autoincrement()) @map("stock_id")
+  itemId      Int      @map("item_id")
+  quantity    Int
+  arrivalDate DateTime @map("arrival_date") @db.Date
+  expiryDate  DateTime @map("expiry_date") @db.Date
+  status      String   @db.VarChar(20)
+  orderId     Int?     @map("order_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  item  Item   @relation(fields: [itemId], references: [itemId])
+  order Order? @relation(fields: [orderId], references: [orderId])
+
+  @@map("stocks")
+}
+
+// 発注（IT3 で追加）
+model PurchaseOrder {
+  purchaseOrderId     Int      @id @default(autoincrement()) @map("purchase_order_id")
+  itemId              Int      @map("item_id")
+  supplierId          Int      @map("supplier_id")
+  quantity            Int
+  orderDate           DateTime @map("order_date") @db.Date
+  expectedArrivalDate DateTime @map("expected_arrival_date") @db.Date
+  status              String   @db.VarChar(20)
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  item     Item     @relation(fields: [itemId], references: [itemId])
+  supplier Supplier @relation(fields: [supplierId], references: [supplierId])
+
+  @@map("purchase_orders")
+}

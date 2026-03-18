@@ -49,6 +49,14 @@
 | `developing-backend` | バックエンド TDD（インサイドアウト） |
 | `developing-frontend` | フロントエンド TDD（アウトサイドイン） |
 
+### レビュー
+
+| スキル | 用途 |
+| :--- | :--- |
+| `analyzing-review` | 分析成果物のマルチパースペクティブレビュー |
+| `developing-review` | 開発成果物のマルチパースペクティブレビュー |
+| `operating-review` | 運用成果物のマルチパースペクティブレビュー |
+
 ### 計画・進捗
 
 | スキル | 用途 |

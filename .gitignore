@@ -20,9 +20,26 @@ Thumbs.db
 dist/
 build/
 
+# Coverage
+coverage/
+
+# Prisma
+apps/backend/src/generated/
+
+# SonarQube
+.scannerwork/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+
 # Logs
 *.log
 npm-debug.log*
 
 tmp
 .agents
+
+# Claude
+.claude/agent-memory/

@@ -306,6 +306,8 @@ function runScan(project, token, hostUrl) {
         `-Dsonar.sources=src ` +
         `-Dsonar.tests=src ` +
         `-Dsonar.test.inclusions="**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx" ` +
+        `-Dsonar.exclusions="**/generated/**,**/node_modules/**,**/test-server.ts" ` +
+        `-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info ` +
         `-Dsonar.host.url=${hostUrl} ` +
         `-Dsonar.token=${token}`,
         { stdio: 'inherit', cwd, env: cleanDockerEnv() },
@@ -513,30 +515,49 @@ export default function (gulp) {
 
   gulp.task('sonar-local:gate', (done) => {
     try {
-      const projectKey = sonarProjectKey();
-      console.log('=== Quality Gate ステータス確認 ===');
+      const projects = loadProjects();
+      const projectKeys = process.env.SONAR_PROJECT_KEY
+        ? [process.env.SONAR_PROJECT_KEY]
+        : projects.map((p) => p.projectKey);
 
-      const data = sonarApi('/api/qualitygates/project_status', { projectKey });
-      const status = data.projectStatus?.status || 'UNKNOWN';
-      const conditions = data.projectStatus?.conditions || [];
-
-      const icon = status === 'OK' ? 'PASS' : 'FAIL';
-      console.log(`  Quality Gate: ${icon} (${status})`);
-
-      if (conditions.length > 0) {
-        console.log('');
-        console.log('  条件:');
-        for (const c of conditions) {
-          const condIcon = c.status === 'OK' ? 'o' : 'x';
-          const actual = c.actualValue ?? '-';
-          const threshold = c.errorThreshold ?? '-';
-          console.log(`    [${condIcon}] ${c.metricKey}: ${actual} (閾値: ${threshold})`);
-        }
+      if (projectKeys.length === 0) {
+        projectKeys.push('my-project');
       }
 
-      console.log('');
-      if (status !== 'OK') {
-        console.log('  Quality Gate を通過していません。sonar-local:issues で詳細を確認してください。');
+      let allPassed = true;
+
+      for (const projectKey of projectKeys) {
+        const label = projects.find((p) => p.projectKey === projectKey)?.label || projectKey;
+        console.log(`=== Quality Gate ステータス確認 [${label}] ===`);
+
+        const data = sonarApi('/api/qualitygates/project_status', { projectKey });
+        const status = data.projectStatus?.status || 'UNKNOWN';
+        const conditions = data.projectStatus?.conditions || [];
+
+        const icon = status === 'OK' ? 'PASS' : 'FAIL';
+        console.log(`  Quality Gate: ${icon} (${status})`);
+
+        if (conditions.length > 0) {
+          console.log('');
+          console.log('  条件:');
+          for (const c of conditions) {
+            const condIcon = c.status === 'OK' ? 'o' : 'x';
+            const actual = c.actualValue ?? '-';
+            const threshold = c.errorThreshold ?? '-';
+            console.log(`    [${condIcon}] ${c.metricKey}: ${actual} (閾値: ${threshold})`);
+          }
+        }
+
+        if (status !== 'OK') {
+          allPassed = false;
+          console.log('');
+          console.log('  Quality Gate を通過していません。sonar-local:issues で詳細を確認してください。');
+        }
+        console.log('');
+      }
+
+      if (allPassed) {
+        console.log('すべてのプロジェクトが Quality Gate を通過しました。');
       }
       done();
     } catch (error) {
@@ -546,9 +567,20 @@ export default function (gulp) {
 
   gulp.task('sonar-local:issues', (done) => {
     try {
-      const projectKey = sonarProjectKey();
+      const projects = loadProjects();
+      const projectKeys = process.env.SONAR_PROJECT_KEY
+        ? [process.env.SONAR_PROJECT_KEY]
+        : projects.map((p) => p.projectKey);
+
+      if (projectKeys.length === 0) {
+        projectKeys.push('my-project');
+      }
+
       const hostUrl = sonarHostUrl();
-      console.log('=== SonarQube プロジェクトサマリー ===');
+
+      for (const projectKey of projectKeys) {
+      const label = projects.find((p) => p.projectKey === projectKey)?.label || projectKey;
+      console.log(`=== SonarQube プロジェクトサマリー [${label}] ===`);
 
       // メトリクスを取得
       const metricsData = sonarApi('/api/measures/component', {
@@ -657,6 +689,7 @@ export default function (gulp) {
 
       console.log('');
       console.log(`詳細: ${hostUrl}/dashboard?id=${projectKey}`);
+      } // end for projectKeys
       done();
     } catch (error) {
       done(error);

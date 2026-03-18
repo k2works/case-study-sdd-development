@@ -1,0 +1,18 @@
+{
+  "projects": [
+    {
+      "name": "backend",
+      "label": "Backend",
+      "projectKey": "fleur-memoire-backend",
+      "scanType": "sonar-scanner",
+      "srcDir": "apps/backend"
+    },
+    {
+      "name": "frontend",
+      "label": "Frontend",
+      "projectKey": "fleur-memoire-frontend",
+      "scanType": "sonar-scanner",
+      "srcDir": "apps/frontend"
+    }
+  ]
+}

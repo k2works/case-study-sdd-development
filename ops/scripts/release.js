@@ -352,22 +352,45 @@ export default function (gulp, options = {}) {
 
   gulp.task('release:preflight:lint', (done) => {
     console.log('[2/5] Lint...');
-    runCommandInDir('npm run lint', rootDir, done);
+    try {
+      execSync('npm run lint', { cwd: path.join(rootDir, 'apps/backend'), stdio: 'inherit' });
+      execSync('npm run lint', { cwd: path.join(rootDir, 'apps/frontend'), stdio: 'inherit' });
+      done();
+    } catch (error) {
+      done(error);
+    }
   });
 
   gulp.task('release:preflight:test', (done) => {
     console.log('[3/5] Test...');
-    runCommandInDir('npm run test', rootDir, done);
+    try {
+      execSync('npm test', { cwd: path.join(rootDir, 'apps/backend'), stdio: 'inherit' });
+      execSync('npm test', { cwd: path.join(rootDir, 'apps/frontend'), stdio: 'inherit' });
+      done();
+    } catch (error) {
+      done(error);
+    }
   });
 
   gulp.task('release:preflight:build', (done) => {
     console.log('[4/5] Build...');
-    runCommandInDir('npm run build', rootDir, done);
+    try {
+      execSync('npm run build', { cwd: path.join(rootDir, 'apps/backend'), stdio: 'inherit' });
+      execSync('npm run build', { cwd: path.join(rootDir, 'apps/frontend'), stdio: 'inherit' });
+      done();
+    } catch (error) {
+      done(error);
+    }
   });
 
   gulp.task('release:preflight:e2e', (done) => {
     console.log('[5/5] E2E Test...');
-    runCommandInDir('npm run test:e2e', rootDir, done);
+    try {
+      execSync('npm run test:e2e', { cwd: path.join(rootDir, 'apps/frontend'), stdio: 'inherit' });
+      done();
+    } catch (error) {
+      done(error);
+    }
   });
 
   gulp.task(
@@ -423,9 +446,14 @@ export default function (gulp, options = {}) {
 
   // ──────────────────────────────────────────────
   // release:deploy:* (release + deploy)
+  // deploy:prd タスクが定義されている場合のみ登録
   // ──────────────────────────────────────────────
 
-  gulp.task('release:deploy:patch', gulp.series('release:patch', 'deploy:prd'));
-  gulp.task('release:deploy:minor', gulp.series('release:minor', 'deploy:prd'));
-  gulp.task('release:deploy:major', gulp.series('release:major', 'deploy:prd'));
+  try {
+    gulp.task('release:deploy:patch', gulp.series('release:patch', 'deploy:prd'));
+    gulp.task('release:deploy:minor', gulp.series('release:minor', 'deploy:prd'));
+    gulp.task('release:deploy:major', gulp.series('release:major', 'deploy:prd'));
+  } catch {
+    // deploy:prd が未定義の場合はスキップ
+  }
 }
