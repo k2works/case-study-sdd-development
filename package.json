@@ -20,19 +20,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/k2works/{project_name}.git"
+    "url": "git+https://github.com/k2works/case-study-sdd-development.git"
   },
   "keywords": [
-    "ai",
-    "programming",
-    "learning"
+    "sdd",
+    "xp",
+    "tdd",
+    "case-study"
   ],
-  "author": "",
+  "author": "k2works",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/k2works/{project_name}/issues"
+    "url": "https://github.com/k2works/case-study-sdd-development/issues"
   },
-  "homepage": "https://github.com/k2works/{project_name}#readme",
+  "homepage": "https://github.com/k2works/case-study-sdd-development#readme",
   "type": "module",
   "dependencies": {
     "@k2works/claude-code-booster": "^2.5.1",
