@@ -1,0 +1,17 @@
+**/node_modules
+.git
+**/.env
+*.db
+*.db-journal
+docs
+ops
+.claude
+.cursor
+.windsurf
+.github
+.husky
+.idea
+.agents
+.devcontainer
+site
+**/.scannerwork

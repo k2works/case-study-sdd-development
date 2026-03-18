@@ -1,3 +1,5 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { createItemRoutes } from './routes/item-routes.js';
 import { createProductRoutes } from './routes/product-routes.js';
@@ -55,5 +57,20 @@ const stockForecastUseCase = new StockForecastUseCase(
   itemRepository,
 );
 app.use('/api', createStockForecastRoutes(stockForecastUseCase));
+
+// 静的ファイル配信（デモ環境用: フロントエンドビルド成果物）
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const publicDir = process.env.PUBLIC_DIR || path.resolve(__dirname, '../../public');
+app.use(express.static(publicDir));
+
+// SPA フォールバック: API 以外のパスは index.html を返す
+app.get('{*path}', (_req, res) => {
+  const indexPath = path.join(publicDir, 'index.html');
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      res.status(404).json({ error: 'Not found' });
+    }
+  });
+});
 
 export { app };

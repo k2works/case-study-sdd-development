@@ -1,0 +1,60 @@
+# =============================================================================
+# デモ環境用 Dockerfile（Heroku Container Registry 向け）
+# フロントエンド + バックエンドを単一コンテナで配信
+# SQLite を使用（エフェメラル: dyno 再起動で初期状態にリセット）
+# =============================================================================
+
+# --- Stage 1: フロントエンドビルド ---
+FROM node:22-slim AS frontend-build
+WORKDIR /app/frontend
+COPY apps/frontend/package.json apps/frontend/package-lock.json* ./
+RUN npm ci
+COPY apps/frontend/ ./
+RUN npm run build
+
+# --- Stage 2: バックエンドビルド ---
+FROM node:22-slim AS backend-build
+WORKDIR /app/backend
+COPY apps/backend/package.json apps/backend/package-lock.json* ./
+RUN npm ci
+COPY apps/backend/ ./
+# SQLite 用 Prisma Client を生成（tsc コンパイル前に .ts を差し替え）
+RUN npx prisma generate --config=prisma.config.sqlite.ts
+# TypeScript コンパイル（SQLite 用 Prisma Client を含む）
+RUN npm run build
+
+# --- Stage 3: 本番イメージ ---
+FROM node:22-slim AS production
+WORKDIR /app
+
+# better-sqlite3 のネイティブビルドに必要
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# 起動時に prisma migrate deploy + tsx seed.ts を実行するため全依存をインストール
+COPY apps/backend/package.json apps/backend/package-lock.json* ./
+RUN npm ci
+
+# バックエンドビルド成果物
+COPY --from=backend-build /app/backend/dist ./dist
+COPY --from=backend-build /app/backend/src/generated ./src/generated
+
+# Prisma スキーマ・マイグレーション・シード
+COPY apps/backend/prisma ./prisma
+COPY apps/backend/prisma.config.sqlite.ts ./prisma.config.sqlite.ts
+
+# デモ起動スクリプト
+COPY apps/backend/scripts/start-demo.sh ./scripts/start-demo.sh
+RUN chmod +x ./scripts/start-demo.sh
+
+# フロントエンドビルド成果物を public/ に配置
+COPY --from=frontend-build /app/frontend/dist ./public
+
+ENV DB_PROVIDER=sqlite
+ENV SQLITE_DB_PATH=./prisma/dev.db
+ENV PUBLIC_DIR=./public
+ENV NODE_ENV=production
+
+# Heroku は $PORT を動的に割り当てる
+CMD ["bash", "scripts/start-demo.sh"]

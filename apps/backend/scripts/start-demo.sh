@@ -1,6 +1,6 @@
 #!/bin/bash
 # デモ環境起動スクリプト（SQLite モード）
-# Heroku の dyno 起動時に generate + migrate + seed → サーバー開始
+# Heroku の dyno 起動時に migrate + seed → サーバー開始
 
 set -e
 
@@ -11,10 +11,6 @@ echo "=== Demo mode (SQLite) ==="
 
 # 古い DB ファイルを削除（エフェメラルなのでクリーンスタート）
 rm -f "$SQLITE_DB_PATH"
-
-# SQLite 用スキーマで Prisma Client を生成
-echo "Generating Prisma Client (SQLite)..."
-npx prisma generate --config=prisma.config.sqlite.ts
 
 # マイグレーション適用
 echo "Running migrations..."
