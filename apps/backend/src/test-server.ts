@@ -19,8 +19,9 @@ import { InMemoryOrderRepository } from './application/order/in-memory-order-rep
 import { InMemoryStockLotRepository } from './application/stock/in-memory-stock-lot-repository.js';
 import { InMemoryPurchaseOrderRepository } from './application/purchase-order/in-memory-purchase-order-repository.js';
 import { InMemoryArrivalRepository } from './application/arrival/in-memory-arrival-repository.js';
+import { PurchaseOrder } from './domain/purchase-order/purchase-order.js';
 import { StockLot } from './domain/stock/stock-lot.js';
-import { ItemId, Quantity } from './domain/shared/value-objects.js';
+import { ItemId, PurchaseOrderStatus, Quantity, SupplierId } from './domain/shared/value-objects.js';
 
 const app = express();
 
@@ -110,7 +111,7 @@ app.post('/api/test/stock-lots', async (req, res) => {
   });
 });
 
-app.post('/api/test/purchase-orders', (req, res) => {
+app.post('/api/test/purchase-orders', async (req, res) => {
   const { itemId, quantity, expectedArrivalDate, status = '発注済み' } = req.body;
 
   if (!itemId || !quantity || !expectedArrivalDate) {
@@ -118,17 +119,25 @@ app.post('/api/test/purchase-orders', (req, res) => {
     return;
   }
 
-  purchaseOrderRepository.addRecord({
-    purchaseOrderId: Date.now(),
-    itemId: Number(itemId),
-    supplierId: 1,
-    quantity: Number(quantity),
-    orderDate: new Date(),
-    expectedArrivalDate: new Date(expectedArrivalDate),
-    status,
-  });
+  const po = await purchaseOrderRepository.save(
+    new PurchaseOrder({
+      purchaseOrderId: null,
+      itemId: new ItemId(Number(itemId)),
+      supplierId: new SupplierId(1),
+      quantity: new Quantity(Number(quantity)),
+      orderDate: new Date(),
+      expectedArrivalDate: new Date(expectedArrivalDate),
+      status: new PurchaseOrderStatus(status as '発注済み' | '入荷済み'),
+    }),
+  );
 
-  res.status(201).json({ itemId, quantity, expectedArrivalDate, status });
+  res.status(201).json({
+    purchaseOrderId: po.purchaseOrderId?.value,
+    itemId: po.itemId.value,
+    quantity: po.quantity.value,
+    expectedArrivalDate: po.expectedArrivalDate.toISOString(),
+    status: po.status.value,
+  });
 });
 
 const PORT = process.env.PORT || 8080;
