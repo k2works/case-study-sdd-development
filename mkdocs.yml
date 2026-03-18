@@ -130,6 +130,11 @@ nav:
       - SonarQube ローカル環境セットアップ手順書: reference/SonarQubeローカル環境セットアップ手順書.md
       - 運用スクリプト作成ガイド: reference/運用スクリプト作成ガイド.md
       - Vim 操作マニュアル: reference/Vim操作マニュアル.md
+  - レビュー:
+      - 概要: review/index.md
+      - イテレーション 3 計画レビュー: review/iteration_plan-3_review_20260317.md
+      - S08 在庫推移レビュー: review/s08_stock_forecast_review_20260318.md
+      - S09 単品発注レビュー: review/s09_review_20260318.md
   - ADR:
       - 概要: adr/index.md
       - ADR-001 発注トランザクション方針: adr/001-purchase-order-transaction-strategy.md

@@ -63,6 +63,14 @@
 | [アプリケーション開発環境セットアップ手順書](./operation/dev_app_instruction.md) | 完了 |
 | [デモ環境セットアップ手順書（Heroku Container）](./operation/dev_heroku_instruction.md) | 完了 |
 
+### レビュー (`review/`)
+
+| ドキュメント | 対象 | 日付 |
+| :--- | :--- | :--- |
+| [イテレーション 3 計画レビュー](./review/iteration_plan-3_review_20260317.md) | IT3 計画 | 2026-03-17 |
+| [S08 在庫推移レビュー](./review/s08_stock_forecast_review_20260318.md) | S08 在庫推移を確認する | 2026-03-18 |
+| [S09 単品発注レビュー](./review/s09_review_20260318.md) | S09 単品を発注する | 2026-03-18 |
+
 ### ADR (`adr/`)
 
 技術的意思決定を記録した Architecture Decision Records です。
