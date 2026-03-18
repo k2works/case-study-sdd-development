@@ -10,12 +10,14 @@ import { OrderList } from './pages/staff/OrderList'
 import { OrderDetail } from './pages/staff/OrderDetail'
 import { StockForecast } from './pages/staff/StockForecast'
 import { PurchaseOrderForm } from './pages/staff/PurchaseOrderForm'
+import { ArrivalRegistration } from './pages/staff/ArrivalRegistration'
 import type { OrderFormProduct, OrderFormData } from './pages/customer/OrderForm'
 import type { ItemDto, CreateItemInput } from './types/item'
 import type { ProductDto, CreateProductInput } from './types/product'
 import type { OrderDto, CreateOrderInput } from './types/order'
 import type { StockForecastItem } from './types/stock-forecast'
 import type { PurchaseOrderInput, PurchaseOrderResult, ItemInfo } from './types/purchase-order'
+import type { PurchaseOrderRecord, RegisterArrivalInput, RegisterArrivalResult } from './types/arrival'
 import { fetchApi } from './api/client'
 
 const API_BASE = '/api';
@@ -96,7 +98,7 @@ const fetchStockForecast = async (
 
 type View = 'customer' | 'staff';
 type CustomerPage = 'list' | 'order-form' | 'order-confirm' | 'order-complete';
-type StaffTab = 'products' | 'items' | 'orders' | 'stock-forecast' | 'purchase-order';
+type StaffTab = 'products' | 'items' | 'orders' | 'stock-forecast' | 'purchase-order' | 'arrival';
 
 function App() {
   const [view, setView] = useState<View>('customer');
@@ -182,6 +184,17 @@ function App() {
 
   const createPurchaseOrder = async (input: PurchaseOrderInput): Promise<PurchaseOrderResult> => {
     return fetchApi<PurchaseOrderResult>('/purchase-orders', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  };
+
+  const fetchPurchaseOrders = async (): Promise<PurchaseOrderRecord[]> => {
+    return fetchApi<PurchaseOrderRecord[]>('/purchase-orders?status=発注済み');
+  };
+
+  const registerArrival = async (input: RegisterArrivalInput): Promise<RegisterArrivalResult> => {
+    return fetchApi<RegisterArrivalResult>('/arrivals', {
       method: 'POST',
       body: JSON.stringify(input),
     });
@@ -282,6 +295,16 @@ function App() {
           >
             在庫推移
           </button>
+          <button
+            className={`staff-tab${staffTab === 'arrival' ? ' staff-tab--active' : ''}`}
+            role="tab"
+            aria-selected={staffTab === 'arrival'}
+            aria-controls="panel-arrival"
+            onClick={() => setStaffTab('arrival')}
+            disabled={staffTab === 'arrival'}
+          >
+            入荷登録
+          </button>
         </div>
         <div role="tabpanel" id={`panel-${staffTab}`}>
           {staffTab === 'products' && (
@@ -326,6 +349,16 @@ function App() {
               onSuccess={() => {
                 setPurchaseItemId(null);
                 setStaffTab('stock-forecast');
+              }}
+            />
+          )}
+          {staffTab === 'arrival' && (
+            <ArrivalRegistration
+              fetchPurchaseOrders={fetchPurchaseOrders}
+              fetchItems={fetchItems}
+              registerArrival={registerArrival}
+              onSuccess={() => {
+                // 登録後はそのまま入荷登録画面に留まる（一覧がリロードされる）
               }}
             />
           )}
