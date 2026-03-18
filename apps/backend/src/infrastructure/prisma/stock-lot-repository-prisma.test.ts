@@ -18,6 +18,7 @@ describe('PrismaStockLotRepository（統合テスト）', () => {
 
   beforeEach(async () => {
     repository = new PrismaStockLotRepository(prisma);
+    await prisma.purchaseOrder.deleteMany();
     await prisma.stock.deleteMany();
     await prisma.productComposition.deleteMany();
     await prisma.product.deleteMany();
