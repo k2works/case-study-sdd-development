@@ -352,22 +352,45 @@ export default function (gulp, options = {}) {
 
   gulp.task('release:preflight:lint', (done) => {
     console.log('[2/5] Lint...');
-    runCommandInDir('npm run lint', rootDir, done);
+    try {
+      execSync('npm run lint', { cwd: path.join(rootDir, 'apps/backend'), stdio: 'inherit' });
+      execSync('npm run lint', { cwd: path.join(rootDir, 'apps/frontend'), stdio: 'inherit' });
+      done();
+    } catch (error) {
+      done(error);
+    }
   });
 
   gulp.task('release:preflight:test', (done) => {
     console.log('[3/5] Test...');
-    runCommandInDir('npm run test', rootDir, done);
+    try {
+      execSync('npm test', { cwd: path.join(rootDir, 'apps/backend'), stdio: 'inherit' });
+      execSync('npm test', { cwd: path.join(rootDir, 'apps/frontend'), stdio: 'inherit' });
+      done();
+    } catch (error) {
+      done(error);
+    }
   });
 
   gulp.task('release:preflight:build', (done) => {
     console.log('[4/5] Build...');
-    runCommandInDir('npm run build', rootDir, done);
+    try {
+      execSync('npm run build', { cwd: path.join(rootDir, 'apps/backend'), stdio: 'inherit' });
+      execSync('npm run build', { cwd: path.join(rootDir, 'apps/frontend'), stdio: 'inherit' });
+      done();
+    } catch (error) {
+      done(error);
+    }
   });
 
   gulp.task('release:preflight:e2e', (done) => {
     console.log('[5/5] E2E Test...');
-    runCommandInDir('npm run test:e2e', rootDir, done);
+    try {
+      execSync('npm run test:e2e', { cwd: path.join(rootDir, 'apps/frontend'), stdio: 'inherit' });
+      done();
+    } catch (error) {
+      done(error);
+    }
   });
 
   gulp.task(
