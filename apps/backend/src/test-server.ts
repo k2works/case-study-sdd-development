@@ -5,12 +5,14 @@ import { createOrderRoutes } from './presentation/routes/order-routes.js';
 import { createStockForecastRoutes } from './presentation/routes/stock-forecast-routes.js';
 import { createPurchaseOrderRoutes } from './presentation/routes/purchase-order-routes.js';
 import { createArrivalRoutes } from './presentation/routes/arrival-routes.js';
+import { createShipmentRoutes } from './presentation/routes/shipment-routes.js';
 import { ItemUseCase } from './application/item/item-usecase.js';
 import { ProductUseCase } from './application/product/product-usecase.js';
 import { OrderUseCase } from './application/order/order-usecase.js';
 import { PurchaseOrderUseCase } from './application/purchase-order/purchase-order-usecase.js';
 import { StockForecastUseCase } from './application/stock/stock-forecast-usecase.js';
 import { ArrivalUseCase } from './application/arrival/arrival-usecase.js';
+import { ShipmentUseCase } from './application/shipment/shipment-usecase.js';
 import { InMemoryItemRepository } from './application/item/in-memory-item-repository.js';
 import { InMemoryProductRepository } from './application/product/in-memory-product-repository.js';
 import { InMemoryOrderRepository } from './application/order/in-memory-order-repository.js';
@@ -53,6 +55,9 @@ const arrivalUseCase = new ArrivalUseCase(
   itemRepository,
 );
 app.use('/api', createArrivalRoutes(arrivalUseCase, purchaseOrderRepository));
+
+const shipmentUseCase = new ShipmentUseCase(orderRepository, productRepository, itemRepository);
+app.use('/api', createShipmentRoutes(shipmentUseCase));
 
 const stockForecastUseCase = new StockForecastUseCase(
   stockLotRepository,

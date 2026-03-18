@@ -7,12 +7,14 @@ import { createOrderRoutes } from './routes/order-routes.js';
 import { createPurchaseOrderRoutes } from './routes/purchase-order-routes.js';
 import { createStockForecastRoutes } from './routes/stock-forecast-routes.js';
 import { createArrivalRoutes } from './routes/arrival-routes.js';
+import { createShipmentRoutes } from './routes/shipment-routes.js';
 import { ItemUseCase } from '../application/item/item-usecase.js';
 import { ProductUseCase } from '../application/product/product-usecase.js';
 import { OrderUseCase } from '../application/order/order-usecase.js';
 import { PurchaseOrderUseCase } from '../application/purchase-order/purchase-order-usecase.js';
 import { StockForecastUseCase } from '../application/stock/stock-forecast-usecase.js';
 import { ArrivalUseCase } from '../application/arrival/arrival-usecase.js';
+import { ShipmentUseCase } from '../application/shipment/shipment-usecase.js';
 import { PrismaItemRepository } from '../infrastructure/prisma/item-repository-prisma.js';
 import { PrismaProductRepository } from '../infrastructure/prisma/product-repository-prisma.js';
 import { PrismaOrderRepository } from '../infrastructure/prisma/order-repository-prisma.js';
@@ -60,6 +62,10 @@ const arrivalUseCase = new ArrivalUseCase(
   itemRepository,
 );
 app.use('/api', createArrivalRoutes(arrivalUseCase, purchaseOrderRepository));
+
+// 出荷 API
+const shipmentUseCase = new ShipmentUseCase(orderRepository, productRepository, itemRepository);
+app.use('/api', createShipmentRoutes(shipmentUseCase));
 
 // 在庫推移 API
 const stockForecastUseCase = new StockForecastUseCase(

@@ -28,6 +28,14 @@ export class InMemoryOrderRepository implements OrderRepository {
     return Array.from(this.orders.values()).filter((order) => statusValues.has(order.status.value));
   }
 
+  async findByShippingDate(shippingDate: Date): Promise<Order[]> {
+    const target = shippingDate.toISOString().slice(0, 10);
+    return Array.from(this.orders.values()).filter((order) => {
+      const sd = order.shippingDate.value.toISOString().slice(0, 10);
+      return sd === target;
+    });
+  }
+
   async save(order: Order): Promise<Order> {
     if (!order.orderId) {
       const id = this.nextId++;
