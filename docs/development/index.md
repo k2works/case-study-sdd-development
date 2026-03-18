@@ -18,7 +18,7 @@
 | IT2 (2026-03-31 〜 2026-04-04) | [計画](iteration_plan-2.md) | [ふりかえり](retrospective-2.md) | [完了報告書](iteration_report-2.md) | 完了 |
 | IT3 (2026-04-07 〜 2026-04-11) | [計画](iteration_plan-3.md) | [ふりかえり](retrospective-3.md) | [完了報告書](iteration_report-3.md) | 完了 |
 | IT4 (2026-04-14 〜 2026-04-18) | [計画](iteration_plan-4.md) | [ふりかえり](retrospective-4.md) | [完了報告書](iteration_report-4.md) | 完了 |
-| IT5 (2026-04-21 〜 2026-04-25) | [計画](iteration_plan-5.md) | - | - | 開発完了 |
+| IT5 (2026-04-21 〜 2026-04-25) | [計画](iteration_plan-5.md) | [ふりかえり](retrospective-5.md) | - | 開発完了 |
 
 ### 進捗サマリー
 
