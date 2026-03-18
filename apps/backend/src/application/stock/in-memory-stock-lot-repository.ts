@@ -21,6 +21,16 @@ export class InMemoryStockLotRepository implements StockLotRepository {
     );
   }
 
+  async findActiveByItemId(itemId: ItemId): Promise<StockLot[]> {
+    return Array.from(this.stockLots.values()).filter(
+      (lot) => lot.itemId.equals(itemId) && lot.status.value === '有効',
+    );
+  }
+
+  async findAllActive(): Promise<StockLot[]> {
+    return Array.from(this.stockLots.values()).filter((lot) => lot.status.value === '有効');
+  }
+
   async save(stockLot: StockLot): Promise<StockLot> {
     if (!stockLot.stockId) {
       const id = this.nextId++;

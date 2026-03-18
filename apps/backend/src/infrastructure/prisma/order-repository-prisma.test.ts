@@ -102,6 +102,49 @@ describe('PrismaOrderRepository（統合テスト）', () => {
     expect(shipped).toHaveLength(0);
   });
 
+  it('複数ステータスで検索できる', async () => {
+    const ordered = await repository.save(
+      Order.createNew({
+        customerId: new CustomerId(10),
+        productId: new ProductId(1),
+        price: new Price(5500),
+        destination: new DestinationSnapshot('田中太郎', '東京都', '03-1111-1111'),
+        deliveryDate: new DeliveryDate(new Date('2026-04-01')),
+        message: new Message(''),
+      }),
+    );
+    const prepared = await repository.save(
+      Order.createNew({
+        customerId: new CustomerId(20),
+        productId: new ProductId(1),
+        price: new Price(5500),
+        destination: new DestinationSnapshot('鈴木花子', '大阪府', '06-2222-2222'),
+        deliveryDate: new DeliveryDate(new Date('2026-04-02')),
+        message: new Message(''),
+      }),
+    );
+    await repository.save(prepared.prepareShipment());
+    const canceled = await repository.save(
+      Order.createNew({
+        customerId: new CustomerId(30),
+        productId: new ProductId(1),
+        price: new Price(5500),
+        destination: new DestinationSnapshot('佐藤次郎', '福岡県', '092-333-3333'),
+        deliveryDate: new DeliveryDate(new Date('2026-04-03')),
+        message: new Message(''),
+      }),
+    );
+    await repository.save(canceled.cancel());
+
+    const found = await repository.findByStatuses([
+      new OrderStatus('注文済み'),
+      new OrderStatus('出荷準備中'),
+    ]);
+
+    expect(found).toHaveLength(2);
+    expect(found.map((order) => order.orderId!.value)).toEqual([ordered.orderId!.value, prepared.orderId!.value]);
+  });
+
   it('受注を更新できる', async () => {
     const saved = await repository.save(
       Order.createNew({

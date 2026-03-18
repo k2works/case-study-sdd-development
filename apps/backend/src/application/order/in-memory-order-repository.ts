@@ -23,6 +23,11 @@ export class InMemoryOrderRepository implements OrderRepository {
     return all;
   }
 
+  async findByStatuses(statuses: OrderStatus[]): Promise<Order[]> {
+    const statusValues = new Set(statuses.map((status) => status.value));
+    return Array.from(this.orders.values()).filter((order) => statusValues.has(order.status.value));
+  }
+
   async save(order: Order): Promise<Order> {
     if (!order.orderId) {
       const id = this.nextId++;

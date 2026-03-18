@@ -32,6 +32,25 @@ export class PrismaStockLotRepository implements StockLotRepository {
     return records.map((r) => this.toDomain(r));
   }
 
+  async findActiveByItemId(itemId: ItemId): Promise<StockLot[]> {
+    const records = await this.prisma.stock.findMany({
+      where: {
+        itemId: itemId.value,
+        status: '有効',
+      },
+      orderBy: { expiryDate: 'asc' },
+    });
+    return records.map((r) => this.toDomain(r));
+  }
+
+  async findAllActive(): Promise<StockLot[]> {
+    const records = await this.prisma.stock.findMany({
+      where: { status: '有効' },
+      orderBy: [{ itemId: 'asc' }, { expiryDate: 'asc' }],
+    });
+    return records.map((r) => this.toDomain(r));
+  }
+
   async save(stockLot: StockLot): Promise<StockLot> {
     if (!stockLot.stockId) {
       const record = await this.prisma.stock.create({

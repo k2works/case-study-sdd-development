@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ItemId, ItemName, Days, PurchaseUnit, SupplierId, ProductId, ProductName, Price, Quantity, OrderId, CustomerId, DeliveryDate, ShippingDate, OrderStatus, Message, StockId, StockStatus } from './value-objects.js';
+import { ItemId, ItemName, Days, PurchaseUnit, SupplierId, ProductId, ProductName, Price, Quantity, OrderId, CustomerId, DeliveryDate, ShippingDate, OrderStatus, Message, StockId, StockStatus, PurchaseOrderId, PurchaseOrderStatus } from './value-objects.js';
 
 describe('ItemId', () => {
   it('正の整数で生成できる', () => {
@@ -216,5 +216,32 @@ describe('StockStatus', () => {
 
   it('無効なステータスはエラー', () => {
     expect(() => new StockStatus('不明' as never)).toThrow();
+  });
+});
+
+describe('PurchaseOrderId', () => {
+  it('正の整数で生成できる', () => {
+    expect(new PurchaseOrderId(1).value).toBe(1);
+  });
+
+  it('0以下の値はエラー', () => {
+    expect(() => new PurchaseOrderId(0)).toThrow();
+    expect(() => new PurchaseOrderId(-1)).toThrow();
+  });
+
+  it('同じ値を持つ PurchaseOrderId は等しい', () => {
+    expect(new PurchaseOrderId(1).equals(new PurchaseOrderId(1))).toBe(true);
+    expect(new PurchaseOrderId(1).equals(new PurchaseOrderId(2))).toBe(false);
+  });
+});
+
+describe('PurchaseOrderStatus', () => {
+  it('有効なステータスで生成できる', () => {
+    expect(new PurchaseOrderStatus('発注済み').value).toBe('発注済み');
+    expect(new PurchaseOrderStatus('入荷済み').value).toBe('入荷済み');
+  });
+
+  it('無効なステータスはエラー', () => {
+    expect(() => new PurchaseOrderStatus('不明' as never)).toThrow();
   });
 });

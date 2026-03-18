@@ -72,6 +72,16 @@ export class OrderId {
   }
 }
 
+export class PurchaseOrderId {
+  constructor(public readonly value: number) {
+    if (value <= 0) throw new Error('PurchaseOrderId は正の整数でなければなりません');
+  }
+
+  equals(other: PurchaseOrderId): boolean {
+    return this.value === other.value;
+  }
+}
+
 export class CustomerId {
   constructor(public readonly value: number) {
     if (value <= 0) throw new Error('CustomerId は正の整数でなければなりません');
@@ -100,6 +110,20 @@ export class OrderStatus {
   constructor(public readonly value: OrderStatusValue) {
     if (!VALID_ORDER_STATUSES.includes(value)) {
       throw new Error(`OrderStatus は ${VALID_ORDER_STATUSES.join(', ')} のいずれかでなければなりません`);
+    }
+  }
+}
+
+export type PurchaseOrderStatusValue = '発注済み' | '入荷済み';
+
+const VALID_PURCHASE_ORDER_STATUSES: PurchaseOrderStatusValue[] = ['発注済み', '入荷済み'];
+
+export class PurchaseOrderStatus {
+  constructor(public readonly value: PurchaseOrderStatusValue) {
+    if (!VALID_PURCHASE_ORDER_STATUSES.includes(value)) {
+      throw new Error(
+        `PurchaseOrderStatus は ${VALID_PURCHASE_ORDER_STATUSES.join(', ')} のいずれかでなければなりません`,
+      );
     }
   }
 }

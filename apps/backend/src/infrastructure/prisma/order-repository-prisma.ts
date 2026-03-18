@@ -33,6 +33,14 @@ export class PrismaOrderRepository implements OrderRepository {
     return records.map((r) => this.toDomain(r));
   }
 
+  async findByStatuses(statuses: OrderStatus[]): Promise<Order[]> {
+    const records = await this.prisma.order.findMany({
+      where: { status: { in: statuses.map((status) => status.value) } },
+      orderBy: { orderId: 'asc' },
+    });
+    return records.map((r) => this.toDomain(r));
+  }
+
   async save(order: Order): Promise<Order> {
     if (!order.orderId) {
       const record = await this.prisma.order.create({

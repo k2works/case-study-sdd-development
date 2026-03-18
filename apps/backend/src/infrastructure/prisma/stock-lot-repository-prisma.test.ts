@@ -80,6 +80,92 @@ describe('PrismaStockLotRepository（統合テスト）', () => {
     expect(roseLots[0].itemId.value).toBe(1);
   });
 
+  it('有効在庫を単品 ID ごとに有効期限順で取得できる', async () => {
+    await repository.save(
+      StockLot.createNew({
+        itemId: new ItemId(1),
+        quantity: new Quantity(10),
+        arrivalDate: new Date('2026-03-15'),
+        expiryDate: new Date('2026-03-22'),
+      }),
+    );
+    const expiringLot = await repository.save(
+      StockLot.createNew({
+        itemId: new ItemId(1),
+        quantity: new Quantity(5),
+        arrivalDate: new Date('2026-03-15'),
+        expiryDate: new Date('2026-03-18'),
+      }),
+    );
+    await repository.save(expiringLot.markAsExpired());
+    await repository.save(
+      StockLot.createNew({
+        itemId: new ItemId(1),
+        quantity: new Quantity(8),
+        arrivalDate: new Date('2026-03-15'),
+        expiryDate: new Date('2026-03-20'),
+      }),
+    );
+
+    const lots = await repository.findActiveByItemId(new ItemId(1));
+
+    expect(lots).toHaveLength(2);
+    expect(lots.map((lot) => lot.expiryDate.toISOString().slice(0, 10))).toEqual([
+      '2026-03-20',
+      '2026-03-22',
+    ]);
+  });
+
+  it('全単品の有効在庫を単品 ID と有効期限順で取得できる', async () => {
+    await repository.save(
+      StockLot.createNew({
+        itemId: new ItemId(2),
+        quantity: new Quantity(20),
+        arrivalDate: new Date('2026-03-15'),
+        expiryDate: new Date('2026-03-25'),
+      }),
+    );
+    await repository.save(
+      StockLot.createNew({
+        itemId: new ItemId(1),
+        quantity: new Quantity(10),
+        arrivalDate: new Date('2026-03-15'),
+        expiryDate: new Date('2026-03-22'),
+      }),
+    );
+    const expiredLot = await repository.save(
+      StockLot.createNew({
+        itemId: new ItemId(2),
+        quantity: new Quantity(5),
+        arrivalDate: new Date('2026-03-15'),
+        expiryDate: new Date('2026-03-18'),
+      }),
+    );
+    await repository.save(expiredLot.markAsExpired());
+    await repository.save(
+      StockLot.createNew({
+        itemId: new ItemId(1),
+        quantity: new Quantity(8),
+        arrivalDate: new Date('2026-03-15'),
+        expiryDate: new Date('2026-03-20'),
+      }),
+    );
+
+    const lots = await repository.findAllActive();
+
+    expect(lots).toHaveLength(3);
+    expect(
+      lots.map((lot) => ({
+        itemId: lot.itemId.value,
+        expiryDate: lot.expiryDate.toISOString().slice(0, 10),
+      })),
+    ).toEqual([
+      { itemId: 1, expiryDate: '2026-03-20' },
+      { itemId: 1, expiryDate: '2026-03-22' },
+      { itemId: 2, expiryDate: '2026-03-25' },
+    ]);
+  });
+
   it('在庫ロットを更新できる', async () => {
     const saved = await repository.save(
       StockLot.createNew({
