@@ -35,7 +35,13 @@ app.get('/api/health', (_req, res) => {
 // 単品 API
 const itemRepository = new PrismaItemRepository(prisma);
 const itemUseCase = new ItemUseCase(itemRepository);
-app.use('/api', createItemRoutes(itemUseCase));
+const supplierNameResolver = {
+  async resolve(supplierId: number): Promise<string> {
+    const supplier = await prisma.supplier.findUnique({ where: { supplierId } });
+    return supplier?.name ?? `仕入先 ${supplierId}`;
+  },
+};
+app.use('/api', createItemRoutes(itemUseCase, supplierNameResolver));
 
 // 商品 API
 const productRepository = new PrismaProductRepository(prisma);

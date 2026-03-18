@@ -5,6 +5,7 @@ export interface ItemDto {
   purchaseUnit: number;
   leadTimeDays: number;
   supplierId: number;
+  supplierName?: string;
 }
 
 export interface CreateItemInput {

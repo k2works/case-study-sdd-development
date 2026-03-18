@@ -1,21 +1,29 @@
 import { Router } from 'express';
 import { ItemUseCase } from '../../application/item/item-usecase.js';
 
-export function createItemRoutes(useCase: ItemUseCase): Router {
+export interface SupplierNameResolver {
+  resolve(supplierId: number): Promise<string>;
+}
+
+export function createItemRoutes(useCase: ItemUseCase, supplierNameResolver?: SupplierNameResolver): Router {
   const router = Router();
 
   router.get('/items', async (_req, res) => {
     const items = await useCase.findAll();
-    res.json(
-      items.map((item) => ({
-        id: item.itemId.value,
+    const result = await Promise.all(
+      items.map(async (item) => ({
+        id: item.itemId!.value,
         name: item.name.value,
         qualityRetentionDays: item.qualityRetentionDays.value,
         purchaseUnit: item.purchaseUnit.value,
         leadTimeDays: item.leadTimeDays.value,
         supplierId: item.supplierId.value,
+        supplierName: supplierNameResolver
+          ? await supplierNameResolver.resolve(item.supplierId.value)
+          : `仕入先 ${item.supplierId.value}`,
       })),
     );
+    res.json(result);
   });
 
   router.post('/items', async (req, res) => {
