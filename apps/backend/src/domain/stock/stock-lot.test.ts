@@ -113,6 +113,26 @@ describe('StockLot', () => {
     expect(() => lot.markAsExpired()).toThrow();
   });
 
+  it('引当解除できる（引当済み → 有効）', () => {
+    const lot = createStockLot({ status: new StockStatus('引当済み'), orderId: new OrderId(1) });
+    const deallocated = lot.deallocate();
+
+    expect(deallocated.status.value).toBe('有効');
+    expect(deallocated.orderId).toBeNull();
+  });
+
+  it('引当済み以外のロットは引当解除できない', () => {
+    const lot = createStockLot();
+
+    expect(() => lot.deallocate()).toThrow('引当済みの在庫ロットのみ引当解除できます');
+  });
+
+  it('消費済みのロットは引当解除できない', () => {
+    const lot = createStockLot({ status: new StockStatus('消費済み'), orderId: new OrderId(1) });
+
+    expect(() => lot.deallocate()).toThrow('引当済みの在庫ロットのみ引当解除できます');
+  });
+
   it('元のインスタンスは変更されない（イミュータブル）', () => {
     const lot = createStockLot();
     lot.allocate(new OrderId(100));

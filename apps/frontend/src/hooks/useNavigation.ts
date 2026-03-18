@@ -4,7 +4,7 @@ import type { OrderDto } from '../types/order';
 
 export type View = 'customer' | 'staff';
 export type CustomerPage = 'list' | 'order-form' | 'order-confirm' | 'order-complete';
-export type StaffTab = 'products' | 'items' | 'orders' | 'stock-forecast' | 'purchase-order' | 'arrival' | 'shipments';
+export type StaffTab = 'products' | 'items' | 'orders' | 'customers' | 'stock-forecast' | 'purchase-order' | 'arrival' | 'shipments';
 
 export function useNavigation() {
   const [view, setView] = useState<View>('customer');

@@ -6,6 +6,7 @@ import type { StockForecastItem } from '../types/stock-forecast';
 import type { PurchaseOrderInput, PurchaseOrderResult, ItemInfo } from '../types/purchase-order';
 import type { PurchaseOrderRecord, RegisterArrivalInput, RegisterArrivalResult } from '../types/arrival';
 import type { ShipmentResult } from '../types/shipment';
+import type { CustomerDto, CreateCustomerInput, DestinationDto } from '../types/customer';
 
 const API_BASE = '/api';
 
@@ -123,5 +124,43 @@ export const recordShipment = async (orderId: number): Promise<void> => {
   await fetchApi('/shipments', {
     method: 'POST',
     body: JSON.stringify({ orderId }),
+  });
+};
+
+// 得意先 API
+export const fetchCustomers = async (): Promise<CustomerDto[]> => {
+  return fetchApi<CustomerDto[]>('/customers');
+};
+
+export const createCustomer = async (input: CreateCustomerInput): Promise<CustomerDto> => {
+  return fetchApi<CustomerDto>('/customers', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+};
+
+export const updateCustomer = async (id: number, input: CreateCustomerInput): Promise<CustomerDto> => {
+  return fetchApi<CustomerDto>(`/customers/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(input),
+  });
+};
+
+export const fetchDestinations = async (customerId: number): Promise<DestinationDto[]> => {
+  return fetchApi<DestinationDto[]>(`/customers/${customerId}/destinations`);
+};
+
+export const fetchOrderDestinations = async (customerId: number): Promise<DestinationDto[]> => {
+  return fetchApi<DestinationDto[]>(`/customers/${customerId}/order-destinations`);
+};
+
+// 届け日変更 API
+export const changeDeliveryDate = async (
+  orderId: number,
+  newDeliveryDate: string,
+): Promise<{ success: boolean; reason?: string; order?: { orderId: number; deliveryDate: string; shippingDate: string; status: string } }> => {
+  return fetchApi(`/orders/${orderId}/delivery-date`, {
+    method: 'PUT',
+    body: JSON.stringify({ newDeliveryDate }),
   });
 };

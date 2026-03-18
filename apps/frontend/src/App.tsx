@@ -11,6 +11,7 @@ import { StockForecast } from './pages/staff/StockForecast'
 import { PurchaseOrderForm } from './pages/staff/PurchaseOrderForm'
 import { ArrivalRegistration } from './pages/staff/ArrivalRegistration'
 import { ShipmentList } from './pages/staff/ShipmentList'
+import { CustomerManagement } from './pages/staff/CustomerManagement'
 import type { CreateOrderInput } from './types/order'
 import { useNavigation } from './hooks/useNavigation'
 import {
@@ -30,6 +31,12 @@ import {
   registerArrival,
   fetchShipments,
   recordShipment,
+  fetchCustomers,
+  createCustomer,
+  updateCustomer,
+  fetchDestinations,
+  fetchOrderDestinations,
+  changeDeliveryDate,
 } from './hooks/useApi'
 
 function App() {
@@ -61,6 +68,8 @@ function App() {
             product={nav.selectedProduct}
             onBack={nav.handleBackToList}
             onConfirm={nav.handleOrderConfirm}
+            fetchCustomers={fetchCustomers}
+            fetchOrderDestinations={fetchOrderDestinations}
           />
         );
       case 'order-confirm':
@@ -100,6 +109,7 @@ function App() {
           orderId={nav.detailOrderId}
           fetchOrder={fetchOrder}
           onBack={nav.handleBackFromDetail}
+          changeDeliveryDate={changeDeliveryDate}
         />
       );
     }
@@ -136,6 +146,16 @@ function App() {
             disabled={nav.staffTab === 'orders'}
           >
             受注管理
+          </button>
+          <button
+            className={`staff-tab${nav.staffTab === 'customers' ? ' staff-tab--active' : ''}`}
+            role="tab"
+            aria-selected={nav.staffTab === 'customers'}
+            aria-controls="panel-customers"
+            onClick={() => nav.setStaffTab('customers')}
+            disabled={nav.staffTab === 'customers'}
+          >
+            得意先
           </button>
           <button
             className={`staff-tab${nav.staffTab === 'stock-forecast' ? ' staff-tab--active' : ''}`}
@@ -188,6 +208,14 @@ function App() {
             <OrderList
               fetchOrders={fetchOrders}
               onDetail={nav.handleOrderDetail}
+            />
+          )}
+          {nav.staffTab === 'customers' && (
+            <CustomerManagement
+              fetchCustomers={fetchCustomers}
+              createCustomer={createCustomer}
+              updateCustomer={updateCustomer}
+              fetchDestinations={fetchDestinations}
             />
           )}
           {nav.staffTab === 'stock-forecast' && (

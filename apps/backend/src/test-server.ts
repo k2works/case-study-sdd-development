@@ -28,7 +28,7 @@ const app = express();
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'UP' });
+  res.json({ status: 'UP', mode: 'test' });
 });
 
 const itemRepository = new InMemoryItemRepository();

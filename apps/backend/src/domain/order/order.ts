@@ -1,5 +1,6 @@
 import { OrderId, CustomerId, ProductId, Price, DeliveryDate, ShippingDate, OrderStatus, Message } from '../shared/value-objects.js';
 import { DestinationSnapshot } from './destination-snapshot.js';
+import { DeliveryDateChangeValidator, ValidationResult } from './delivery-date-change-validator.js';
 
 export interface OrderProps {
   orderId: OrderId | null;
@@ -64,5 +65,15 @@ export class Order {
       throw new Error('注文済みの受注のみキャンセルできます');
     }
     return new Order({ ...this, status: new OrderStatus('キャンセル') });
+  }
+
+  changeDeliveryDate(newDeliveryDate: DeliveryDate): ValidationResult & { order?: Order } {
+    const validation = DeliveryDateChangeValidator.validate(this, newDeliveryDate);
+    if (!validation.success) {
+      return validation;
+    }
+
+    const newOrder = new Order({ ...this, deliveryDate: newDeliveryDate });
+    return { success: true, order: newOrder };
   }
 }

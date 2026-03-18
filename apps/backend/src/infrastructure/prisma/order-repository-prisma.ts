@@ -49,11 +49,19 @@ export class PrismaOrderRepository implements OrderRepository {
     return records.map((r) => this.toDomain(r));
   }
 
+  async findByCustomerId(customerId: CustomerId): Promise<Order[]> {
+    const records = await this.prisma.order.findMany({
+      where: { customerId: customerId.value },
+      orderBy: { orderId: 'asc' },
+    });
+    return records.map((r) => this.toDomain(r));
+  }
+
   async save(order: Order): Promise<Order> {
     if (!order.orderId) {
       const record = await this.prisma.order.create({
         data: {
-          customerId: order.customerId.value,
+          customerId: order.customerId?.value ?? null,
           productId: order.productId.value,
           price: order.price.value,
           destinationName: order.destination.name,
@@ -71,7 +79,7 @@ export class PrismaOrderRepository implements OrderRepository {
     const record = await this.prisma.order.update({
       where: { orderId: order.orderId.value },
       data: {
-        customerId: order.customerId.value,
+        customerId: order.customerId?.value ?? null,
         productId: order.productId.value,
         price: order.price.value,
         destinationName: order.destination.name,
@@ -88,7 +96,7 @@ export class PrismaOrderRepository implements OrderRepository {
 
   private toDomain(record: {
     orderId: number;
-    customerId: number;
+    customerId: number | null;
     productId: number;
     price: number;
     destinationName: string;
@@ -101,7 +109,7 @@ export class PrismaOrderRepository implements OrderRepository {
   }): Order {
     return new Order({
       orderId: new OrderId(record.orderId),
-      customerId: new CustomerId(record.customerId),
+      customerId: record.customerId === null || record.customerId === undefined ? new CustomerId(0) : new CustomerId(record.customerId),
       productId: new ProductId(record.productId),
       price: new Price(record.price),
       destination: new DestinationSnapshot(

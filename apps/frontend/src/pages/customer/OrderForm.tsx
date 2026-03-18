@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import type { CustomerDto } from '../../types/customer';
+import type { OrderDestination } from '../../types/order';
 
 export interface OrderFormProduct {
   id: number;
@@ -18,6 +20,8 @@ interface Props {
   product: OrderFormProduct;
   onBack: () => void;
   onConfirm: (data: OrderFormData) => void;
+  fetchCustomers?: () => Promise<CustomerDto[]>;
+  fetchOrderDestinations?: (customerId: number) => Promise<OrderDestination[]>;
 }
 
 function getMinDeliveryDate(): string {
@@ -26,12 +30,42 @@ function getMinDeliveryDate(): string {
   return date.toISOString().split('T')[0];
 }
 
-export function OrderForm({ product, onBack, onConfirm }: Readonly<Props>) {
+export function OrderForm({ product, onBack, onConfirm, fetchCustomers, fetchOrderDestinations }: Readonly<Props>) {
   const [deliveryDate, setDeliveryDate] = useState('');
   const [destinationName, setDestinationName] = useState('');
   const [destinationAddress, setDestinationAddress] = useState('');
   const [destinationPhone, setDestinationPhone] = useState('');
   const [message, setMessage] = useState('');
+
+  // 届け先コピー用の状態
+  const [customers, setCustomers] = useState<CustomerDto[]>([]);
+  const [orderDestinations, setOrderDestinations] = useState<OrderDestination[]>([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
+
+  useEffect(() => {
+    if (fetchCustomers) {
+      fetchCustomers().then(setCustomers);
+    }
+  }, [fetchCustomers]);
+
+  const handleCustomerChange = async (customerId: string) => {
+    setSelectedCustomerId(customerId);
+    setOrderDestinations([]);
+    if (customerId && fetchOrderDestinations) {
+      const dests = await fetchOrderDestinations(Number(customerId));
+      setOrderDestinations(dests);
+    }
+  };
+
+  const handleDestinationSelect = (index: string) => {
+    if (index === '') return;
+    const dest = orderDestinations[Number(index)];
+    if (dest) {
+      setDestinationName(dest.name);
+      setDestinationAddress(dest.address);
+      setDestinationPhone(dest.phone);
+    }
+  };
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,6 +99,47 @@ export function OrderForm({ product, onBack, onConfirm }: Readonly<Props>) {
             required
           />
         </div>
+
+        {fetchCustomers && (
+          <div className="form-section" style={{ marginBottom: '1rem' }}>
+            <h4>過去の届け先からコピー</h4>
+            <div className="form-group">
+              <label className="form-label" htmlFor="customer-select">得意先を選択</label>
+              <select
+                className="form-input"
+                id="customer-select"
+                value={selectedCustomerId}
+                onChange={(e) => handleCustomerChange(e.target.value)}
+              >
+                <option value="">-- 選択してください --</option>
+                {customers.map((c) => (
+                  <option key={c.customerId} value={String(c.customerId)}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {orderDestinations.length > 0 && (
+              <div className="form-group">
+                <label className="form-label" htmlFor="destination-select">届け先を選択</label>
+                <select
+                  className="form-input"
+                  id="destination-select"
+                  defaultValue=""
+                  onChange={(e) => handleDestinationSelect(e.target.value)}
+                >
+                  <option value="">-- 選択してください --</option>
+                  {orderDestinations.map((dest, idx) => (
+                    <option key={`${dest.name}-${dest.address}`} value={String(idx)}>
+                      {dest.name} - {dest.address}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="form-group">
           <label className="form-label" htmlFor="destination-name">届け先名</label>

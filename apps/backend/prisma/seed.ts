@@ -33,6 +33,8 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.item.deleteMany();
   await prisma.supplier.deleteMany();
+  await prisma.destination.deleteMany();
+  await prisma.customer.deleteMany();
 
   // シーケンスをリセット（PostgreSQL のみ）
   if (dbProvider === 'postgresql') {
@@ -43,12 +45,33 @@ async function main() {
     await prisma.$executeRawUnsafe(`ALTER SEQUENCE stocks_stock_id_seq RESTART WITH 1`);
     await prisma.$executeRawUnsafe(`ALTER SEQUENCE purchase_orders_purchase_order_id_seq RESTART WITH 1`);
     await prisma.$executeRawUnsafe(`ALTER SEQUENCE arrivals_arrival_id_seq RESTART WITH 1`);
+    await prisma.$executeRawUnsafe(`ALTER SEQUENCE customers_customer_id_seq RESTART WITH 1`);
+    await prisma.$executeRawUnsafe(`ALTER SEQUENCE destinations_destination_id_seq RESTART WITH 1`);
   } else {
     // SQLite: autoincrement カウンタをリセット
     await prisma.$executeRawUnsafe(`DELETE FROM sqlite_sequence`);
   }
 
   console.log('Existing data cleared.');
+
+  // --- 顧客 ---
+  const customers = await prisma.customer.createMany({
+    data: [
+      { name: '山田花子', phone: '03-1234-5678', email: 'hanako@example.com' },
+      { name: '佐藤太郎', phone: '03-8765-4321', email: 'taro@example.com' },
+    ],
+  });
+  console.log(`Customers created: ${customers.count}`);
+
+  // --- 届け先 ---
+  const destinations = await prisma.destination.createMany({
+    data: [
+      { customerId: 1, name: '田中太郎', address: '東京都渋谷区1-2-3', phone: '090-1234-5678' },
+      { customerId: 1, name: '鈴木花子', address: '東京都新宿区4-5-6', phone: '090-8765-4321' },
+      { customerId: 2, name: '高橋一郎', address: '東京都品川区7-8-9', phone: '090-1111-2222' },
+    ],
+  });
+  console.log(`Destinations created: ${destinations.count}`);
 
   // --- 仕入先 ---
   const suppliers = await prisma.supplier.createMany({

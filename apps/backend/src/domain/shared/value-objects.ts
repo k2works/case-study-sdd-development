@@ -86,6 +86,20 @@ export class CustomerId {
   constructor(public readonly value: number) {
     if (value <= 0) throw new Error('CustomerId は正の整数でなければなりません');
   }
+
+  equals(other: CustomerId): boolean {
+    return this.value === other.value;
+  }
+}
+
+export class DestinationId {
+  constructor(public readonly value: number) {
+    if (value <= 0) throw new Error('DestinationId は正の整数でなければなりません');
+  }
+
+  equals(other: DestinationId): boolean {
+    return this.value === other.value;
+  }
 }
 
 export class DeliveryDate {
