@@ -72,11 +72,11 @@ export function ShipmentList({
 
       {error && <p className="error-message" role="alert">{error}</p>}
 
-      {result && result.targets.length === 0 && (
+      {result?.targets.length === 0 && (
         <p>該当日の出荷対象はありません。</p>
       )}
 
-      {result && result.targets.length > 0 && (
+      {(result?.targets.length ?? 0) > 0 && (
         <>
           <table className="data-table">
             <thead>

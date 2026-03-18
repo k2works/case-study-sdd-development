@@ -48,9 +48,7 @@ export class InMemoryPurchaseOrderRepository implements PurchaseOrderRepository 
   }
 
   async save(purchaseOrder: PurchaseOrder): Promise<PurchaseOrder> {
-    const purchaseOrderId = purchaseOrder.purchaseOrderId
-      ? purchaseOrder.purchaseOrderId
-      : new PurchaseOrderId(this.nextId++);
+    const purchaseOrderId = purchaseOrder.purchaseOrderId ?? new PurchaseOrderId(this.nextId++);
     this.nextId = Math.max(this.nextId, purchaseOrderId.value + 1);
     const savedPurchaseOrder = new PurchaseOrder({
       purchaseOrderId,

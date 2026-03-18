@@ -13,7 +13,7 @@ export function createShipmentRoutes(shipmentUseCase: ShipmentUseCase): Router {
     }
 
     const date = new Date(shippingDate);
-    if (isNaN(date.getTime())) {
+    if (Number.isNaN(date.getTime())) {
       res.status(400).json({ error: 'shippingDate の形式が不正です' });
       return;
     }
