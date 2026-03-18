@@ -11,6 +11,7 @@ import { OrderDetail } from './pages/staff/OrderDetail'
 import { StockForecast } from './pages/staff/StockForecast'
 import { PurchaseOrderForm } from './pages/staff/PurchaseOrderForm'
 import { ArrivalRegistration } from './pages/staff/ArrivalRegistration'
+import { ShipmentList } from './pages/staff/ShipmentList'
 import type { OrderFormProduct, OrderFormData } from './pages/customer/OrderForm'
 import type { ItemDto, CreateItemInput } from './types/item'
 import type { ProductDto, CreateProductInput } from './types/product'
@@ -18,6 +19,7 @@ import type { OrderDto, CreateOrderInput } from './types/order'
 import type { StockForecastItem } from './types/stock-forecast'
 import type { PurchaseOrderInput, PurchaseOrderResult, ItemInfo } from './types/purchase-order'
 import type { PurchaseOrderRecord, RegisterArrivalInput, RegisterArrivalResult } from './types/arrival'
+import type { ShipmentResult } from './types/shipment'
 import { fetchApi } from './api/client'
 
 const API_BASE = '/api';
@@ -98,7 +100,7 @@ const fetchStockForecast = async (
 
 type View = 'customer' | 'staff';
 type CustomerPage = 'list' | 'order-form' | 'order-confirm' | 'order-complete';
-type StaffTab = 'products' | 'items' | 'orders' | 'stock-forecast' | 'purchase-order' | 'arrival';
+type StaffTab = 'products' | 'items' | 'orders' | 'stock-forecast' | 'purchase-order' | 'arrival' | 'shipments';
 
 function App() {
   const [view, setView] = useState<View>('customer');
@@ -197,6 +199,17 @@ function App() {
     return fetchApi<RegisterArrivalResult>('/arrivals', {
       method: 'POST',
       body: JSON.stringify(input),
+    });
+  };
+
+  const fetchShipments = async (shippingDate: string): Promise<ShipmentResult> => {
+    return fetchApi<ShipmentResult>(`/shipments?shippingDate=${encodeURIComponent(shippingDate)}`);
+  };
+
+  const recordShipment = async (orderId: number): Promise<void> => {
+    await fetchApi('/shipments', {
+      method: 'POST',
+      body: JSON.stringify({ orderId }),
     });
   };
 
@@ -305,6 +318,16 @@ function App() {
           >
             入荷登録
           </button>
+          <button
+            className={`staff-tab${staffTab === 'shipments' ? ' staff-tab--active' : ''}`}
+            role="tab"
+            aria-selected={staffTab === 'shipments'}
+            aria-controls="panel-shipments"
+            onClick={() => setStaffTab('shipments')}
+            disabled={staffTab === 'shipments'}
+          >
+            出荷
+          </button>
         </div>
         <div role="tabpanel" id={`panel-${staffTab}`}>
           {staffTab === 'products' && (
@@ -350,6 +373,12 @@ function App() {
                 setPurchaseItemId(null);
                 setStaffTab('stock-forecast');
               }}
+            />
+          )}
+          {staffTab === 'shipments' && (
+            <ShipmentList
+              fetchShipments={fetchShipments}
+              recordShipment={recordShipment}
             />
           )}
           {staffTab === 'arrival' && (
