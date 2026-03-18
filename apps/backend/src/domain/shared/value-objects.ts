@@ -150,6 +150,16 @@ export class Message {
   }
 }
 
+export class ArrivalId {
+  constructor(public readonly value: number) {
+    if (value <= 0) throw new Error('ArrivalId は正の整数でなければなりません');
+  }
+
+  equals(other: ArrivalId): boolean {
+    return this.value === other.value;
+  }
+}
+
 export class StockId {
   constructor(public readonly value: number) {
     if (value <= 0) throw new Error('StockId は正の整数でなければなりません');

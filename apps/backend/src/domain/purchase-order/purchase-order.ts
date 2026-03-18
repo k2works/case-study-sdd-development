@@ -61,9 +61,12 @@ export class PurchaseOrder {
     this.status = props.status;
   }
 
-  receive(): PurchaseOrder {
+  receive(arrivalQuantity: number): PurchaseOrder {
     if (this.status.value === '入荷済み') {
       throw new Error('既に入荷済みです');
+    }
+    if (arrivalQuantity !== this.quantity.value) {
+      throw new Error('入荷数量は発注数量と一致する必要があります');
     }
 
     return new PurchaseOrder({
