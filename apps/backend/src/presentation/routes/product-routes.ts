@@ -8,7 +8,7 @@ export function createProductRoutes(useCase: ProductUseCase): Router {
     const products = await useCase.findAll();
     res.json(
       products.map((p) => ({
-        id: p.productId.value,
+        id: p.productId!.value,
         name: p.name.value,
         price: p.price.value,
         compositions: p.compositions.map((c) => ({
@@ -23,7 +23,7 @@ export function createProductRoutes(useCase: ProductUseCase): Router {
     try {
       const product = await useCase.create(req.body);
       res.status(201).json({
-        id: product.productId.value,
+        id: product.productId!.value,
         name: product.name.value,
         price: product.price.value,
         compositions: product.compositions.map((c) => ({
@@ -43,7 +43,7 @@ export function createProductRoutes(useCase: ProductUseCase): Router {
         ...req.body,
       });
       res.json({
-        id: product.productId.value,
+        id: product.productId!.value,
         name: product.name.value,
         price: product.price.value,
         compositions: product.compositions.map((c) => ({

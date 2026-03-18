@@ -73,7 +73,7 @@ describe('PrismaPurchaseOrderRepository（統合テスト）', () => {
 
     const saved = await repository.save(purchaseOrder);
 
-    expect(saved.purchaseOrderId.value).toBeGreaterThan(0);
+    expect(saved.purchaseOrderId!.value).toBeGreaterThan(0);
     expect(saved.itemId.value).toBe(1);
     expect(saved.quantity.value).toBe(200);
     expect(saved.status.value).toBe('発注済み');

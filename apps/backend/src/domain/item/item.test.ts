@@ -24,7 +24,7 @@ describe('Item', () => {
   it('正しいプロパティで生成できる', () => {
     const item = createItem();
 
-    expect(item.itemId.value).toBe(1);
+    expect(item.itemId!.value).toBe(1);
     expect(item.name.value).toBe('赤バラ');
     expect(item.qualityRetentionDays.value).toBe(5);
     expect(item.purchaseUnit.value).toBe(100);
@@ -37,7 +37,7 @@ describe('Item', () => {
     const updated = item.changeName(new ItemName('白バラ'));
 
     expect(updated.name.value).toBe('白バラ');
-    expect(updated.itemId.value).toBe(1);
+    expect(updated.itemId!.value).toBe(1);
   });
 
   it('品質維持日数を変更できる', () => {

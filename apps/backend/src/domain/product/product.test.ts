@@ -25,7 +25,7 @@ describe('Product', () => {
   it('正しいプロパティで生成できる', () => {
     const product = createProduct();
 
-    expect(product.productId.value).toBe(1);
+    expect(product.productId!.value).toBe(1);
     expect(product.name.value).toBe('ローズブーケ');
     expect(product.price.value).toBe(5500);
     expect(product.compositions).toHaveLength(2);

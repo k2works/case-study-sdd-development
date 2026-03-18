@@ -69,7 +69,7 @@ export class InMemoryPurchaseOrderRepository implements PurchaseOrderRepository 
 
   private toRecord(purchaseOrder: PurchaseOrder): PurchaseOrderRecord {
     return {
-      purchaseOrderId: purchaseOrder.purchaseOrderId.value,
+      purchaseOrderId: purchaseOrder.purchaseOrderId!.value,
       itemId: purchaseOrder.itemId.value,
       supplierId: purchaseOrder.supplierId.value,
       quantity: purchaseOrder.quantity.value,

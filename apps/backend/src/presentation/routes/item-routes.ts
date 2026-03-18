@@ -30,7 +30,7 @@ export function createItemRoutes(useCase: ItemUseCase, supplierNameResolver?: Su
     try {
       const item = await useCase.create(req.body);
       res.status(201).json({
-        id: item.itemId.value,
+        id: item.itemId!.value,
         name: item.name.value,
         qualityRetentionDays: item.qualityRetentionDays.value,
         purchaseUnit: item.purchaseUnit.value,
@@ -49,7 +49,7 @@ export function createItemRoutes(useCase: ItemUseCase, supplierNameResolver?: Su
         ...req.body,
       });
       res.json({
-        id: item.itemId.value,
+        id: item.itemId!.value,
         name: item.name.value,
         qualityRetentionDays: item.qualityRetentionDays.value,
         purchaseUnit: item.purchaseUnit.value,
