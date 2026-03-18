@@ -187,13 +187,13 @@ GHCR からイメージを取得して実行するには：
 
 ```bash
 # イメージをプル
-docker pull ghcr.io/k2works/{project_name}:latest
+docker pull ghcr.io/k2works/case-study-sdd-development:latest
 
 # または特定バージョン
-docker pull ghcr.io/k2works/{project_name}:0.0.1
+docker pull ghcr.io/k2works/case-study-sdd-development:0.0.1
 
 # コンテナを実行
-docker run -it -v $(pwd):/srv ghcr.io/k2works/{project_name}:latest
+docker run -it -v $(pwd):/srv ghcr.io/k2works/case-study-sdd-development:latest
 ```
 
 または、docker-compose を使用してローカルでビルド・実行することもできます：
