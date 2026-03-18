@@ -7,7 +7,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     LANG=ja_JP.UTF-8 \
     LC_ALL=ja_JP.UTF-8 \
     LC_CTYPE=ja_JP.UTF-8 \
-    NODE_VER=$NODE_MAJOR
+    NODE_VER=$NODE_MAJOR \
+    PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # ユーザーの設定
 ARG USERNAME=ubuntu
@@ -95,6 +96,35 @@ RUN npm install -g @github/copilot
 
 # Codex CLIのインストール
 RUN npm install -g @openai/codex
+
+# Playwright 実行環境のインストール
+RUN apt-get update && apt-get install -y \
+    libasound2t64 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2t64 \
+    libdbus-1-3 \
+    libdrm2 \
+    libgbm1 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libpango-1.0-0 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxkbcommon0 \
+    libxrandr2 \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p $PLAYWRIGHT_BROWSERS_PATH \
+    && npm install -g playwright@1.58.2 \
+    && playwright install chromium \
+    && chown -R $USERNAME:$USERNAME $PLAYWRIGHT_BROWSERS_PATH
 
 # すべてのインストールが完了した後、ユーザーのホームディレクトリの所有権を確保
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
