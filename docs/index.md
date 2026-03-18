@@ -52,6 +52,8 @@
 | [イテレーション 2 ふりかえり](./development/retrospective-2.md) | 完了 |
 | [イテレーション 2 完了報告書](./development/iteration_report-2.md) | 完了 |
 | [イテレーション 3 計画](./development/iteration_plan-3.md) | 完了 |
+| [イテレーション 3 ふりかえり](./development/retrospective-3.md) | 完了 |
+| [イテレーション 3 完了報告書](./development/iteration_report-3.md) | 完了 |
 
 ### 運用 (`operation/`)
 
@@ -62,6 +64,10 @@
 ### ADR (`adr/`)
 
 技術的意思決定を記録した Architecture Decision Records です。
+
+| ADR | 決定内容 | ステータス |
+| :--- | :--- | :--- |
+| [ADR-001](./adr/001-purchase-order-transaction-strategy.md) | 発注作成時のトランザクション方針 | 承認済み |
 
 ### リファレンス (`reference/`)
 
