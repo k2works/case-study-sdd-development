@@ -83,6 +83,7 @@
 | :--- | :--- | :--- |
 | [ADR-001](./adr/001-purchase-order-transaction-strategy.md) | 発注作成時のトランザクション方針 | 承認済み |
 | [ADR-002](./adr/002-demo-environment-sqlite.md) | デモ環境 DB を SQLite に切り替え | 承認済み |
+| [ADR-003](./adr/003-delivery-date-change-transaction-strategy.md) | 届け日変更時のトランザクション方針 | 承認済み |
 
 ### リファレンス (`reference/`)
 
