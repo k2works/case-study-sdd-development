@@ -51,6 +51,51 @@ describe('PurchaseOrder', () => {
     expect(purchaseOrder.quantity.value).toBe(10);
   });
 
+  it('createNew で購入単位 - 1 の数量が購入単位に切り上げられる（境界値: 9→10）', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(baseDate);
+
+    const purchaseOrder = PurchaseOrder.createNew({
+      itemId: new ItemId(1),
+      quantity: new Quantity(9),
+      purchaseUnit: new PurchaseUnit(10),
+      leadTimeDays: 3,
+      supplierId: new SupplierId(10),
+    });
+
+    expect(purchaseOrder.quantity.value).toBe(10);
+  });
+
+  it('createNew で購入単位ちょうどの数量はそのまま（境界値: 10→10）', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(baseDate);
+
+    const purchaseOrder = PurchaseOrder.createNew({
+      itemId: new ItemId(1),
+      quantity: new Quantity(10),
+      purchaseUnit: new PurchaseUnit(10),
+      leadTimeDays: 3,
+      supplierId: new SupplierId(10),
+    });
+
+    expect(purchaseOrder.quantity.value).toBe(10);
+  });
+
+  it('createNew で購入単位 + 1 の数量が次の倍数に切り上げられる（境界値: 11→20）', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(baseDate);
+
+    const purchaseOrder = PurchaseOrder.createNew({
+      itemId: new ItemId(1),
+      quantity: new Quantity(11),
+      purchaseUnit: new PurchaseUnit(10),
+      leadTimeDays: 3,
+      supplierId: new SupplierId(10),
+    });
+
+    expect(purchaseOrder.quantity.value).toBe(20);
+  });
+
   it('createNew で既に倍数の場合はそのままになる', () => {
     vi.useFakeTimers();
     vi.setSystemTime(baseDate);

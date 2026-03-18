@@ -123,7 +123,7 @@ describe('PurchaseOrderForm', () => {
     await user.click(screen.getByRole('button', { name: '発注する' }));
 
     await waitFor(() => {
-      expect(mockCreatePurchaseOrder).toHaveBeenCalledWith({ itemId: 1, quantity: 7 });
+      expect(mockCreatePurchaseOrder).toHaveBeenCalledWith({ itemId: 1, quantity: 10 });
     });
     expect(mockOnSuccess).toHaveBeenCalledWith(mockResult);
   });
@@ -201,5 +201,50 @@ describe('PurchaseOrderForm', () => {
     });
 
     expect(screen.getByRole('button', { name: '発注する' })).toBeDisabled();
+  });
+
+  it('単品情報の取得に失敗するとエラーメッセージが表示される', async () => {
+    mockFetchItemInfo.mockRejectedValue(new Error('Network error'));
+
+    render(
+      <PurchaseOrderForm
+        itemId={1}
+        fetchItemInfo={mockFetchItemInfo}
+        createPurchaseOrder={mockCreatePurchaseOrder}
+        onBack={mockOnBack}
+        onSuccess={mockOnSuccess}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('単品情報の取得に失敗しました。');
+    });
+  });
+
+  it('発注に失敗するとエラーメッセージが表示される', async () => {
+    mockCreatePurchaseOrder.mockRejectedValue(new Error('Server error'));
+
+    render(
+      <PurchaseOrderForm
+        itemId={1}
+        fetchItemInfo={mockFetchItemInfo}
+        createPurchaseOrder={mockCreatePurchaseOrder}
+        onBack={mockOnBack}
+        onSuccess={mockOnSuccess}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('発注数量')).toBeInTheDocument();
+    });
+
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText('発注数量'), '7');
+    await user.click(screen.getByRole('button', { name: '発注する' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('発注に失敗しました。再度お試しください。');
+    });
+    expect(mockOnSuccess).not.toHaveBeenCalled();
   });
 });

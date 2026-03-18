@@ -26,12 +26,16 @@ export function PurchaseOrderForm({
   const [itemInfo, setItemInfo] = useState<ItemInfo | null>(null);
   const [quantity, setQuantity] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchItemInfo(itemId).then(setItemInfo);
+    fetchItemInfo(itemId)
+      .then(setItemInfo)
+      .catch(() => setError('単品情報の取得に失敗しました。'));
   }, [fetchItemInfo, itemId]);
 
   const enteredQuantity = quantity ? Number(quantity) : 0;
+  // プレビュー用の購入単位倍数調整。正式な調整はサーバー側で行われる
   const adjustedQuantity =
     itemInfo && enteredQuantity > 0
       ? Math.ceil(enteredQuantity / itemInfo.purchaseUnit) * itemInfo.purchaseUnit
@@ -45,17 +49,20 @@ export function PurchaseOrderForm({
     : null;
 
   const handleSubmit = async () => {
-    if (!quantity || isSubmitting) {
+    if (!adjustedQuantity || isSubmitting) {
       return;
     }
 
     setIsSubmitting(true);
+    setError(null);
     try {
       const result = await createPurchaseOrder({
         itemId,
-        quantity: Number(quantity),
+        quantity: adjustedQuantity,
       });
       onSuccess(result);
+    } catch {
+      setError('発注に失敗しました。再度お試しください。');
     } finally {
       setIsSubmitting(false);
     }
@@ -67,6 +74,7 @@ export function PurchaseOrderForm({
         <h2>発注画面</h2>
       </div>
 
+      {error && <p className="error-message" role="alert">{error}</p>}
       {itemInfo && (
         <div className="form-section">
           <div className="form-group">
@@ -111,7 +119,7 @@ export function PurchaseOrderForm({
             <button
               className="btn btn--primary"
               onClick={handleSubmit}
-              disabled={!quantity || isSubmitting}
+              disabled={!adjustedQuantity || isSubmitting}
             >
               発注する
             </button>
