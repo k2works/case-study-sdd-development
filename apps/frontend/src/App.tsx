@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import './App.css'
 import { ItemManagement } from './pages/staff/ItemManagement'
 import { ProductManagement } from './pages/staff/ProductManagement'
 import { ProductList } from './pages/customer/ProductList'
@@ -7,10 +8,12 @@ import { OrderConfirm } from './pages/customer/OrderConfirm'
 import { OrderComplete } from './pages/customer/OrderComplete'
 import { OrderList } from './pages/staff/OrderList'
 import { OrderDetail } from './pages/staff/OrderDetail'
+import { StockForecast } from './pages/staff/StockForecast'
 import type { OrderFormProduct, OrderFormData } from './pages/customer/OrderForm'
 import type { ItemDto, CreateItemInput } from './types/item'
 import type { ProductDto, CreateProductInput } from './types/product'
 import type { OrderDto, CreateOrderInput } from './types/order'
+import type { StockForecastItem } from './types/stock-forecast'
 import { fetchApi } from './api/client'
 
 const API_BASE = '/api';
@@ -77,9 +80,21 @@ const createOrder = async (input: CreateOrderInput): Promise<OrderDto> => {
   });
 };
 
+const fetchStockForecast = async (
+  fromDate: string,
+  toDate: string,
+  itemId?: number,
+): Promise<StockForecastItem[]> => {
+  const params = new URLSearchParams({ fromDate, toDate });
+  if (itemId) {
+    params.set('itemId', String(itemId));
+  }
+  return fetchApi<StockForecastItem[]>(`/stock/forecast?${params.toString()}`);
+};
+
 type View = 'customer' | 'staff';
 type CustomerPage = 'list' | 'order-form' | 'order-confirm' | 'order-complete';
-type StaffTab = 'products' | 'items' | 'orders';
+type StaffTab = 'products' | 'items' | 'orders' | 'stock-forecast';
 
 function App() {
   const [view, setView] = useState<View>('customer');
@@ -233,6 +248,16 @@ function App() {
           >
             受注管理
           </button>
+          <button
+            className={`staff-tab${staffTab === 'stock-forecast' ? ' staff-tab--active' : ''}`}
+            role="tab"
+            aria-selected={staffTab === 'stock-forecast'}
+            aria-controls="panel-stock-forecast"
+            onClick={() => setStaffTab('stock-forecast')}
+            disabled={staffTab === 'stock-forecast'}
+          >
+            在庫推移
+          </button>
         </div>
         <div role="tabpanel" id={`panel-${staffTab}`}>
           {staffTab === 'products' && (
@@ -254,6 +279,11 @@ function App() {
             <OrderList
               fetchOrders={fetchOrders}
               onDetail={handleOrderDetail}
+            />
+          )}
+          {staffTab === 'stock-forecast' && (
+            <StockForecast
+              fetchForecast={fetchStockForecast}
             />
           )}
         </div>
