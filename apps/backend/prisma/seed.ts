@@ -25,6 +25,7 @@ async function main() {
   console.log(`Seeding database (${dbProvider})...`);
 
   // 既存データを削除（外部キー制約の順序で）
+  await prisma.arrival.deleteMany();
   await prisma.purchaseOrder.deleteMany();
   await prisma.stock.deleteMany();
   await prisma.order.deleteMany();
@@ -41,6 +42,7 @@ async function main() {
     await prisma.$executeRawUnsafe(`ALTER SEQUENCE orders_order_id_seq RESTART WITH 1`);
     await prisma.$executeRawUnsafe(`ALTER SEQUENCE stocks_stock_id_seq RESTART WITH 1`);
     await prisma.$executeRawUnsafe(`ALTER SEQUENCE purchase_orders_purchase_order_id_seq RESTART WITH 1`);
+    await prisma.$executeRawUnsafe(`ALTER SEQUENCE arrivals_arrival_id_seq RESTART WITH 1`);
   } else {
     // SQLite: autoincrement カウンタをリセット
     await prisma.$executeRawUnsafe(`DELETE FROM sqlite_sequence`);
