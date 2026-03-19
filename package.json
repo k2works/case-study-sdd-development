@@ -1,7 +1,6 @@
 {
-  "name": "case-study-sdd-development",
+  "name": "",
   "version": "0.0.0",
-  "description": "仕様駆動開発（SDD）のケーススタディ",
   "main": "index.js",
   "scripts": {
     "start": "gulp dev",
@@ -20,23 +19,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/k2works/case-study-sdd-development.git"
+    "url": "git+https://github.com/k2works/{project_name}.git"
   },
   "keywords": [
-    "sdd",
-    "xp",
-    "tdd",
-    "case-study"
+    "ai",
+    "programming",
+    "learning"
   ],
-  "author": "k2works",
+  "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/k2works/case-study-sdd-development/issues"
+    "url": "https://github.com/k2works/{project_name}/issues"
   },
-  "homepage": "https://github.com/k2works/case-study-sdd-development#readme",
+  "homepage": "https://github.com/k2works/{project_name}#readme",
   "type": "module",
   "dependencies": {
-    "@k2works/claude-code-booster": "^2.4.0",
     "dotenv": "^17.2.3",
     "gulp": "^5.0.0"
   }
