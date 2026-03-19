@@ -44,7 +44,8 @@
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| [リリース計画](./development/release_plan.md) | 未着手 |
+| [リリース計画](./development/release_plan.md) | 進行中 |
+| [イテレーション 1 計画](./development/iteration_plan-1.md) | 進行中 |
 
 ### 運用 (`operation/`)
 
