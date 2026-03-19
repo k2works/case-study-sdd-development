@@ -152,18 +152,18 @@
 
 ```mermaid
 gantt
-    title イテレーション 1 - Week 1
-    dateFormat  YYYY-MM-DD
+    title IT1 Week1
+    dateFormat YYYY-MM-DD
     section 環境構築
-    Docker Compose 設定          :d01, 2026-03-19, 1d
-    バックエンド初期化            :d02, after d01, 1d
-    フロントエンド初期化          :d03, after d01, 1d
-    Prisma スキーマ定義           :d04, after d02, 1d
-    CI 設定                      :d05, after d04, 1d
+    Docker Compose    :d01, 2026-03-19, 1d
+    バックエンド初期化 :d02, after d01, 1d
+    フロントエンド初期化 :d03, after d01, 1d
+    Prisma スキーマ   :d04, after d02, 1d
+    CI 設定           :d05, after d04, 1d
     section US-12 商品マスタ
-    ドメイン層・リポジトリ        :d06, 2026-03-21, 2d
-    ユースケース・API             :d07, after d06, 1d
-    フロント画面                  :d08, after d07, 1d
+    ドメイン層        :d06, 2026-03-21, 2d
+    ユースケース API  :d07, after d06, 1d
+    フロント画面      :d08, after d07, 1d
 ```
 
 | 日 | タスク |
@@ -178,16 +178,16 @@ gantt
 
 ```mermaid
 gantt
-    title イテレーション 1 - Week 2
-    dateFormat  YYYY-MM-DD
+    title IT1 Week2
+    dateFormat YYYY-MM-DD
     section US-13 単品マスタ
-    ドメイン層・リポジトリ        :a01, 2026-03-26, 2d
-    ユースケース・API             :a02, after a01, 1d
-    フロント画面                  :a03, after a02, 1d
+    ドメイン層        :a01, 2026-03-26, 2d
+    ユースケース API  :a02, after a01, 1d
+    フロント画面      :a03, after a02, 1d
     section US-01 商品一覧
-    API・フロント画面             :a04, 2026-03-26, 2d
-    テスト・統合確認              :a05, after a04, 2d
-    デモ準備                      :a06, 2026-04-01, 1d
+    API フロント      :a04, 2026-03-26, 2d
+    テスト統合確認    :a05, after a04, 2d
+    デモ準備          :a06, 2026-04-01, 1d
 ```
 
 | 日 | タスク |
