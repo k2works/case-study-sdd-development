@@ -36,6 +36,7 @@ model Item {
   compositions   ProductComposition[]
   stocks         Stock[]
   purchaseOrders PurchaseOrder[]
+  arrivals       Arrival[]
 
   @@map("items")
 }
@@ -68,10 +69,40 @@ model ProductComposition {
   @@map("product_compositions")
 }
 
+// 得意先
+model Customer {
+  customerId Int      @id @default(autoincrement()) @map("customer_id")
+  name       String
+  phone      String
+  email      String?  @unique
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  destinations Destination[]
+  orders       Order[]
+
+  @@map("customers")
+}
+
+// 届け先
+model Destination {
+  destinationId Int      @id @default(autoincrement()) @map("destination_id")
+  customerId    Int      @map("customer_id")
+  name          String
+  address       String
+  phone         String
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  customer Customer @relation(fields: [customerId], references: [customerId])
+
+  @@map("destinations")
+}
+
 // 受注
 model Order {
   orderId            Int      @id @default(autoincrement()) @map("order_id")
-  customerId         Int      @map("customer_id")
+  customerId         Int?     @map("customer_id")
   productId          Int      @map("product_id")
   price              Int
   destinationName    String   @map("destination_name")
@@ -84,8 +115,9 @@ model Order {
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
 
-  product Product @relation(fields: [productId], references: [productId])
-  stocks  Stock[]
+  customer Customer? @relation(fields: [customerId], references: [customerId])
+  product  Product   @relation(fields: [productId], references: [productId])
+  stocks   Stock[]
 
   @@map("orders")
 }
@@ -120,8 +152,24 @@ model PurchaseOrder {
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
 
-  item     Item     @relation(fields: [itemId], references: [itemId])
-  supplier Supplier @relation(fields: [supplierId], references: [supplierId])
+  item     Item      @relation(fields: [itemId], references: [itemId])
+  supplier Supplier  @relation(fields: [supplierId], references: [supplierId])
+  arrivals Arrival[]
 
   @@map("purchase_orders")
+}
+
+// 入荷
+model Arrival {
+  arrivalId       Int      @id @default(autoincrement()) @map("arrival_id")
+  itemId          Int      @map("item_id")
+  purchaseOrderId Int      @map("purchase_order_id")
+  quantity        Int
+  arrivalDate     DateTime @map("arrival_date")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  item          Item          @relation(fields: [itemId], references: [itemId])
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [purchaseOrderId])
+
+  @@map("arrivals")
 }

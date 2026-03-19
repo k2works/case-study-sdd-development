@@ -190,4 +190,35 @@ describe('Order API', () => {
       expect(res.body.reason).toBeDefined();
     });
   });
+
+  describe('PUT /api/orders/:id/cancel', () => {
+    it('注文をキャンセルできる', async () => {
+      await setupProductAndStock();
+      const created = await request(app).post('/api/orders').send({
+        customerId: 10,
+        productId: 1,
+        destinationName: '田中太郎',
+        destinationAddress: '東京都',
+        destinationPhone: '03-1234-5678',
+        deliveryDate: '2026-04-01',
+      });
+
+      const res = await request(app).put(`/api/orders/${created.body.id}/cancel`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+
+      // キャンセル後の状態確認
+      const order = await request(app).get(`/api/orders/${created.body.id}`);
+      expect(order.body.status).toBe('キャンセル');
+    });
+
+    it('存在しない受注 ID で失敗レスポンスを返す', async () => {
+      const res = await request(app).put('/api/orders/999/cancel');
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(false);
+      expect(res.body.reason).toBeDefined();
+    });
+  });
 });

@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.3.0] - 2026-03-19
+
+### Features
+
+- S06 在庫チェック付き届け日変更 + S15 注文キャンセル実装 (930c9a3)
+
+### Bug Fixes
+
+- handleTabChange → setStaffTab に修正（TypeScript ビルドエラー解消） (076ea8b)
+- SQLite スキーマを IT5 構成に同期（Customer/Destination/Arrival 追加） (40c2d27)
+- tsc -b --noEmit のエラー 5 件を修正 (2c7762c)
+- tsc --noEmit の strictNullChecks エラー 25 件を修正 (d6c6a17)
+
+### Documentation
+
+- release_plan.md IT6 タスク完了・全リリース条件更新 (e4bbb71)
+- review/index.md に IT6 レビュー 2 件を追加 (46b923c)
+- IT6 ふりかえり・完了報告書作成、リリース計画最終更新 (1947d9f)
+- IT6 受入条件を全件チェック済みに更新 (cc0a231)
+- IT6 全タスク完了状態に更新 (71dcb65)
+- IT6 開発成果物レビュー結果（5 エージェント並列） (dbd4b71)
+- IT6 進捗更新・GitHub Issues クローズ・Phase3 Milestone クローズ (53e128a)
+- IT6 計画作成・XP レビュー反映・GitHub 同期 (a5f3f0d)
+
+### Tests
+
+- S04 得意先管理 + S05 届け日変更の E2E テスト追加（IT5 負債解消） (338ea3b)
+- S06 在庫チェック付き届け日変更 + S15 注文キャンセルの E2E テスト追加 (8a0f92c)
+
 ## [0.2.0] - 2026-03-18
 
 ### Features

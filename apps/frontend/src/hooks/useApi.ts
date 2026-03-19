@@ -154,6 +154,15 @@ export const fetchOrderDestinations = async (customerId: number): Promise<Destin
   return fetchApi<DestinationDto[]>(`/customers/${customerId}/order-destinations`);
 };
 
+// 注文キャンセル API
+export const cancelOrder = async (
+  orderId: number,
+): Promise<{ success: boolean; reason?: string }> => {
+  return fetchApi(`/orders/${orderId}/cancel`, {
+    method: 'PUT',
+  });
+};
+
 // 届け日変更 API
 export const changeDeliveryDate = async (
   orderId: number,
