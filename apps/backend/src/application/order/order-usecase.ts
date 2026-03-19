@@ -145,6 +145,41 @@ export class OrderUseCase {
       return { success: false, reason: result.reason };
     }
 
+    // 在庫チェック先行方式: 既存引当を読み取り、再引当可能か確認
+    const product = await this.productRepository.findById(order.productId);
+    if (product) {
+      // 既存引当ロットを取得（読み取りのみ）
+      const allocatedLots = await this.stockLotRepository.findByOrderId(order.orderId!);
+
+      // 在庫チェック: 既存引当を解放した場合に再引当可能か
+      const activeStatus = new StockStatus('有効');
+      for (const composition of product.compositions) {
+        const activeLots = await this.stockLotRepository.findByItemIdAndStatus(composition.itemId, activeStatus);
+        const activeTotal = activeLots.reduce((sum, lot) => sum + lot.quantity.value, 0);
+        // 既存引当のうちこの単品分を加算（解放されると有効に戻る分）
+        const allocatedForItem = allocatedLots
+          .filter((lot) => lot.itemId.value === composition.itemId.value)
+          .reduce((sum, lot) => sum + lot.quantity.value, 0);
+        const availableAfterDeallocate = activeTotal + allocatedForItem;
+
+        if (availableAfterDeallocate < composition.quantity.value) {
+          return {
+            success: false,
+            reason: `在庫が不足しています（単品ID: ${composition.itemId.value}、必要: ${composition.quantity.value}、在庫: ${availableAfterDeallocate}）`,
+          };
+        }
+      }
+
+      // 在庫十分: deallocate → allocate を実行
+      await this.deallocateOrderLots(allocatedLots);
+
+      // 新しい引当を実行
+      await this.saveAllocations(
+        await this.prepareAllocations(product.compositions),
+        order.orderId!,
+      );
+    }
+
     const saved = await this.orderRepository.save(result.order!);
     return {
       success: true,
@@ -155,6 +190,36 @@ export class OrderUseCase {
         status: saved.status.value,
       },
     };
+  }
+
+  async cancelOrder(
+    orderId: number,
+  ): Promise<{ success: boolean; reason?: string }> {
+    const order = await this.orderRepository.findById(new OrderId(orderId));
+    if (!order) {
+      return { success: false, reason: '受注が見つかりません' };
+    }
+
+    if (order.status.value !== '注文済み') {
+      return { success: false, reason: '注文済みの受注のみキャンセルできます' };
+    }
+
+    // 引当済みロットを解除
+    const allocatedLots = await this.stockLotRepository.findByOrderId(order.orderId!);
+    await this.deallocateOrderLots(allocatedLots);
+
+    // 受注をキャンセル
+    const cancelled = order.cancel();
+    await this.orderRepository.save(cancelled);
+
+    return { success: true };
+  }
+
+  private async deallocateOrderLots(lots: StockLot[]): Promise<void> {
+    for (const lot of lots) {
+      const deallocated = lot.deallocate();
+      await this.stockLotRepository.save(deallocated);
+    }
   }
 
   async findById(id: number): Promise<Order | null> {

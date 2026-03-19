@@ -58,6 +58,17 @@ export function createOrderRoutes(useCase: OrderUseCase): Router {
     }
   });
 
+  router.put('/orders/:id/cancel', async (req, res) => {
+    const id = Number(req.params.id);
+
+    try {
+      const result = await useCase.cancelOrder(id);
+      res.json(result);
+    } catch (e) {
+      res.status(400).json({ error: (e as Error).message });
+    }
+  });
+
   router.get('/orders/:id', async (req, res) => {
     const order = await useCase.findById(Number(req.params.id));
     if (!order) {

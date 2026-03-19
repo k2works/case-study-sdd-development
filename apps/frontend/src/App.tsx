@@ -37,6 +37,7 @@ import {
   fetchDestinations,
   fetchOrderDestinations,
   changeDeliveryDate,
+  cancelOrder,
 } from './hooks/useApi'
 
 function App() {
@@ -110,6 +111,8 @@ function App() {
           fetchOrder={fetchOrder}
           onBack={nav.handleBackFromDetail}
           changeDeliveryDate={changeDeliveryDate}
+          cancelOrder={cancelOrder}
+          onNavigateToStockForecast={() => nav.handleTabChange('stock-forecast')}
         />
       );
     }

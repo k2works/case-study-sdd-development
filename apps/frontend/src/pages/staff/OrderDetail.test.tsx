@@ -24,6 +24,8 @@ const mockOrder: OrderDto = {
 const mockFetchOrder = vi.fn<(id: number) => Promise<OrderDto>>();
 const mockOnBack = vi.fn();
 const mockChangeDeliveryDate = vi.fn<(orderId: number, newDeliveryDate: string) => Promise<{ success: boolean; reason?: string; order?: { orderId: number; deliveryDate: string; shippingDate: string; status: string } }>>();
+const mockCancelOrder = vi.fn<(orderId: number) => Promise<{ success: boolean; reason?: string }>>();
+const mockOnNavigateToStockForecast = vi.fn();
 
 describe('OrderDetail', () => {
   beforeEach(() => {
@@ -176,6 +178,180 @@ describe('OrderDetail', () => {
       });
 
       expect(screen.queryByText('届け日変更')).not.toBeInTheDocument();
+    });
+
+    it('在庫不足エラー時に在庫推移画面への導線が表示される', async () => {
+      mockChangeDeliveryDate.mockResolvedValue({
+        success: false,
+        reason: '在庫が不足しています（単品ID: 1、必要: 10、在庫: 5）',
+      });
+
+      render(
+        <OrderDetail
+          orderId={1}
+          fetchOrder={mockFetchOrder}
+          onBack={mockOnBack}
+          changeDeliveryDate={mockChangeDeliveryDate}
+          onNavigateToStockForecast={mockOnNavigateToStockForecast}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('届け日変更')).toBeInTheDocument();
+      });
+
+      await userEvent.type(screen.getByLabelText('新しい届け日'), '2026-05-01');
+      await userEvent.click(screen.getByRole('button', { name: '届け日を変更する' }));
+
+      await waitFor(() => {
+        expect(screen.getByText(/在庫が不足しています/)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: '在庫推移を確認' })).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('注文キャンセル', () => {
+    beforeEach(() => {
+      mockCancelOrder.mockResolvedValue({ success: true });
+    });
+
+    it('注文済みの場合、キャンセルボタンが表示される', async () => {
+      render(
+        <OrderDetail
+          orderId={1}
+          fetchOrder={mockFetchOrder}
+          onBack={mockOnBack}
+          cancelOrder={mockCancelOrder}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'キャンセル' })).toBeInTheDocument();
+      });
+    });
+
+    it('出荷準備中の場合、キャンセルボタンが表示されない', async () => {
+      mockFetchOrder.mockResolvedValue({ ...mockOrder, status: '出荷準備中' });
+
+      render(
+        <OrderDetail
+          orderId={1}
+          fetchOrder={mockFetchOrder}
+          onBack={mockOnBack}
+          cancelOrder={mockCancelOrder}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('出荷準備中')).toBeInTheDocument();
+      });
+
+      expect(screen.queryByRole('button', { name: 'キャンセル' })).not.toBeInTheDocument();
+    });
+
+    it('キャンセルボタンを押すと確認ダイアログが表示される', async () => {
+      render(
+        <OrderDetail
+          orderId={1}
+          fetchOrder={mockFetchOrder}
+          onBack={mockOnBack}
+          cancelOrder={mockCancelOrder}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'キャンセル' })).toBeInTheDocument();
+      });
+
+      await userEvent.click(screen.getByRole('button', { name: 'キャンセル' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('この注文をキャンセルしますか？')).toBeInTheDocument();
+        expect(screen.getByText(/この操作は取り消せません/)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'はい、キャンセルする' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'いいえ' })).toBeInTheDocument();
+      });
+    });
+
+    it('確認ダイアログで「はい」を押すとキャンセルが実行される', async () => {
+      const cancelledOrder = { ...mockOrder, status: 'キャンセル' };
+      mockFetchOrder
+        .mockResolvedValueOnce(mockOrder)
+        .mockResolvedValueOnce(cancelledOrder);
+
+      render(
+        <OrderDetail
+          orderId={1}
+          fetchOrder={mockFetchOrder}
+          onBack={mockOnBack}
+          cancelOrder={mockCancelOrder}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'キャンセル' })).toBeInTheDocument();
+      });
+
+      await userEvent.click(screen.getByRole('button', { name: 'キャンセル' }));
+      await userEvent.click(screen.getByRole('button', { name: 'はい、キャンセルする' }));
+
+      await waitFor(() => {
+        expect(mockCancelOrder).toHaveBeenCalledWith(1);
+      });
+    });
+
+    it('キャンセル後はキャンセルボタンと届け日変更セクションが非表示になる', async () => {
+      const cancelledOrder: OrderDto = { ...mockOrder, status: 'キャンセル' };
+      mockFetchOrder
+        .mockResolvedValueOnce(mockOrder)
+        .mockResolvedValueOnce(cancelledOrder);
+
+      render(
+        <OrderDetail
+          orderId={1}
+          fetchOrder={mockFetchOrder}
+          onBack={mockOnBack}
+          cancelOrder={mockCancelOrder}
+          changeDeliveryDate={mockChangeDeliveryDate}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'キャンセル' })).toBeInTheDocument();
+      });
+
+      await userEvent.click(screen.getByRole('button', { name: 'キャンセル' }));
+      await userEvent.click(screen.getByRole('button', { name: 'はい、キャンセルする' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('キャンセル')).toBeInTheDocument();
+      });
+
+      // キャンセルボタンと届け日変更が非表示
+      expect(screen.queryByRole('button', { name: 'キャンセル' })).not.toBeInTheDocument();
+      expect(screen.queryByText('届け日変更')).not.toBeInTheDocument();
+    });
+
+    it('確認ダイアログで「いいえ」を押すとキャンセルされない', async () => {
+      render(
+        <OrderDetail
+          orderId={1}
+          fetchOrder={mockFetchOrder}
+          onBack={mockOnBack}
+          cancelOrder={mockCancelOrder}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'キャンセル' })).toBeInTheDocument();
+      });
+
+      await userEvent.click(screen.getByRole('button', { name: 'キャンセル' }));
+      await userEvent.click(screen.getByRole('button', { name: 'いいえ' }));
+
+      expect(mockCancelOrder).not.toHaveBeenCalled();
+      // ダイアログが閉じる
+      expect(screen.queryByText('この注文をキャンセルしますか？')).not.toBeInTheDocument();
     });
   });
 });
