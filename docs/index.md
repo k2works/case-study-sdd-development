@@ -13,32 +13,32 @@
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| [ビジネスアーキテクチャ](./analysis/business_architecture.md) | 未着手 |
-| [インセプションデッキ](./analysis/inception_deck.md) | 未着手 |
+| [ビジネスアーキテクチャ](./analysis/business_architecture.md) | 完了 |
+| [インセプションデッキ](./analysis/inception_deck.md) | 完了 |
 
 ### 要件定義 (`requirements/`)
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| [要件定義書（RDRA 2.0）](./requirements/requirements_definition.md) | 未着手 |
-| [ビジネスユースケース](./requirements/business_usecase.md) | 未着手 |
-| [システムユースケース](./requirements/system_usecase.md) | 未着手 |
-| [ユーザーストーリー](./requirements/user_story.md) | 未着手 |
+| [要件定義書（RDRA 2.0）](./requirements/requirements_definition.md) | 完了 |
+| [ビジネスユースケース](./requirements/business_usecase.md) | 完了 |
+| [システムユースケース](./requirements/system_usecase.md) | 完了 |
+| [ユーザーストーリー](./requirements/user_story.md) | 完了 |
 
 ### 設計 (`design/`)
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| [バックエンドアーキテクチャ](./design/architecture_backend.md) | 未着手 |
-| [フロントエンドアーキテクチャ](./design/architecture_frontend.md) | 未着手 |
-| [インフラストラクチャ](./design/architecture_infrastructure.md) | 未着手 |
-| [データモデル設計](./design/data-model.md) | 未着手 |
-| [ドメインモデル設計](./design/domain-model.md) | 未着手 |
-| [UI 設計](./design/ui-design.md) | 未着手 |
-| [テスト戦略](./design/test_strategy.md) | 未着手 |
-| [非機能要件](./design/non_functional.md) | 未着手 |
-| [運用要件](./design/operation.md) | 未着手 |
-| [技術スタック選定](./design/tech_stack.md) | 未着手 |
+| [バックエンドアーキテクチャ](./design/architecture_backend.md) | 完了 |
+| [フロントエンドアーキテクチャ](./design/architecture_frontend.md) | 完了 |
+| [インフラストラクチャ](./design/architecture_infrastructure.md) | 完了 |
+| [データモデル設計](./design/data-model.md) | 完了 |
+| [ドメインモデル設計](./design/domain-model.md) | 完了 |
+| [UI 設計](./design/ui-design.md) | 完了 |
+| [テスト戦略](./design/test_strategy.md) | 完了 |
+| [非機能要件](./design/non_functional.md) | 完了 |
+| [運用要件](./design/operation.md) | 完了 |
+| [技術スタック選定](./design/tech_stack.md) | 完了 |
 
 ### 開発 (`development/`)
 
@@ -78,6 +78,7 @@
 - [リリースガイド](./reference/リリースガイド.md)
 - [リリース・イテレーション計画ガイド](./reference/リリース・イテレーション計画ガイド.md)
 - [環境変数管理ガイド](./reference/環境変数管理ガイド.md)
+- [運用スクリプト作成ガイド](./reference/運用スクリプト作成ガイド.md)
 - [言語別開発ガイド](./reference/言語別開発ガイド.md)
 - [Java アプリケーション環境構築ガイド](./reference/Javaアプリケーション環境構築ガイド.md)
 - [TypeScript アプリケーション環境構築ガイド](./reference/TypeScriptアプリケーション環境構築ガイド.md)
@@ -100,4 +101,5 @@
 - [イテレーション計画](./template/イテレーション計画.md)
 - [イテレーション完了報告書](./template/イテレーション完了報告書.md)
 - [リリース計画](./template/リリース計画.md)
+- [リリース完了報告書](./template/リリース完了報告書.md)
 - [README](./template/README.md)

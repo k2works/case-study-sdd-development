@@ -6,20 +6,20 @@
 
 ### アーキテクチャ
 
-- [バックエンドアーキテクチャ](./architecture_backend.md) - バックエンドアーキテクチャ設計
-- [フロントエンドアーキテクチャ](./architecture_frontend.md) - フロントエンドアーキテクチャ設計
-- [インフラストラクチャ](./architecture_infrastructure.md) - インフラストラクチャ設計
+- [バックエンドアーキテクチャ](./architecture_backend.md) - レイヤードアーキテクチャ、REST API 設計
+- [フロントエンドアーキテクチャ](./architecture_frontend.md) - React SPA、コンポーネント設計
+- [インフラストラクチャ](./architecture_infrastructure.md) - Docker Compose、CI/CD パイプライン
 
 ### モデル設計
 
 - [データモデル設計](./data-model.md) - 概念・論理データモデル、テーブル定義、ER 図
-- [ドメインモデル設計](./domain-model.md) - 境界づけられたコンテキスト、集約・エンティティ・値オブジェクト設計
-- [UI 設計](./ui-design.md) - 画面設計、画面遷移図、コンポーネント設計
+- [ドメインモデル設計](./domain-model.md) - ユビキタス言語、エンティティ・値オブジェクト・集約・ドメインサービス
+- [UI 設計](./ui-design.md) - 画面一覧、画面遷移図、画面イメージ（salt 図）
 
 ### 品質・運用
 
-- [テスト戦略](./test_strategy.md) - テストピラミッド、テスト種別・ツール・CI/CD 統合
-- [非機能要件](./non_functional.md) - 性能・可用性・セキュリティ・保守性・拡張性要件
+- [テスト戦略](./test_strategy.md) - ピラミッド型テスト、TDD 方針、カバレッジ目標
+- [非機能要件](./non_functional.md) - 性能・セキュリティ・可用性・保守性・拡張性要件
 - [運用要件](./operation.md) - 監視設計・バックアップ・デプロイ・障害対応
 
 ### その他
