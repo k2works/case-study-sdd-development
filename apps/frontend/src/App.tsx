@@ -112,7 +112,7 @@ function App() {
           onBack={nav.handleBackFromDetail}
           changeDeliveryDate={changeDeliveryDate}
           cancelOrder={cancelOrder}
-          onNavigateToStockForecast={() => nav.handleTabChange('stock-forecast')}
+          onNavigateToStockForecast={() => { nav.setStaffTab('stock-forecast'); }}
         />
       );
     }
