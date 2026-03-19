@@ -45,6 +45,9 @@
 | ドキュメント | 状態 |
 | :--- | :--- |
 | [リリース計画](./development/release_plan.md) | 完了 |
+| [Release 0.1.0 MVP 完了報告書](./development/release_report-0_1_0.md) | 完了 |
+| [Release 0.2.0 業務拡張 完了報告書](./development/release_report-0_2_0.md) | 完了 |
+| [Release 0.3.0 完成版 完了報告書](./development/release_report-0_3_0.md) | 完了 |
 | [イテレーション 1 計画](./development/iteration_plan-1.md) | 完了 |
 | [イテレーション 1 完了報告書](./development/iteration_report-1.md) | 完了 |
 | [イテレーション 1 ふりかえり](./development/retrospective-1.md) | 完了 |
@@ -137,6 +140,7 @@
 - [イテレーション計画](./template/イテレーション計画.md)
 - [イテレーション完了報告書](./template/イテレーション完了報告書.md)
 - [リリース計画](./template/リリース計画.md)
+- [リリース完了報告書](./template/リリース完了報告書.md)
 - [アプリケーション開発環境セットアップ手順書](./template/アプリケーション開発環境セットアップ手順書.md)
 - [開発環境セットアップ手順書](./template/開発環境セットアップ手順書.md)
 - [AWS ステージング環境セットアップ手順書](./template/AWSステージング環境セットアップ手順書.md)
