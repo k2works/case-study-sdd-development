@@ -104,6 +104,8 @@ nav:
       - イテレーション 5 ふりかえり: development/retrospective-5.md
       - イテレーション 5 完了報告書: development/iteration_report-5.md
       - イテレーション 6 計画: development/iteration_plan-6.md
+      - イテレーション 6 ふりかえり: development/retrospective-6.md
+      - イテレーション 6 完了報告書: development/iteration_report-6.md
   - 運用:
       - 概要: operation/index.md
       - アプリケーション開発環境セットアップ: operation/dev_app_instruction.md
@@ -143,6 +145,7 @@ nav:
       - S09 単品発注レビュー: review/s09_review_20260318.md
       - イテレーション 5 計画レビュー: review/iteration_plan-5_review_20260318.md
       - イテレーション 6 計画レビュー: review/iteration_plan-6_review_20260319.md
+      - イテレーション 6 開発成果物レビュー: review/it6_implementation_review_20260319.md
   - ADR:
       - 概要: adr/index.md
       - ADR-001 発注トランザクション方針: adr/001-purchase-order-transaction-strategy.md

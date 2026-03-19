@@ -60,7 +60,9 @@
 | [イテレーション 5 計画](./development/iteration_plan-5.md) | 完了 |
 | [イテレーション 5 ふりかえり](./development/retrospective-5.md) | 完了 |
 | [イテレーション 5 完了報告書](./development/iteration_report-5.md) | 完了 |
-| [イテレーション 6 計画](./development/iteration_plan-6.md) | 進行中 |
+| [イテレーション 6 計画](./development/iteration_plan-6.md) | 完了 |
+| [イテレーション 6 ふりかえり](./development/retrospective-6.md) | 完了 |
+| [イテレーション 6 完了報告書](./development/iteration_report-6.md) | 完了 |
 
 ### 運用 (`operation/`)
 
@@ -78,6 +80,7 @@
 | [S09 単品発注レビュー](./review/s09_review_20260318.md) | S09 単品を発注する | 2026-03-18 |
 | [イテレーション 5 計画レビュー](./review/iteration_plan-5_review_20260318.md) | IT5 計画 | 2026-03-18 |
 | [イテレーション 6 計画レビュー](./review/iteration_plan-6_review_20260319.md) | IT6 計画 | 2026-03-19 |
+| [イテレーション 6 開発成果物レビュー](./review/it6_implementation_review_20260319.md) | IT6 実装 | 2026-03-19 |
 
 ### ADR (`adr/`)
 
