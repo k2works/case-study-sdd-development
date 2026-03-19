@@ -32,16 +32,16 @@
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| [バックエンドアーキテクチャ](./design/architecture_backend.md) | 未着手 |
-| [フロントエンドアーキテクチャ](./design/architecture_frontend.md) | 未着手 |
-| [インフラストラクチャ](./design/architecture_infrastructure.md) | 未着手 |
-| [データモデル設計](./design/data-model.md) | 未着手 |
-| [ドメインモデル設計](./design/domain-model.md) | 未着手 |
-| [UI 設計](./design/ui-design.md) | 未着手 |
-| [テスト戦略](./design/test_strategy.md) | 未着手 |
-| [非機能要件](./design/non_functional.md) | 未着手 |
-| [運用要件](./design/operation.md) | 未着手 |
-| [技術スタック選定](./design/tech_stack.md) | 未着手 |
+| [バックエンドアーキテクチャ](./design/architecture_backend.md) | 作成済み |
+| [フロントエンドアーキテクチャ](./design/architecture_frontend.md) | 作成済み |
+| [インフラストラクチャ](./design/architecture_infrastructure.md) | 作成済み |
+| [データモデル設計](./design/data-model.md) | 作成済み |
+| [ドメインモデル設計](./design/domain-model.md) | 作成済み |
+| [UI 設計](./design/ui-design.md) | 作成済み |
+| [テスト戦略](./design/test_strategy.md) | 作成済み |
+| [非機能要件](./design/non_functional.md) | 作成済み |
+| [運用要件](./design/operation.md) | 作成済み |
+| [技術スタック選定](./design/tech_stack.md) | 作成済み |
 
 ### 開発 (`development/`)
 
@@ -59,7 +59,9 @@
 
 技術的意思決定を記録した Architecture Decision Records です。
 
-- 現在、個別 ADR は未作成です。
+- [ADR-001: ヘキサゴナルアーキテクチャを採用し、初期段階では CQRS を採用しない](./adr/001-adopt-hexagonal-architecture.md)
+- [ADR-002: 受注に届け先スナップショットを保持する](./adr/002-store-delivery-address-snapshot-on-orders.md)
+- [ADR-003: 仕入先連携を partner API 境界に分離する](./adr/003-separate-supplier-integration-boundary.md)
 
 ### リファレンス (`reference/`)
 

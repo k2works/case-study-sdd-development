@@ -27,7 +27,7 @@
 
 ## Technical Stack
 
-- Node.js 22.x
+- Node.js 24 LTS
 - npm
 - Gulp
 - MkDocs
