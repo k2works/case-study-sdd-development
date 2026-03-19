@@ -1,5 +1,7 @@
 # AI Agent 実行ガイドライン
 
+> Ralph Loop を使用する場合は、`.specify/memory/constitution.md` を最初に読み、そちらを Ralph 用の source of truth として扱ってください。
+
 **最重要**：自律的に判断・実行。確認は最小限に。
 
 ## ペルソナ

@@ -43,21 +43,49 @@ claude mcp add -s project memory -- npx @modelcontextprotocol/server-memory
 claude mcp add -s project codex -- npx @openai/codex mcp-server
 ```
 
-#### ralph-loopの導入
+#### Ralph Wiggum
 
-- Claude Code 起動後、/plugin を実行
+このリポジトリには `fstandhartinger/ralph-wiggum` ベースのループスクリプトを導入済みです。
 
-- 検索ボックスで ralph-loop を探して選択
+- `scripts/ralph-loop.sh` : Claude Code 用
+- `scripts/ralph-loop-codex.sh` : Codex CLI 用
+- `scripts/ralph-loop-gemini.sh` : Gemini 用
+- `scripts/ralph-loop-copilot.sh` : Copilot 用
 
-- インストールするスコープを選ぶ（ユーザー / プロジェクト / ローカル）
+初回に読むファイル:
 
-- Claude Code を再起動
+- `.specify/memory/constitution.md`
+- `specs/*.md`
 
-- コマンドで実行
+Planning mode:
 
-```powershell
-/ralph-loop "<プロンプト>" --max-iterations <数値> --completion-promise "<完了テキスト>"
+```bash
+bash ./scripts/ralph-loop-codex.sh plan
 ```
+
+Build mode:
+
+```bash
+bash ./scripts/ralph-loop-codex.sh
+```
+
+Claude Code を使う場合:
+
+```bash
+bash ./scripts/ralph-loop.sh
+```
+
+反復回数を制限する場合:
+
+```bash
+bash ./scripts/ralph-loop-codex.sh 20
+```
+
+補足:
+
+- Windows では `Git Bash`、`WSL`、または bash が使えるコンテナ内で実行してください。
+- Telegram 通知を使う場合は `TG_BOT_TOKEN` と `TG_CHAT_ID` を環境変数で設定してください。
+- GitHub Issues 連携には `gh` CLI の認証が必要です。
 
 #### AI アシスタント（Skills）
 

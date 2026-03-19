@@ -1,5 +1,7 @@
 # AGENTS.md
 
+> Ralph Loop を使用するエージェントは、開始前に `.specify/memory/constitution.md` も必ず参照してください。
+
 AI コーディングエージェント向けのプロジェクトガイドラインです。
 
 > **重要**: 詳細なガイドラインは `CLAUDE.md` を参照してください。
@@ -91,4 +93,5 @@ chore: ビルド・設定変更
 <!-- プロジェクトの参照ドキュメントを記述 -->
 
 - `CLAUDE.md` - 詳細な AI エージェント実行ガイドライン
+- `.specify/memory/constitution.md` - Ralph Wiggum の実行方針と自動化ルール
 - <!-- その他の参照ドキュメント -->

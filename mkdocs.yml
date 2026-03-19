@@ -73,6 +73,7 @@ nav:
       - 概要: development/index.md
   - 運用:
       - 概要: operation/index.md
+      - Ralph Wiggum 運用ガイド: operation/ralph.md
   - リファレンス:
       - 概要: reference/index.md
       - よいソフトウェアとは: reference/よいソフトウェアとは.md
