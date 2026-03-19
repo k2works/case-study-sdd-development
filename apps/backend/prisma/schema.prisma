@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Supplier {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  items     Item[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("suppliers")
+}
+
+model Item {
+  id           Int                  @id @default(autoincrement())
+  name         String               @db.VarChar(100)
+  supplierId   Int                  @map("supplier_id")
+  shelfLife    Int                  @map("shelf_life")
+  isActive     Boolean              @default(true) @map("is_active")
+  supplier     Supplier             @relation(fields: [supplierId], references: [id])
+  compositions ProductComposition[]
+  createdAt    DateTime             @default(now()) @map("created_at")
+  updatedAt    DateTime             @updatedAt @map("updated_at")
+
+  @@map("items")
+}
+
+model Product {
+  id           Int                  @id @default(autoincrement())
+  name         String               @db.VarChar(100)
+  price        Int
+  isActive     Boolean              @default(true) @map("is_active")
+  compositions ProductComposition[]
+  createdAt    DateTime             @default(now()) @map("created_at")
+  updatedAt    DateTime             @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+model ProductComposition {
+  id        Int     @id @default(autoincrement())
+  productId Int     @map("product_id")
+  itemId    Int     @map("item_id")
+  quantity  Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  item      Item    @relation(fields: [itemId], references: [id])
+
+  @@unique([productId, itemId])
+  @@map("product_compositions")
+}
