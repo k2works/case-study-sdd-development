@@ -173,3 +173,76 @@ main {
   font-size: 1.5rem;
   font-weight: 700;
 }
+
+.order-form-section {
+  margin-top: 24px;
+  padding: 24px 32px 32px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(20, 83, 45, 0.12);
+  box-shadow: 0 18px 40px rgba(20, 83, 45, 0.08);
+}
+
+.order-form {
+  display: grid;
+  gap: 20px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field label {
+  font-weight: 700;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(20, 83, 45, 0.2);
+  border-radius: 16px;
+  background: #fffdf8;
+  color: inherit;
+  font: inherit;
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: 2px solid rgba(20, 83, 45, 0.2);
+  border-color: var(--accent);
+}
+
+.field-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.95rem;
+}
+
+.primary-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .hero,
+  .order-summary,
+  .order-form-section {
+    padding: 24px 20px;
+  }
+}

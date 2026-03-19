@@ -1,3 +1,8 @@
+"use client";
+
+import { ChangeEvent, FormEvent, useState } from "react";
+import { useSearchParams } from "next/navigation";
+
 const productNames = {
   "rose-garden": "ローズガーデン",
   "seasonal-mimosa": "季節のミモザブーケ",
@@ -6,13 +11,21 @@ const productNames = {
 
 type ProductId = keyof typeof productNames;
 
-type OrderPageProps = {
-  searchParams?: Promise<{
-    product?: string;
-  }>;
+export type OrderFormValues = {
+  deliveryDate: string;
+  deliveryAddress: string;
+  message: string;
 };
 
-function resolveProductName(productId?: string) {
+export type OrderFormErrors = Partial<Record<keyof OrderFormValues, string>>;
+
+const initialFormValues: OrderFormValues = {
+  deliveryDate: "",
+  deliveryAddress: "",
+  message: "",
+};
+
+function resolveProductName(productId?: string | null) {
   if (!productId) {
     return "未選択";
   }
@@ -24,9 +37,45 @@ function resolveProductName(productId?: string) {
   return "対象外の商品です";
 }
 
-export default async function OrderPage({ searchParams }: OrderPageProps) {
-  const params = searchParams ? await searchParams : undefined;
-  const productName = resolveProductName(params?.product);
+export function validateOrderForm(values: OrderFormValues): OrderFormErrors {
+  const errors: OrderFormErrors = {};
+
+  if (!values.deliveryDate.trim()) {
+    errors.deliveryDate = "届け日は必須です。";
+  }
+
+  if (!values.deliveryAddress.trim()) {
+    errors.deliveryAddress = "届け先は必須です。";
+  }
+
+  if (!values.message.trim()) {
+    errors.message = "メッセージは必須です。";
+  }
+
+  return errors;
+}
+
+export default function OrderPage() {
+  const searchParams = useSearchParams();
+  const productName = resolveProductName(searchParams.get("product"));
+  const [values, setValues] = useState<OrderFormValues>(initialFormValues);
+  const [errors, setErrors] = useState<OrderFormErrors>({});
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErrors(validateOrderForm(values));
+  };
+
+  const handleChange =
+    (field: keyof OrderFormValues) =>
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const nextValue = event.target.value;
+
+      setValues((current) => ({
+        ...current,
+        [field]: nextValue,
+      }));
+    };
 
   return (
     <main>
@@ -34,15 +83,76 @@ export default async function OrderPage({ searchParams }: OrderPageProps) {
         <section className="hero">
           <span className="badge">Order Form</span>
           <h1>注文入力</h1>
-          <p>選択した花束を確認し、次のステップで届け日や届け先を入力します。</p>
+          <p>選択した花束を確認し、届け日、届け先、メッセージを入力してください。</p>
         </section>
 
         <section className="order-summary" aria-label="注文入力サマリー">
           <h2>選択中の商品</h2>
           <p className="order-product-name">{productName}</p>
-          <p>
-            この画面を基点に、次の spec で届け日、届け先、メッセージ入力を追加します。
-          </p>
+          <p>内容を入力後、確認画面へ進む前に必須項目の不足をこの画面で確認できます。</p>
+        </section>
+
+        <section className="order-form-section" aria-label="注文入力フォーム">
+          <form className="order-form" onSubmit={handleSubmit} noValidate>
+            <div className="field">
+              <label htmlFor="delivery-date">届け日</label>
+              <input
+                id="delivery-date"
+                name="deliveryDate"
+                type="date"
+                value={values.deliveryDate}
+                onChange={handleChange("deliveryDate")}
+                aria-describedby={errors.deliveryDate ? "delivery-date-error" : undefined}
+              />
+              {errors.deliveryDate ? (
+                <p className="field-error" id="delivery-date-error" role="alert">
+                  {errors.deliveryDate}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="field">
+              <label htmlFor="delivery-address">届け先</label>
+              <input
+                id="delivery-address"
+                name="deliveryAddress"
+                type="text"
+                value={values.deliveryAddress}
+                onChange={handleChange("deliveryAddress")}
+                placeholder="東京都港区南青山 1-2-3"
+                aria-describedby={
+                  errors.deliveryAddress ? "delivery-address-error" : undefined
+                }
+              />
+              {errors.deliveryAddress ? (
+                <p className="field-error" id="delivery-address-error" role="alert">
+                  {errors.deliveryAddress}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="field">
+              <label htmlFor="message">メッセージ</label>
+              <textarea
+                id="message"
+                name="message"
+                rows={5}
+                value={values.message}
+                onChange={handleChange("message")}
+                placeholder="開店祝いのメッセージを添えてください。"
+                aria-describedby={errors.message ? "message-error" : undefined}
+              />
+              {errors.message ? (
+                <p className="field-error" id="message-error" role="alert">
+                  {errors.message}
+                </p>
+              ) : null}
+            </div>
+
+            <button className="primary-button" type="submit">
+              入力内容を確認する
+            </button>
+          </form>
         </section>
       </div>
     </main>

@@ -1,20 +1,84 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import OrderPage from "./page";
+const { mockUseSearchParams } = vi.hoisted(() => ({
+  mockUseSearchParams: vi.fn(),
+}));
+
+vi.mock("next/navigation", () => ({
+  useSearchParams: mockUseSearchParams,
+}));
+
+import OrderPage, { validateOrderForm } from "./page";
 
 describe("OrderPage", () => {
-  it("選択した商品を注文入力画面で確認できる", async () => {
-    render(
-      await OrderPage({
-        searchParams: Promise.resolve({ product: "rose-garden" }),
-      }),
-    );
+  beforeEach(() => {
+    mockUseSearchParams.mockReturnValue(new URLSearchParams("product=rose-garden"));
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("選択した商品を注文入力画面で確認できる", () => {
+    render(<OrderPage />);
 
     expect(
       screen.getByRole("heading", { level: 1, name: "注文入力" }),
     ).toBeInTheDocument();
     expect(screen.getByText("選択中の商品")).toBeInTheDocument();
     expect(screen.getByText("ローズガーデン")).toBeInTheDocument();
+  });
+
+  it("届け日、届け先、メッセージを入力できる", () => {
+    render(<OrderPage />);
+
+    const deliveryDate = screen.getByLabelText("届け日");
+    const deliveryAddress = screen.getByLabelText("届け先");
+    const message = screen.getByLabelText("メッセージ");
+
+    fireEvent.change(deliveryDate, { target: { value: "2026-03-31" } });
+    fireEvent.change(deliveryAddress, { target: { value: "東京都港区南青山 1-2-3" } });
+    fireEvent.change(message, { target: { value: "開店祝いのメッセージを添えてください。" } });
+
+    expect(deliveryDate).toHaveValue("2026-03-31");
+    expect(deliveryAddress).toHaveValue("東京都港区南青山 1-2-3");
+    expect(message).toHaveValue("開店祝いのメッセージを添えてください。");
+  });
+
+  it("必須項目が未入力のまま送信するとエラーを表示する", () => {
+    render(<OrderPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "入力内容を確認する" }));
+
+    expect(screen.getByText("届け日は必須です。")).toBeInTheDocument();
+    expect(screen.getByText("届け先は必須です。")).toBeInTheDocument();
+    expect(screen.getByText("メッセージは必須です。")).toBeInTheDocument();
+  });
+});
+
+describe("validateOrderForm", () => {
+  it("必須項目の未入力を検出する", () => {
+    expect(
+      validateOrderForm({
+        deliveryDate: "",
+        deliveryAddress: " ",
+        message: "",
+      }),
+    ).toEqual({
+      deliveryDate: "届け日は必須です。",
+      deliveryAddress: "届け先は必須です。",
+      message: "メッセージは必須です。",
+    });
+  });
+
+  it("入力済みの項目はエラーにしない", () => {
+    expect(
+      validateOrderForm({
+        deliveryDate: "2026-03-31",
+        deliveryAddress: "東京都港区南青山 1-2-3",
+        message: "開店祝いのメッセージを添えてください。",
+      }),
+    ).toEqual({});
   });
 });
