@@ -86,6 +86,8 @@
 | `generating-slides` | インセプションデッキのスライド生成 |
 | `git-commit` | Conventional Commits 準拠のコミット |
 | `creating-adr` | ADR 作成 |
+| `creating-release-report` | リリース完了報告書作成 |
+| `creating-iteration-report` | イテレーション完了報告書作成 |
 
 ### 共通
 
