@@ -29,7 +29,7 @@ dateCreated: 2026-03-19T00:00:00.000Z
 >
 > — https://t-wada.hatenablog.jp/entry/clean-code-that-works
 
-現時点のリポジトリは、分析、設計、計画、運用スクリプト、MkDocs ベースのドキュメント基盤が先行して整備されています。`apps/frontend/` と `apps/backend/` は今後の実装用ディレクトリとして確保済みであり、本手順書ではそれらを開発可能にするローカル環境を対象にします。
+現時点のリポジトリは、分析、設計、計画、運用スクリプト、MkDocs ベースのドキュメント基盤が先行して整備されています。本手順書では、`apps/frontend/` に `Next.js`、`apps/backend/` に `NestJS` の最小アプリケーション環境をセットアップし、ローカルで起動・テストできる状態を対象にします。
 
 ---
 
@@ -119,8 +119,8 @@ npm install
 | システム | ディレクトリ | 説明 | ポート (DB / App) |
 |---------|-------------|------|-------------------|
 | ドキュメント基盤 | `docs/`, `mkdocs.yml` | MkDocs ベースの設計 / 計画 / 運用文書 | - / `8000` |
-| フロントエンド実装領域 | `apps/frontend/` | Next.js アプリ実装予定 | - / 未割当 |
-| バックエンド実装領域 | `apps/backend/` | NestJS アプリ実装予定 | `5432` 想定 / 未割当 |
+| フロントエンド実装領域 | `apps/frontend/` | Next.js 16 / React 19.2 アプリ | - / `3001` |
+| バックエンド実装領域 | `apps/backend/` | NestJS 11 API | `5432` / `3000` |
 | 運用スクリプト | `ops/scripts/`, `gulpfile.js` | MkDocs、vault、SSH、SonarQube 補助 | - / - |
 | 開発コンテナ | `Dockerfile`, `docker-compose.yml` | Dev Container と MkDocs 実行環境 | - / `8000` |
 
@@ -147,7 +147,7 @@ npm install
 |---------|------|-----------|
 | 言語 | TypeScript | 5 系想定 |
 | フレームワーク | Next.js / React | 16 / 19.2 |
-| CSS | 未決定 | 実装時確定 |
+| CSS | グローバル CSS | Next.js 標準 |
 
 ### インフラストラクチャ
 
@@ -166,29 +166,30 @@ npm install
 
 | プロファイル | データベース | Docker | 用途 |
 |-------------|------------|--------|------|
-| default | 未起動 | 不要 | 日常開発、ドキュメント編集、スクリプト実行 |
-| product | PostgreSQL 導入後に使用 | 必要 | 本番互換テスト、コンテナベース検証 |
+| default | ローカル PostgreSQL 未使用でも可 | 不要 | 日常開発、フロント / バックの即時起動 |
+| product | PostgreSQL 17 | 必要 | DB を含む本番互換テスト、コンテナベース検証 |
 
 ### default プロファイル（推奨: 日常開発）
 
 ```bash
 npm install
-npm run docs:serve
+npm run dev:backend
+npm run dev:frontend
 ```
 
-ブラウザで `http://localhost:8000` を開き、ドキュメントプレビューを確認します。
+ブラウザで `http://localhost:3001` を開き、別ターミナルで `http://localhost:3000/health` を確認します。
 
 ### product プロファイル（本番互換）
 
 ```bash
+# PostgreSQL を起動
+docker compose up -d postgres
+
 # 開発コンテナに入る
 docker compose run --rm dev bash
-
-# MkDocs コンテナを起動
-docker compose up -d mkdocs plantuml
 ```
 
-このコンテナは `Dockerfile` を使って構築され、Node.js、Nix、Claude Code、Codex CLI、Gemini CLI、Copilot CLI、Playwright を含みます。アプリ本体用 DB コンテナはまだ未定義のため、今後の開発環境手順書で補完します。
+このコンテナは `Dockerfile` を使って構築され、Node.js、Nix、Claude Code、Codex CLI、Gemini CLI、Copilot CLI、Playwright を含みます。DB を使う検証時は `postgres` サービスを併用します。
 
 ---
 
@@ -197,28 +198,32 @@ docker compose up -d mkdocs plantuml
 ### タスクランナー経由（推奨）
 
 ```bash
-# 開発サーバー起動
+# バックエンド起動
+npm run dev:backend
+
+# フロントエンド起動
+npm run dev:frontend
+
+# ドキュメント起動
 npm run docs:serve
-
-# 停止
-npm run docs:stop
-
-# ビルド
-npm run docs:build
 ```
 
 ### ビルドツール直接実行
 
 ```bash
-npx gulp mkdocs:serve
-npx gulp mkdocs:stop
-npx gulp mkdocs:build
+cd apps/backend
+npm run dev
+
+cd apps/frontend
+npm run dev
 ```
 
 ### アクセス確認
 
 | サービス | URL | 説明 |
 |---------|-----|------|
+| フロントエンド | http://localhost:3001 | Next.js アプリ |
+| バックエンド | http://localhost:3000/health | NestJS ヘルスチェック |
 | ドキュメント | http://localhost:8000 | MkDocs プレビュー |
 | PlantUML | http://localhost:8080/plantuml | 図のレンダリング用 |
 | GitHub CLI | `gh auth status` | GitHub 連携確認 |
@@ -230,7 +235,7 @@ npx gulp mkdocs:build
 ### コンテナの起動
 
 ```bash
-docker compose up -d mkdocs plantuml
+docker compose up -d postgres mkdocs plantuml
 
 # コンテナ状態確認
 docker compose ps
@@ -239,10 +244,12 @@ docker compose ps
 ### Docker Compose の便利なコマンド
 
 ```bash
-docker compose up -d mkdocs plantuml
+docker compose up -d postgres mkdocs plantuml
 docker compose down
+docker compose logs -f postgres
 docker compose logs -f mkdocs
 docker compose run --rm dev bash
+docker compose exec postgres psql -U postgres -d fleur_memoire
 ```
 
 ---
@@ -251,13 +258,14 @@ docker compose run --rm dev bash
 
 ### 全テスト実行
 
-現時点ではアプリケーション実装が未着手のため、まずドキュメントとスクリプトの健全性確認を実行します。
+最小アプリケーション環境の健全性確認として、フロントエンド、バックエンド、ドキュメントのテストを実行します。
 
 ```bash
-# ドキュメントビルド
+npm run test:backend
+npm run test:frontend
+npm run typecheck:backend
+npm run typecheck:frontend
 npm run docs:build
-
-# Docker Compose 定義確認
 docker compose config --quiet
 ```
 
@@ -265,15 +273,16 @@ docker compose config --quiet
 
 | テスト種別 | ツール | 説明 |
 |-----------|--------|------|
+| フロントエンド単体テスト | Vitest + Testing Library | 画面コンポーネントの表示確認 |
+| バックエンド API テスト | Vitest + Supertest | `/health` の疎通確認 |
 | ドキュメントビルド確認 | MkDocs | ナビゲーションと Markdown の整合確認 |
 | 構成テスト | Docker Compose | `docker-compose.yml` の妥当性確認 |
-| 将来の単体テスト | Vitest | ドメインロジックと UI ロジック |
-| 将来の統合テスト | Supertest / PostgreSQL | API と DB の接続確認 |
+| 将来の統合テスト | PostgreSQL | API と DB の接続確認 |
 | 将来の E2E テスト | Playwright | 顧客導線、管理画面導線 |
 
 ### テストカバレッジ
 
-アプリ本体は未実装のため、現時点ではカバレッジレポートは未生成です。実装開始後は [test_strategy.md](../design/test_strategy.md) に従い、バックエンド 85%、フロント Feature 80% を目標にします。
+現時点では最小の疎通テストのみを配置しています。実装開始後は [test_strategy.md](../design/test_strategy.md) に従い、バックエンド 85%、フロント Feature 80% を目標にします。
 
 ---
 
@@ -283,15 +292,22 @@ docker compose config --quiet
 
 | ツール | 目的 | コマンド |
 |--------|------|---------|
+| ESLint | TypeScript / TSX の静的解析 | `npm run lint --workspace @fleur-memoire/backend` など |
+| TypeScript | 型整合性確認 | `npm run typecheck:backend` / `npm run typecheck:frontend` |
 | MkDocs Build | ドキュメント整合性確認 | `npm run docs:build` |
 | Docker Compose | 構成妥当性確認 | `docker compose config --quiet` |
 | SonarQube Local | 将来の静的解析 | `ops/docker/sonarqube-local/` を利用 |
-| ESLint | 実装開始後のコード規約検証 | 未設定 |
 
 ### 品質チェックの実行
 
 ```bash
 # 現在実行できる品質チェック
+npm run lint --workspace @fleur-memoire/backend
+npm run lint --workspace @fleur-memoire/frontend
+npm run typecheck:backend
+npm run typecheck:frontend
+npm run test:backend
+npm run test:frontend
 npm run docs:build
 docker compose config --quiet
 ```
@@ -324,8 +340,11 @@ case-study-sdd-development/
 ├── .husky/                          # Git Hooks
 ├── .specify/                        # constitution / memory
 ├── apps/
-│   ├── backend/                     # バックエンド実装領域
-│   └── frontend/                    # フロントエンド実装領域
+│   ├── backend/                     # NestJS API
+│   │   ├── src/
+│   │   └── test/
+│   └── frontend/                    # Next.js アプリ
+│       └── app/
 ├── docs/
 │   ├── analysis/
 │   ├── design/
@@ -408,15 +427,19 @@ git commit --no-verify -m "メッセージ"
 
 ```bash
 npm install
+docker compose up -d postgres
+npm run test:backend
+npm run test:frontend
 docker compose config --quiet
 npm run docs:build
 ```
 
 ### その後の確認
 
-1. `npm run docs:serve` で `http://localhost:8000` が開けること。
-2. `docker compose run --rm dev bash` で開発コンテナへ入れること。
-3. `gh auth status` が成功し、GitHub 連携が有効であること。
+1. `npm run dev:frontend` で `http://localhost:3001` が開けること。
+2. `npm run dev:backend` で `http://localhost:3000/health` が `200` を返すこと。
+3. `docker compose up -d postgres` 後に `docker compose ps` で `postgres` が `healthy` になること。
+4. `gh auth status` が成功し、GitHub 連携が有効であること。
 
 ---
 
@@ -428,10 +451,10 @@ npm run docs:build
 - `Dockerfile` と `docker-compose.yml` の `dev` サービスも `NODE_MAJOR=24` に統一済みです。
 - ホスト環境も `Node.js 24 LTS` を維持してください。
 
-### アプリ本体は未実装
+### コンテナの Node.js イメージ
 
-- `apps/frontend/` と `apps/backend/` は現時点では実装前のため、アプリ起動手順はまだ確定していません。
-- 本手順書は、まずドキュメント / スクリプト / コンテナ基盤を扱える状態にすることを目的とします。
+- `Dockerfile` と `docker-compose.yml` は `Node.js 24` に揃えています。
+- 既存の `dev` イメージが古い場合は `docker compose build --no-cache dev` を実行して更新してください。
 
 ---
 

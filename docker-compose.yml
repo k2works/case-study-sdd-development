@@ -10,6 +10,22 @@ services:
     tty: true
     stdin_open: true
 
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: fleur_memoire
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fleur_memoire"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   mkdocs:
     build:
       context: .
@@ -31,3 +47,6 @@ services:
     image: plantuml/plantuml-server:jetty
     environment:
       BASE_URL: plantuml
+
+volumes:
+  postgres-data:

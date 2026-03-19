@@ -1,9 +1,22 @@
 {
-  "name": "",
+  "name": "case-study-sdd-development",
   "version": "0.0.0",
   "main": "index.js",
+  "workspaces": [
+    "apps/backend",
+    "apps/frontend"
+  ],
   "scripts": {
     "start": "gulp dev",
+    "app:install": "npm install --workspaces --include-workspace-root",
+    "dev:backend": "npm run dev --workspace @fleur-memoire/backend",
+    "dev:frontend": "npm run dev --workspace @fleur-memoire/frontend",
+    "build:backend": "npm run build --workspace @fleur-memoire/backend",
+    "build:frontend": "npm run build --workspace @fleur-memoire/frontend",
+    "test:backend": "npm run test --workspace @fleur-memoire/backend",
+    "test:frontend": "npm run test --workspace @fleur-memoire/frontend",
+    "typecheck:backend": "npm run typecheck --workspace @fleur-memoire/backend",
+    "typecheck:frontend": "npm run typecheck --workspace @fleur-memoire/frontend",
     "journal": "gulp journal:generate",
     "docs:serve": "gulp mkdocs:serve",
     "docs:stop": "gulp mkdocs:stop",
