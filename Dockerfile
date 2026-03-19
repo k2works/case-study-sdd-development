@@ -2,7 +2,7 @@
 FROM ubuntu:24.04 AS base
 
 # 環境変数の設定
-ARG NODE_MAJOR=22
+ARG NODE_MAJOR=24
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=ja_JP.UTF-8 \
     LC_ALL=ja_JP.UTF-8 \

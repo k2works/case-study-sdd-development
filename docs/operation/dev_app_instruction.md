@@ -422,11 +422,11 @@ npm run docs:build
 
 ## 14. 既知の注意点
 
-### Node.js バージョン差異
+### Node.js バージョン
 
 - プロジェクト方針上の標準は `Node.js 24 LTS` です。
-- 一方で、現行の `Dockerfile` と `docker-compose.yml` の `dev` サービスは `NODE_MAJOR=22` を使っています。
-- 実装フェーズに入る前に、ホスト環境とコンテナ環境の Node.js メジャーバージョンを揃えることを推奨します。
+- `Dockerfile` と `docker-compose.yml` の `dev` サービスも `NODE_MAJOR=24` に統一済みです。
+- ホスト環境も `Node.js 24 LTS` を維持してください。
 
 ### アプリ本体は未実装
 

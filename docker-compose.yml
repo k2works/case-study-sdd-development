@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        NODE_MAJOR: 22
+        NODE_MAJOR: 24
     volumes:
       - .:/srv
     tty: true
