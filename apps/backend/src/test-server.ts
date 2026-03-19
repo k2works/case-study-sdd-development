@@ -6,6 +6,9 @@ import { createStockForecastRoutes } from './presentation/routes/stock-forecast-
 import { createPurchaseOrderRoutes } from './presentation/routes/purchase-order-routes.js';
 import { createArrivalRoutes } from './presentation/routes/arrival-routes.js';
 import { createShipmentRoutes } from './presentation/routes/shipment-routes.js';
+import { createCustomerRoutes } from './presentation/routes/customer-routes.js';
+import { CustomerUseCase } from './application/customer/customer-usecase.js';
+import { InMemoryCustomerRepository } from './application/customer/in-memory-customer-repository.js';
 import { ItemUseCase } from './application/item/item-usecase.js';
 import { ProductUseCase } from './application/product/product-usecase.js';
 import { OrderUseCase } from './application/order/order-usecase.js';
@@ -69,6 +72,10 @@ const stockForecastUseCase = new StockForecastUseCase(
 );
 app.use('/api', createStockForecastRoutes(stockForecastUseCase));
 
+const customerRepository = new InMemoryCustomerRepository();
+const customerUseCase = new CustomerUseCase(customerRepository);
+app.use('/api', createCustomerRoutes(customerUseCase, orderUseCase));
+
 app.post('/api/test/reset', (_req, res) => {
   itemRepository.clear();
   productRepository.clear();
@@ -76,6 +83,7 @@ app.post('/api/test/reset', (_req, res) => {
   stockLotRepository.clear();
   purchaseOrderRepository.clear();
   arrivalRepository.clear();
+  customerRepository.clear();
   res.status(204).send();
 });
 
