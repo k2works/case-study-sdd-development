@@ -91,6 +91,7 @@ nav:
       - イテレーション 1 計画: development/iteration_plan-1.md
   - 運用:
       - 概要: operation/index.md
+      - アプリケーション開発環境セットアップ: operation/dev_app_instruction.md
   - リファレンス:
       - 概要: reference/index.md
       - よいソフトウェアとは: reference/よいソフトウェアとは.md
