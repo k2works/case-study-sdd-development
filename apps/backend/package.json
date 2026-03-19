@@ -4,7 +4,7 @@
   "description": "フレール・メモワール WEB ショップ バックエンド API",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch src/main.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "vitest run",
