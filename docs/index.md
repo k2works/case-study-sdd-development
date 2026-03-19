@@ -47,7 +47,9 @@
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| 既存ドキュメントなし | 未着手 |
+| [リリース計画](./development/release_plan.md) | 作成済み |
+| [イテレーション 1 計画](./development/iteration_plan-1.md) | 作成済み |
+| ふりかえり / 完了報告書 | 未着手 |
 
 ### 運用 (`operation/`)
 
