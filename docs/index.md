@@ -55,6 +55,7 @@
 
 | ドキュメント | 状態 |
 | :--- | :--- |
+| [アプリケーション開発環境セットアップ手順書](./operation/dev_app_instruction.md) | 作成済み |
 | [Ralph Wiggum 運用ガイド](./operation/ralph.md) | 作成済み |
 
 ### ADR (`adr/`)
