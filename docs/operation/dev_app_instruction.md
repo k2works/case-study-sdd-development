@@ -263,6 +263,7 @@ docker compose exec postgres psql -U postgres -d fleur_memoire
 ```bash
 npm run test:backend
 npm run test:frontend
+npm run test:e2e:frontend
 npm run typecheck:backend
 npm run typecheck:frontend
 npm run docs:build
@@ -308,9 +309,24 @@ npm run typecheck:backend
 npm run typecheck:frontend
 npm run test:backend
 npm run test:frontend
+npm run test:e2e:frontend
 npm run docs:build
 docker compose config --quiet
 ```
+
+### 顧客注文導線の E2E スモーク実行
+
+`Playwright` により、商品一覧から注文入力画面までの最小導線を確認できます。
+
+```bash
+# 初回のみ、Chromium を取得
+npm exec --workspace @fleur-memoire/frontend playwright install --with-deps chromium
+
+# 顧客注文導線のスモークテスト
+npm run test:e2e:frontend
+```
+
+GitHub Actions では `frontend-quality.yml` から同じコマンドを実行し、`US-01` の入口導線が継続的に壊れていないことを確認します。
 
 ### コード複雑度の基準
 
