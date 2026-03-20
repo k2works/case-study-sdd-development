@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "@frerememoire/webshop-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "format": "prettier --write \"src/**/*.{ts,tsx}\""
   },
   "dependencies": {

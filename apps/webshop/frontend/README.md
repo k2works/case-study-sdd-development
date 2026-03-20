@@ -1,73 +1,51 @@
-# React + TypeScript + Vite
+# フレール・メモワール WEB ショップ - フロントエンド
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+花束注文・在庫管理・出荷管理を統合する WEB ショップのフロントエンドアプリケーション。
 
-Currently, two official plugins are available:
+## 技術スタック
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19 + TypeScript 5.9
+- Vite 8（ビルドツール）
+- React Router 7（ルーティング）
+- TanStack Query 5（サーバー状態管理）
+- Tailwind CSS 4（スタイリング）
+- Vitest + Testing Library（テスト）
 
-## React Compiler
+## 開発コマンド
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev          # 開発サーバー起動（http://localhost:5173）
+npm run build        # プロダクションビルド
+npm run test         # テスト実行
+npm run test:watch   # テストウォッチモード
+npm run lint         # ESLint 実行
+npm run format       # Prettier フォーマット
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## ディレクトリ構成
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+src/
+├── components/      # 共通コンポーネント
+│   ├── ui/          # UI プリミティブ
+│   └── layout/      # レイアウトコンポーネント
+├── features/        # 機能モジュール
+│   ├── auth/        # 認証
+│   ├── customer/    # 得意先管理
+│   ├── inventory/   # 在庫管理
+│   ├── item/        # 単品管理
+│   ├── order/       # 受注管理
+│   ├── product/     # 商品管理
+│   ├── purchase/    # 発注管理
+│   └── shipping/    # 出荷管理
+├── hooks/           # カスタムフック
+├── lib/             # ユーティリティライブラリ
+├── pages/           # ページコンポーネント
+├── providers/       # コンテキストプロバイダー
+├── types/           # 型定義
+└── utils/           # ヘルパー関数
+```
+
+## 詳細
+
+セットアップ手順の詳細は [アプリケーション開発環境セットアップ手順書](../../docs/operation/app-development-setup.md) を参照してください。
