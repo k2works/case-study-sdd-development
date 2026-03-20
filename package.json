@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "case-study-sdd-development",
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
@@ -15,11 +15,16 @@
     "claude:yolo": "claude --dangerously-skip-permissions",
     "copilot:yolo": "copilot --allow-all-tools",
     "codex:yolo": "codex --yolo",
-    "gemini:yolo": "gemini --yolo"
+    "gemini:yolo": "gemini --yolo",
+    "webshop:backend": "cd apps/webshop/backend && ./gradlew bootRun",
+    "webshop:backend:test": "cd apps/webshop/backend && ./gradlew test",
+    "webshop:frontend": "cd apps/webshop/frontend && npm run dev",
+    "webshop:frontend:test": "cd apps/webshop/frontend && npm run test",
+    "webshop:db": "cd apps/webshop && docker compose up -d db"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/k2works/{project_name}.git"
+    "url": "git+https://github.com/k2works/case-study-sdd-development.git"
   },
   "keywords": [
     "ai",
@@ -29,9 +34,9 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/k2works/{project_name}/issues"
+    "url": "https://github.com/k2works/case-study-sdd-development/issues"
   },
-  "homepage": "https://github.com/k2works/{project_name}#readme",
+  "homepage": "https://github.com/k2works/case-study-sdd-development#readme",
   "type": "module",
   "dependencies": {
     "dotenv": "^17.2.3",

@@ -63,7 +63,7 @@
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| [アプリケーション開発環境セットアップ手順書](./operation/dev_app_instruction.md) | 未着手 |
+| [アプリケーション開発環境セットアップ手順書](./operation/app-development-setup.md) | 作成済み |
 
 ### ADR (`adr/`)
 
