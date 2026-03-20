@@ -3,7 +3,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/webshop
     driver-class-name: org.postgresql.Driver
     username: webshop
-    password: webshop
+    password: ${SPRING_DATASOURCE_PASSWORD:webshop}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:

@@ -22,7 +22,7 @@ services:
       dockerfile: Dockerfile
     container_name: webshop-backend
     environment:
-      SPRING_PROFILES_ACTIVE: product
+      SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/webshop
       SPRING_DATASOURCE_USERNAME: webshop
       SPRING_DATASOURCE_PASSWORD: webshop
