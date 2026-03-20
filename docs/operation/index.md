@@ -12,6 +12,10 @@
 
 - [開発スクリプトリファレンス](./develop-script.md) - アプリケーション開発タスク（Gulp タスク）のコマンドリファレンス
 
+### CI/CD
+
+- [CI/CD パイプライン設計](./cicd-pipeline.md) - GitHub Actions による CI/CD パイプラインの設計と設定
+
 ### インフラ
 
 インフラ構成の一覧を追加予定です。

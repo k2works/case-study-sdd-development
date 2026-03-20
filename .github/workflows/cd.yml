@@ -1,0 +1,202 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/webshop/**'
+  release:
+    types: [published]
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ap-northeast-1
+  ECR_REPOSITORY_BACKEND: webshop-backend
+  ECR_REPOSITORY_FRONTEND: webshop-frontend
+  ECS_CLUSTER: webshop-cluster
+  ECS_SERVICE_BACKEND: webshop-backend
+  ECS_SERVICE_FRONTEND: webshop-frontend
+  ECS_TASK_DEFINITION_BACKEND: apps/webshop/backend/task-definition.json
+  ECS_TASK_DEFINITION_FRONTEND: apps/webshop/frontend/task-definition.json
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # ============================================
+  # CI ゲート（CD 前にテストを通す）
+  # ============================================
+  ci-gate:
+    name: CI Gate
+    uses: ./.github/workflows/ci.yml
+
+  # ============================================
+  # Docker イメージビルド＆プッシュ
+  # ============================================
+  build-images:
+    name: Build & Push Images
+    runs-on: ubuntu-latest
+    needs: ci-gate
+    outputs:
+      backend-image: ${{ steps.build-backend.outputs.image }}
+      frontend-image: ${{ steps.build-frontend.outputs.image }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set image tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=sha-$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push backend image
+        id: build-backend
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          IMAGE=$ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG
+          docker build -t $IMAGE apps/webshop/backend/
+          docker push $IMAGE
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+
+      - name: Build and push frontend image
+        id: build-frontend
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          IMAGE=$ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG
+          docker build -t $IMAGE apps/webshop/frontend/
+          docker push $IMAGE
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+
+  # ============================================
+  # ステージングデプロイ（main push 時に自動）
+  # ============================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-images
+    if: github.event_name == 'push'
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_STAGING }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy backend to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION_BACKEND }}
+          service: ${{ env.ECS_SERVICE_BACKEND }}-staging
+          cluster: ${{ env.ECS_CLUSTER }}-staging
+          wait-for-service-stability: true
+
+      - name: Deploy frontend to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION_FRONTEND }}
+          service: ${{ env.ECS_SERVICE_FRONTEND }}-staging
+          cluster: ${{ env.ECS_CLUSTER }}-staging
+          wait-for-service-stability: true
+
+      - name: Health check
+        run: |
+          echo "Waiting for staging to stabilize..."
+          sleep 30
+          HEALTH_URL="${{ secrets.STAGING_URL }}/api/health"
+          for i in $(seq 1 5); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "Staging health check passed"
+              exit 0
+            fi
+            echo "Attempt $i: status=$STATUS, retrying in 10s..."
+            sleep 10
+          done
+          echo "Staging health check failed"
+          exit 1
+
+  # ============================================
+  # 本番デプロイ（リリースタグ作成時、手動承認必須）
+  # ============================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build-images
+    if: github.event_name == 'release'
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PRODUCTION }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy backend to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION_BACKEND }}
+          service: ${{ env.ECS_SERVICE_BACKEND }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      - name: Deploy frontend to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION_FRONTEND }}
+          service: ${{ env.ECS_SERVICE_FRONTEND }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      - name: Health check
+        run: |
+          echo "Waiting for production to stabilize..."
+          sleep 30
+          HEALTH_URL="${{ secrets.PRODUCTION_URL }}/api/health"
+          for i in $(seq 1 5); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "Production health check passed"
+              exit 0
+            fi
+            echo "Attempt $i: status=$STATUS, retrying in 10s..."
+            sleep 10
+          done
+          echo "Production health check failed"
+          exit 1
+
+      - name: Generate deployment summary
+        run: |
+          echo "## Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ github.event.release.tag_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Backend:** ${{ needs.build-images.outputs.backend-image }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Frontend:** ${{ needs.build-images.outputs.frontend-image }}" >> $GITHUB_STEP_SUMMARY
