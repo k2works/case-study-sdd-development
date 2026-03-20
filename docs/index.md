@@ -52,6 +52,8 @@
 | [要件定義レビュー](./review/requirements_review_20260320.md) | 要件定義書・ユースケース・ユーザーストーリーのレビュー |
 | [設計レビュー](./review/design_review_20260320.md) | アーキテクチャ・データモデル・ドメインモデル等のレビュー |
 | [統合レビュー](./review/integrated_review_20260320.md) | カテゴリ横断の統合分析 |
+| [初回セットアップレビュー](./review/webshop_initial_setup_review_20260320.md) | webshop 初期セットアップのコードレビュー |
+| [CI/CD パイプラインレビュー](./review/cicd_pipeline_review_20260320.md) | CI/CD パイプラインの運用レビュー |
 
 ### 開発 (`development/`)
 
@@ -65,6 +67,7 @@
 | :--- | :--- |
 | [アプリケーション開発環境セットアップ手順書](./operation/app-development-setup.md) | 作成済み |
 | [開発スクリプトリファレンス](./operation/develop-script.md) | 作成済み |
+| [CI/CD パイプライン設計](./operation/cicd-pipeline.md) | 作成済み |
 
 ### ADR (`adr/`)
 
