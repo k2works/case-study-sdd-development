@@ -15,7 +15,12 @@
     "claude:yolo": "claude --dangerously-skip-permissions",
     "copilot:yolo": "copilot --allow-all-tools",
     "codex:yolo": "codex --yolo",
-    "gemini:yolo": "gemini --yolo"
+    "gemini:yolo": "gemini --yolo",
+    "webshop:backend": "cd apps/webshop/backend && ./gradlew bootRun",
+    "webshop:backend:test": "cd apps/webshop/backend && ./gradlew test",
+    "webshop:frontend": "cd apps/webshop/frontend && npm run dev",
+    "webshop:frontend:test": "cd apps/webshop/frontend && npm run test",
+    "webshop:db": "cd apps/webshop && docker compose up -d db"
   },
   "repository": {
     "type": "git",
