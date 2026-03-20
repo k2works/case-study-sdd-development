@@ -49,6 +49,8 @@ java -version
 
 - https://adoptium.net/
 
+> **Note**: コンテナ環境では Java が Nix 経由で自動提供されます。npm スクリプトや Gulp タスクは Java が未インストールの場合、自動的に `nix develop .#webshop` を使用します。手動でのインストールは不要です。
+
 ### Docker のインストール
 
 Docker Desktop をインストールします。
@@ -542,6 +544,23 @@ Could not resolve all files for configuration ':compileClasspath'.
 # JDBC URL: jdbc:h2:mem:webshop
 # Username: sa
 # Password: (空)
+```
+
+### JAVA_HOME is not set エラー
+
+**問題**: `npm run webshop:backend:test` 実行時に `JAVA_HOME is not set` エラーが発生する
+
+**解決策**: Nix がインストールされている環境（コンテナ等）では、Java は自動的に Nix 経由で提供されます。Nix のパスが通っていることを確認してください。
+
+```bash
+# Nix の確認
+which nix
+
+# 手動で webshop 環境に入る場合
+nix develop .#webshop
+
+# Java バージョンの確認
+java -version
 ```
 
 ### pre-commit フックが失敗する場合
