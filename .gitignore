@@ -27,3 +27,5 @@ npm-debug.log*
 tmp
 .agents
 .claude/agent-memory
+site
+lib
