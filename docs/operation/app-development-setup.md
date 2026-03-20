@@ -146,7 +146,7 @@ npm install
 | プロファイル | データベース | Docker | 用途 |
 |-------------|------------|--------|------|
 | default | H2（インメモリ） | 不要 | 日常開発・即座起動 |
-| product | PostgreSQL 15+ | 必要 | 本番互換テスト |
+| prod | PostgreSQL 15+ | 必要 | 本番互換テスト |
 
 ### default プロファイル（推奨：日常開発）
 
@@ -157,16 +157,16 @@ cd apps/webshop/backend
 ./gradlew bootRun
 ```
 
-### product プロファイル（本番互換）
+### prod プロファイル（本番互換）
 
 ```bash
 # データベースコンテナを起動
 cd apps/webshop
 docker compose up -d db
 
-# product プロファイルで起動
+# prod プロファイルで起動
 cd backend
-./gradlew bootRun --args='--spring.profiles.active=product'
+./gradlew bootRun --args='--spring.profiles.active=prod'
 ```
 
 ---
@@ -338,7 +338,7 @@ case-study-sdd-development/
 │       │       │   │   └── infrastructure/    # インフラストラクチャ層
 │       │       │   └── resources/
 │       │       │       ├── application.yml
-│       │       │       ├── application-product.yml
+│       │       │       ├── application-prod.yml
 │       │       │       └── db/migration/      # マイグレーション
 │       │       └── test/
 │       ├── frontend/

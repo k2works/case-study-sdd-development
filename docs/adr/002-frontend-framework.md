@@ -20,7 +20,7 @@
 
 ## 決定
 
-**フレームワーク**: React 18.x + TypeScript 5.x
+**フレームワーク**: React 19.x + TypeScript 5.9.x
 
 **レンダリング戦略**: SPA（Client-Side Rendering）
 
