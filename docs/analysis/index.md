@@ -6,3 +6,10 @@
 
 - [ビジネスアーキテクチャ](./business_architecture.md) - ビジネス構造を定義
 - [インセプションデッキ](./inception_deck.md) - プロジェクトの全体像と方向性を共有
+
+## 進捗状況
+
+| ドキュメント | 状態 |
+| :--- | :--- |
+| [ビジネスアーキテクチャ](./business_architecture.md) | 作成済み |
+| [インセプションデッキ](./inception_deck.md) | 作成済み |
