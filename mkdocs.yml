@@ -91,6 +91,7 @@ nav:
       - 要件定義レビュー: review/requirements_review_20260320.md
       - 設計レビュー: review/design_review_20260320.md
       - 統合レビュー: review/integrated_review_20260320.md
+      - CI/CD パイプラインレビュー: review/cicd_pipeline_review_20260320.md
   - 開発:
       - 概要: development/index.md
   - 運用:
