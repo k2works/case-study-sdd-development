@@ -13,8 +13,9 @@
 
     <module name="TreeWalker">
         <module name="MethodLength">
-            <property name="max" value="150"/>
+            <property name="max" value="50"/>
         </module>
+        <module name="NeedBraces"/>
         <module name="ParameterNumber">
             <property name="max" value="7"/>
         </module>

@@ -4,6 +4,7 @@ WORKDIR /app
 COPY gradle/ gradle/
 COPY gradlew .
 COPY build.gradle settings.gradle gradle.properties ./
+COPY config/ config/
 RUN ./gradlew dependencies --no-daemon || true
 COPY src/ src/
 RUN ./gradlew bootJar --no-daemon
