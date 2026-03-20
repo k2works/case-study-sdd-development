@@ -18,7 +18,7 @@
 
 | ソフトウェア | バージョン | 備考 |
 | :----------- | :--------- | :--- |
-| nodejs       | 22.x       |      |
+| nodejs       | 24.x LTS   | 開発ランタイム |
 
 ## 構成
 
@@ -34,6 +34,13 @@
 ```bash
 npm install
 npm start
+```
+
+アプリケーション開発用の shell に入る場合は、以下を使います。
+
+```bash
+docker compose build dev
+docker compose run --rm dev bash
 ```
 
 ### 構築

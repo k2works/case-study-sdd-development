@@ -9,7 +9,7 @@ packages.mkShell {
     tmux
     zip
     unzip
-    nodejs_22
+    nodejs_24
     gh
   ];
   # ホスト環境から完全に分離する

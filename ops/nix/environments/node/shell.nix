@@ -5,7 +5,7 @@ in
 packages.mkShell {
   inherit (baseShell) pure;
   buildInputs = baseShell.buildInputs ++ (with packages; [
-    nodejs_20
+    nodejs_24
     nodePackages.npm
     nodePackages.typescript
     nodePackages.typescript-language-server
