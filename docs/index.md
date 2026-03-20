@@ -33,12 +33,16 @@
 | [データモデル設計](./design/data-model.md) | 作成済み |
 | [ドメインモデル設計](./design/domain-model.md) | 作成済み |
 | [UI 設計](./design/ui_design.md) | 作成済み |
+| [テスト戦略](./design/test_strategy.md) | 作成済み |
+| [非機能要件](./design/non_functional.md) | 作成済み |
+| [運用要件](./design/operation.md) | 作成済み |
+| [技術スタック](./design/tech_stack.md) | 作成済み |
 
 ### 開発 (`development/`)
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| 現在の開発ドキュメント | `index.md` のみ |
+| [リリース計画](./development/release_plan.md) | 作成済み |
 
 ### 運用 (`operation/`)
 
