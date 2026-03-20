@@ -64,6 +64,7 @@
 | ドキュメント | 状態 |
 | :--- | :--- |
 | [アプリケーション開発環境セットアップ手順書](./operation/app-development-setup.md) | 作成済み |
+| [開発スクリプトリファレンス](./operation/develop-script.md) | 作成済み |
 
 ### ADR (`adr/`)
 

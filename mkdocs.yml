@@ -96,6 +96,7 @@ nav:
   - 運用:
       - 概要: operation/index.md
       - アプリケーション開発環境セットアップ: operation/app-development-setup.md
+      - 開発スクリプトリファレンス: operation/develop-script.md
   - リファレンス:
       - 概要: reference/index.md
       - よいソフトウェアとは: reference/よいソフトウェアとは.md
