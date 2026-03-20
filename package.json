@@ -20,7 +20,14 @@
     "webshop:backend:test": "cd apps/webshop/backend && ./gradlew test",
     "webshop:frontend": "cd apps/webshop/frontend && npm run dev",
     "webshop:frontend:test": "cd apps/webshop/frontend && npm run test",
-    "webshop:db": "cd apps/webshop && docker compose up -d db"
+    "webshop:db": "cd apps/webshop && docker compose up -d db",
+    "webshop:db:stop": "gulp dev:webshop:db:stop",
+    "webshop:backend:prod": "gulp dev:webshop:backend:prod",
+    "webshop:build": "gulp dev:webshop:build",
+    "tdd:webshop:backend": "gulp tdd:webshop:backend",
+    "tdd:webshop:frontend": "gulp tdd:webshop:frontend",
+    "dev:help": "gulp dev:help",
+    "setup:webshop": "gulp setup:webshop"
   },
   "repository": {
     "type": "git",
