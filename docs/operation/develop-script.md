@@ -126,6 +126,26 @@ npx gulp dev:webshop:build
 
 ---
 
+## Java 自動検出
+
+バックエンド関連のタスク（`./gradlew` を使用するもの）は、Java の可用性を自動検出します。
+
+| 環境 | 動作 |
+|------|------|
+| Java インストール済み | 直接実行（オーバーヘッドなし） |
+| Java 未インストール（Nix あり） | `nix develop .#webshop` 経由で透過的に実行 |
+
+コンテナ環境では Java が Nix 経由で自動的に提供されるため、手動で `nix develop` を実行する必要はありません。
+
+手動で Nix 環境に入る場合:
+
+```bash
+# webshop 開発環境（Java 21 + Node.js 22）
+nix develop .#webshop
+```
+
+---
+
 ## npm スクリプトショートカット
 
 以下の npm スクリプトで Gulp タスクを簡略化して実行できます。

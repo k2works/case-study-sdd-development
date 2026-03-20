@@ -1,5 +1,7 @@
 'use strict';
 
+import fs from 'fs';
+import path from 'path';
 import { execSync } from 'child_process';
 
 /**
@@ -24,6 +26,59 @@ export function isDockerAvailable() {
   } catch {
     return false;
   }
+}
+
+/**
+ * Java が利用可能か確認する
+ * @returns {boolean} Java が利用可能なら true
+ */
+export function isJavaAvailable() {
+  try {
+    execSync('java -version', { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Nix の実行パスを探索する
+ * @returns {string|null} Nix の実行パス、見つからなければ null
+ */
+function findNix() {
+  const candidates = [
+    `${process.env.HOME}/.nix-profile/bin/nix`,
+    '/nix/var/nix/profiles/default/bin/nix',
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  try {
+    return execSync('which nix', { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Java が必要なコマンドをラップする
+ * Java が利用可能ならそのまま返し、不可なら nix develop でラップする
+ * @param {string} command - 実行コマンド
+ * @returns {string} ラップ済みコマンド
+ */
+export function wrapWithJava(command) {
+  if (isJavaAvailable()) {
+    return command;
+  }
+  const nix = findNix();
+  if (!nix) {
+    console.warn('Warning: Java is not available and Nix is not found.');
+    console.warn('Please install Java or ensure Nix is on the PATH.');
+    return command;
+  }
+  const flakeDir = path.resolve(new URL('.', import.meta.url).pathname, '../..');
+  const escaped = command.replace(/'/g, "'\\''");
+  return `${nix} develop ${flakeDir}#webshop --command bash -c '${escaped}'`;
 }
 
 /**

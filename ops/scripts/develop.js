@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
-import { cleanDockerEnv, isDockerAvailable } from './shared.js';
+import { cleanDockerEnv, isDockerAvailable, wrapWithJava } from './shared.js';
 
 // ============================================
 // 設定
@@ -54,6 +54,19 @@ function dockerCompose(args) {
 function localExec(command, opts = {}) {
   const cwd = opts.cwd ? path.join(process.cwd(), opts.cwd) : process.cwd();
   execSync(command, { stdio: 'inherit', shell: true, cwd, env: cleanDockerEnv() });
+}
+
+/**
+ * Java が必要なローカルコマンドを実行する
+ * Java が未インストールの場合、Nix 経由で透過的に実行する
+ * @param {string} command - 実行するコマンド
+ * @param {object} [opts] - オプション
+ * @param {string} [opts.cwd] - 作業ディレクトリ（プロジェクトルートからの相対パス）
+ */
+function javaExec(command, opts = {}) {
+  const cwd = opts.cwd ? path.join(process.cwd(), opts.cwd) : process.cwd();
+  const wrappedCommand = wrapWithJava(command);
+  execSync(wrappedCommand, { stdio: 'inherit', shell: true, cwd, env: cleanDockerEnv() });
 }
 
 /**
@@ -115,7 +128,7 @@ export default function (gulp) {
   gulp.task('dev:webshop:backend', (done) => {
     try {
       console.log('Starting webshop backend (default profile)...');
-      localExec('./gradlew bootRun', { cwd: BACKEND_DIR });
+      javaExec('./gradlew bootRun', { cwd: BACKEND_DIR });
       done();
     } catch (error) {
       done(error);
@@ -126,7 +139,7 @@ export default function (gulp) {
     try {
       console.log('Starting webshop backend (prod profile)...');
       console.log('Note: PostgreSQL must be running. Use "gulp dev:webshop:db" to start.');
-      localExec("./gradlew bootRun --args='--spring.profiles.active=prod'", { cwd: BACKEND_DIR });
+      javaExec("./gradlew bootRun --args='--spring.profiles.active=prod'", { cwd: BACKEND_DIR });
       done();
     } catch (error) {
       done(error);
@@ -136,7 +149,7 @@ export default function (gulp) {
   gulp.task('dev:webshop:backend:test', (done) => {
     try {
       console.log('Running webshop backend tests...');
-      localExec('./gradlew test', { cwd: BACKEND_DIR });
+      javaExec('./gradlew test', { cwd: BACKEND_DIR });
       done();
     } catch (error) {
       done(error);
@@ -170,7 +183,7 @@ export default function (gulp) {
   gulp.task('tdd:webshop:backend', (done) => {
     try {
       console.log('Starting webshop backend TDD mode (continuous test)...');
-      localExec('./gradlew test --continuous', { cwd: BACKEND_DIR });
+      javaExec('./gradlew test --continuous', { cwd: BACKEND_DIR });
       done();
     } catch (error) {
       done(error);
@@ -192,7 +205,7 @@ export default function (gulp) {
   gulp.task('dev:webshop:build:backend', (done) => {
     try {
       console.log('Building webshop backend...');
-      localExec('./gradlew build', { cwd: BACKEND_DIR });
+      javaExec('./gradlew build', { cwd: BACKEND_DIR });
       console.log('Backend build completed.');
       done();
     } catch (error) {
@@ -250,7 +263,7 @@ export default function (gulp) {
   gulp.task('setup:webshop:backend:build', (done) => {
     try {
       console.log('Building and testing backend...');
-      localExec('./gradlew build', { cwd: BACKEND_DIR });
+      javaExec('./gradlew build', { cwd: BACKEND_DIR });
       console.log('Backend build completed.');
       done();
     } catch (error) {
