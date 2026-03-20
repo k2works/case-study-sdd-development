@@ -1,0 +1,32 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "webshop-backend",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-lc", "cd apps/webshop/backend && /nix/var/nix/profiles/default/bin/nix develop ../../..#webshop --command ./gradlew bootRun"],
+      "port": 8080,
+      "autoPort": false
+    },
+    {
+      "name": "webshop-frontend",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-lc", "cd apps/webshop/frontend && npm run dev"],
+      "port": 5173,
+      "autoPort": false
+    },
+    {
+      "name": "webshop-db",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "-f", "apps/webshop/docker-compose.yml", "up", "-d", "db"],
+      "port": 5432
+    },
+    {
+      "name": "docs",
+      "runtimeExecutable": "/usr/local/bin/docker",
+      "runtimeArgs": ["compose", "up", "mkdocs"],
+      "port": 8000,
+      "autoPort": false
+    }
+  ]
+}
