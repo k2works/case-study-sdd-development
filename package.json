@@ -26,7 +26,8 @@
     "webshop:build": "gulp dev:webshop:build",
     "tdd:webshop:backend": "gulp tdd:webshop:backend",
     "tdd:webshop:frontend": "gulp tdd:webshop:frontend",
-    "dev:help": "gulp dev:help"
+    "dev:help": "gulp dev:help",
+    "setup:webshop": "gulp setup:webshop"
   },
   "repository": {
     "type": "git",

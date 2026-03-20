@@ -1,5 +1,6 @@
 'use strict';
 
+import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { cleanDockerEnv, isDockerAvailable } from './shared.js';
@@ -53,6 +54,24 @@ function dockerCompose(args) {
 function localExec(command, opts = {}) {
   const cwd = opts.cwd ? path.join(process.cwd(), opts.cwd) : process.cwd();
   execSync(command, { stdio: 'inherit', shell: true, cwd, env: cleanDockerEnv() });
+}
+
+/**
+ * .env ファイルが存在しなければ .env.example からコピーする
+ */
+function copyEnvIfNeeded() {
+  const envPath = path.join(process.cwd(), '.env');
+  const examplePath = path.join(process.cwd(), '.env.example');
+  if (fs.existsSync(envPath)) {
+    console.log('.env already exists. Skipping.');
+    return;
+  }
+  if (!fs.existsSync(examplePath)) {
+    console.warn('.env.example not found. Skipping .env creation.');
+    return;
+  }
+  fs.copyFileSync(examplePath, envPath);
+  console.log('.env created from .env.example');
 }
 
 // ============================================
@@ -194,11 +213,78 @@ export default function (gulp) {
 
   gulp.task('dev:webshop:build', gulp.series('dev:webshop:build:backend', 'dev:webshop:build:frontend'));
 
+  // --- セットアップ ---
+
+  gulp.task('setup:webshop:env', (done) => {
+    try {
+      console.log('Checking .env file...');
+      copyEnvIfNeeded();
+      done();
+    } catch (error) {
+      done(error);
+    }
+  });
+
+  gulp.task('setup:webshop:root', (done) => {
+    try {
+      console.log('Installing root dependencies...');
+      localExec('npm install');
+      console.log('Root dependencies installed.');
+      done();
+    } catch (error) {
+      done(error);
+    }
+  });
+
+  gulp.task('setup:webshop:frontend:install', (done) => {
+    try {
+      console.log('Installing frontend dependencies...');
+      localExec('npm install', { cwd: FRONTEND_DIR });
+      console.log('Frontend dependencies installed.');
+      done();
+    } catch (error) {
+      done(error);
+    }
+  });
+
+  gulp.task('setup:webshop:backend:build', (done) => {
+    try {
+      console.log('Building and testing backend...');
+      localExec('./gradlew build', { cwd: BACKEND_DIR });
+      console.log('Backend build completed.');
+      done();
+    } catch (error) {
+      done(error);
+    }
+  });
+
+  gulp.task('setup:webshop:frontend:build', (done) => {
+    try {
+      console.log('Building frontend...');
+      localExec('npm run build', { cwd: FRONTEND_DIR });
+      console.log('Frontend build completed.');
+      done();
+    } catch (error) {
+      done(error);
+    }
+  });
+
+  gulp.task('setup:webshop', gulp.series(
+    'setup:webshop:env',
+    'setup:webshop:root',
+    'setup:webshop:frontend:install',
+    'setup:webshop:backend:build',
+    'setup:webshop:frontend:build'
+  ));
+
   // --- ヘルプ ---
 
   gulp.task('dev:help', (done) => {
     console.log(`
 === 開発タスク一覧 ===
+
+セットアップ:
+  setup:webshop               初回セットアップ（依存インストール＋ビルド＋テスト）
 
 データベース:
   dev:webshop:db              PostgreSQL データベースコンテナを起動
@@ -224,6 +310,9 @@ TDD:
   dev:help                    このヘルプを表示
 
 --- 典型的な開発フロー ---
+
+初回セットアップ:
+  1. npx gulp setup:webshop                # 依存インストール＋ビルド＋テスト
 
 日常開発（H2 インメモリ DB）:
   1. npx gulp dev:webshop:backend          # バックエンド起動

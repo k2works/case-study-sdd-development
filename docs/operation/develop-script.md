@@ -10,6 +10,12 @@
 
 ## コマンドリファレンス
 
+### セットアップ
+
+| コマンド | 説明 |
+|---------|------|
+| `npx gulp setup:webshop` | 初回セットアップ（.env 生成、依存インストール、ビルド＋テスト）一括実行 |
+
 ### データベース
 
 | コマンド | 説明 |
@@ -54,6 +60,23 @@
 ---
 
 ## 典型的な開発フロー
+
+### 初回セットアップ
+
+リポジトリをクローンした後、コマンド 1 つで開発環境をセットアップできます。
+
+```bash
+# 初回セットアップ（.env 生成 → 依存インストール → ビルド＋テスト）
+npx gulp setup:webshop
+```
+
+実行される内容:
+
+1. `.env.example` から `.env` を生成（存在しない場合のみ）
+2. ルート依存パッケージのインストール（`npm install`）
+3. フロントエンド依存パッケージのインストール（`npm install`）
+4. バックエンドのビルドとテスト（`./gradlew build`）
+5. フロントエンドのビルド（`npm run build`）
 
 ### 日常開発（H2 インメモリ DB）
 
@@ -120,6 +143,7 @@ npx gulp dev:webshop:build
 | `npm run tdd:webshop:backend` | `gulp tdd:webshop:backend` |
 | `npm run tdd:webshop:frontend` | `gulp tdd:webshop:frontend` |
 | `npm run dev:help` | `gulp dev:help` |
+| `npm run setup:webshop` | `gulp setup:webshop` |
 
 ---
 
