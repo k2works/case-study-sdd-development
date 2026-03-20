@@ -56,6 +56,12 @@
 
 技術的意思決定を記録した Architecture Decision Records です。
 
+| ADR | 決定内容 | ステータス |
+| :--- | :--- | :--- |
+| [ADR-001](./adr/001-architecture-pattern.md) | アーキテクチャパターン選定（ドメインモデル + ポートとアダプター） | 承認済み |
+| [ADR-002](./adr/002-frontend-framework.md) | フロントエンドフレームワーク選定（React SPA） | 承認済み |
+| [ADR-003](./adr/003-infrastructure.md) | インフラストラクチャ選定（AWS ECS Fargate） | 承認済み |
+
 ### リファレンス (`reference/`)
 
 開発ガイドラインやベストプラクティスのリファレンスドキュメントです。

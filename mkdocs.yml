@@ -102,6 +102,9 @@ nav:
       - Vim 操作マニュアル: reference/Vim操作マニュアル.md
   - ADR:
       - 概要: adr/index.md
+      - ADR-001 アーキテクチャパターン選定: adr/001-architecture-pattern.md
+      - ADR-002 フロントエンドフレームワーク選定: adr/002-frontend-framework.md
+      - ADR-003 インフラストラクチャ選定: adr/003-infrastructure.md
   - テンプレート:
       - 概要: template/index.md
       - まずこれを読もうリスト: template/まずこれを読もうリスト.md
