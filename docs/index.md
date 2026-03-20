@@ -48,7 +48,7 @@
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| 現在の運用ドキュメント | `index.md` のみ |
+| [アプリケーション開発環境セットアップ手順書](./operation/application-development-environment-setup.md) | 作成済み |
 
 ### ADR (`adr/`)
 

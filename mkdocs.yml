@@ -87,6 +87,7 @@ nav:
       - リリース計画: development/release_plan.md
   - 運用:
       - 概要: operation/index.md
+      - アプリケーション開発環境セットアップ手順書: operation/application-development-environment-setup.md
   - リファレンス:
       - 概要: reference/index.md
       - よいソフトウェアとは: reference/よいソフトウェアとは.md
