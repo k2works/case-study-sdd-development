@@ -63,8 +63,9 @@ function getOrderErrorInfo(error: unknown): { message: string; requiresRelogin: 
     }
   }
 
+  const genericError = error instanceof Error ? error.message : '不明なエラー'
   return {
-    message: '注文の送信に失敗しました。もう一度お試しください。',
+    message: `注文の送信に失敗しました。もう一度お試しください。(${genericError})`,
     requiresRelogin: false,
   }
 }
@@ -87,6 +88,7 @@ export function OrderConfirmPage() {
       navigate('/orders/complete', { replace: true })
     },
     onError: (error) => {
+      console.error('Order placement failed:', error)
       const { message, requiresRelogin: shouldRelogin } = getOrderErrorInfo(error)
       setErrorMessage(message)
       setRequiresRelogin(shouldRelogin)
