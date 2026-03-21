@@ -1,5 +1,7 @@
 package com.frerememoire.webshop.infrastructure.api;
 
+import com.frerememoire.webshop.infrastructure.security.JwtAuthenticationFilter;
+import com.frerememoire.webshop.infrastructure.security.JwtTokenProvider;
 import com.frerememoire.webshop.infrastructure.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(HealthCheckController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtTokenProvider.class, JwtAuthenticationFilter.class})
 class HealthCheckControllerTest {
 
     @Autowired
