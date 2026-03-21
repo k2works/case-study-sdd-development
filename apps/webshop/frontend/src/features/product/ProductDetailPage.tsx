@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { catalogApi } from '../../lib/product-api'
 import type { Product } from '../../types/product'
 
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
   const productId = Number(id)
 
   const { data: product, isLoading } = useQuery<Product>({
@@ -71,6 +72,16 @@ export function ProductDetailPage() {
             </div>
           </div>
         )}
+
+        <div className="mt-8">
+          <button
+            type="button"
+            onClick={() => navigate(`/orders/new/${product.id}`)}
+            className="w-full bg-emerald-600 text-white font-medium rounded-lg px-4 py-3 hover:bg-emerald-700 transition-colors text-sm"
+          >
+            この商品を注文する
+          </button>
+        </div>
       </div>
     </div>
   )
