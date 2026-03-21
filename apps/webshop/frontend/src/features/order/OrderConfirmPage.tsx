@@ -34,6 +34,13 @@ function getOrderErrorInfo(error: unknown): { message: string; requiresRelogin: 
     const detail = apiError.response?.data?.detail
     const errors = apiError.response?.data?.errors
 
+    if (status === 403) {
+      return {
+        message: '注文する権限がありません。得意先アカウントでログインしてください。',
+        requiresRelogin: true,
+      }
+    }
+
     if (status === 404 && typeof detail === 'string' && (detail.includes('ユーザー') || detail.includes('得意先'))) {
       return {
         message: 'ログイン状態が無効になりました。再度ログインしてください。',
