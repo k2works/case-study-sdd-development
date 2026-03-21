@@ -10,7 +10,7 @@ export function LoginPage() {
   const { login } = useAuth()
   const [error, setError] = useState<string | null>(null)
 
-  const isDev = import.meta.env.MODE === 'development'
+  const isDev = import.meta.env.MODE === 'development' || import.meta.env.VITE_DEMO_MODE === 'true'
 
   const {
     register,
