@@ -22,6 +22,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Component
 @Profile("default")
 public class DevDataInitializer implements ApplicationRunner {
@@ -66,41 +68,24 @@ public class DevDataInitializer implements ApplicationRunner {
     }
 
     private void createOwnerUser() {
-        if (!authUserRepository.existsByEmail("dev@example.com")) {
-            UserProfile profile = new UserProfile("太郎", "開発", null);
-            AuthUser user = AuthUser.create(
-                    "dev@example.com", passwordEncoder.encode("Password1"),
-                    Role.OWNER, profile);
-            authUserRepository.save(user);
-            log.info("オーナーユーザーを作成しました: dev@example.com / Password1 (OWNER)");
-        }
+        ensurePrivilegedUser("dev@example.com", "太郎", "開発", null, Role.OWNER, "オーナー");
     }
 
     private void createStaffUser() {
-        if (!authUserRepository.existsByEmail("staff@example.com")) {
-            UserProfile profile = new UserProfile("花子", "受注", null);
-            AuthUser user = AuthUser.create(
-                    "staff@example.com", passwordEncoder.encode("Password1"),
-                    Role.ORDER_STAFF, profile);
-            authUserRepository.save(user);
-            log.info("受注スタッフユーザーを作成しました: staff@example.com / Password1 (ORDER_STAFF)");
-        }
+        ensurePrivilegedUser("staff@example.com", "花子", "受注", null, Role.ORDER_STAFF, "受注スタッフ");
     }
 
     private void createCustomerUser() {
-        if (!authUserRepository.existsByEmail("customer@example.com")) {
-            AuthUser user = registrationUseCase.register(
-                    "customer@example.com", "Password1",
-                    "太郎", "山田", "090-1234-5678");
-            // CUSTOMER ロール登録時に Customer レコードを自動作成
-            if (!customerRepository.existsByUserId(user.getId())) {
-                Customer customer = Customer.create(user.getId(),
-                        user.getProfile().getLastName() + " " + user.getProfile().getFirstName(),
-                        user.getProfile().getPhone());
-                customerRepository.save(customer);
-            }
-            log.info("得意先ユーザーを作成しました: customer@example.com / Password1");
+        var existingCustomer = authUserRepository.findByEmail("customer@example.com");
+        if (existingCustomer.isPresent()) {
+            ensureCustomerRecord(existingCustomer.get());
+            return;
         }
+
+        registrationUseCase.register(
+                "customer@example.com", "Password1",
+                "太郎", "山田", "090-1234-5678");
+        log.info("得意先ユーザーを作成しました: customer@example.com / Password1");
     }
 
     private void createSeedItems() {
@@ -170,5 +155,59 @@ public class DevDataInitializer implements ApplicationRunner {
                 .filter(item -> item.getName().equals(itemName))
                 .findFirst()
                 .ifPresent(item -> productUseCase.addComposition(product.getId(), item.getId(), quantity));
+    }
+
+    private void ensurePrivilegedUser(String email, String firstName, String lastName,
+                                      String phone, Role expectedRole, String label) {
+        UserProfile expectedProfile = new UserProfile(firstName, lastName, phone);
+        var existingUser = authUserRepository.findByEmail(email);
+
+        if (existingUser.isEmpty()) {
+            AuthUser user = AuthUser.create(
+                    email, passwordEncoder.encode("Password1"),
+                    expectedRole, expectedProfile);
+            authUserRepository.save(user);
+            log.info("{}ユーザーを作成しました: {} / Password1 ({})", label, email, expectedRole);
+            return;
+        }
+
+        AuthUser currentUser = existingUser.get();
+        if (currentUser.getRole() == expectedRole && hasSameProfile(currentUser.getProfile(), expectedProfile)) {
+            return;
+        }
+
+        AuthUser repairedUser = new AuthUser(
+                currentUser.getId(),
+                currentUser.getEmail(),
+                currentUser.getPasswordHash(),
+                expectedRole,
+                expectedProfile,
+                currentUser.getFailedLoginCount(),
+                currentUser.getLockedUntil(),
+                currentUser.getCreatedAt(),
+                LocalDateTime.now()
+        );
+        authUserRepository.save(repairedUser);
+        log.info("{}ユーザーを補正しました: {} ({})", label, email, expectedRole);
+    }
+
+    private void ensureCustomerRecord(AuthUser user) {
+        if (customerRepository.existsByUserId(user.getId())) {
+            return;
+        }
+
+        Customer customer = Customer.create(
+                user.getId(),
+                user.getProfile().getLastName() + " " + user.getProfile().getFirstName(),
+                user.getProfile().getPhone()
+        );
+        customerRepository.save(customer);
+        log.info("得意先レコードを補正しました: userId={}", user.getId());
+    }
+
+    private boolean hasSameProfile(UserProfile currentProfile, UserProfile expectedProfile) {
+        return currentProfile.getFirstName().equals(expectedProfile.getFirstName())
+                && currentProfile.getLastName().equals(expectedProfile.getLastName())
+                && java.util.Objects.equals(currentProfile.getPhone(), expectedProfile.getPhone());
     }
 }

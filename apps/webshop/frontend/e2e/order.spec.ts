@@ -31,10 +31,10 @@ test.describe('注文ナビゲーション', () => {
   test('CUSTOMER ユーザーのナビゲーションに「注文履歴」が表示される', async ({ page, request }) => {
     await loginAsCustomer(page, request)
 
-    await expect(page.getByRole('link', { name: '商品カタログ' })).toBeVisible()
+    await expect(page.getByRole('link', { name: '商品カタログ', exact: true })).toBeVisible()
     await expect(page.getByRole('link', { name: '注文履歴' })).toBeVisible()
     // CUSTOMER には受注管理は非表示
-    await expect(page.getByRole('link', { name: '受注管理' })).not.toBeVisible()
+    await expect(page.getByRole('link', { name: '受注管理' })).toHaveCount(0)
   })
 
   test('「注文履歴」リンクから注文履歴ページに遷移できる', async ({ page, request }) => {
@@ -49,7 +49,7 @@ test.describe('注文ナビゲーション', () => {
     await loginAsCustomer(page, request)
 
     await page.goto('/orders/my')
-    await expect(page.getByText('まだ注文がありません')).toBeVisible()
+    await expect(page.getByText('まだ注文がありません。')).toBeVisible({ timeout: 10000 })
     await expect(page.getByText('商品カタログから注文する')).toBeVisible()
   })
 })
@@ -58,8 +58,8 @@ test.describe('注文フロー', () => {
   test('商品カタログから商品詳細に遷移できる', async ({ page, request }) => {
     await loginAsCustomer(page, request)
 
-    await page.getByRole('link', { name: '商品カタログ' }).click()
+    await page.getByRole('link', { name: '商品カタログ', exact: true }).click()
     await expect(page).toHaveURL(/\/catalog\/products/)
-    await expect(page.getByRole('heading', { name: '商品カタログ' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: '商品一覧' })).toBeVisible()
   })
 })

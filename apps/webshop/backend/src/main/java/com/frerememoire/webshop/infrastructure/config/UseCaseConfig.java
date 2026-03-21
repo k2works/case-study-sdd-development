@@ -29,8 +29,9 @@ public class UseCaseConfig {
     @Bean
     public RegistrationUseCase registrationUseCase(
             AuthUserRepository userRepository,
+            CustomerRepository customerRepository,
             PasswordEncoder passwordEncoder) {
-        return new RegistrationUseCase(userRepository, passwordEncoder);
+        return new RegistrationUseCase(userRepository, customerRepository, passwordEncoder);
     }
 
     @Bean
