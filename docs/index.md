@@ -71,9 +71,9 @@
 | [IT2 イテレーション計画](./development/iteration_plan-2.md) | 完了（11 SP / 170 テスト） |
 | [IT2 ふりかえり](./development/iteration_retrospective-2.md) | 作成済み |
 | [IT2 完了報告書](./development/iteration_report-2.md) | 作成済み |
-| [IT3 イテレーション計画](./development/iteration_plan-3.md) | 計画済み（13 SP / 56h） |
-| [IT3 ふりかえり](./development/iteration_retrospective-3.md) | 未着手 |
-| [IT3 完了報告書](./development/iteration_report-3.md) | 未着手 |
+| [IT3 イテレーション計画](./development/iteration_plan-3.md) | 完了（13 SP / 56h） |
+| [IT3 ふりかえり](./development/iteration_retrospective-3.md) | 作成済み |
+| [IT3 完了報告書](./development/iteration_report-3.md) | 作成済み |
 
 ### 運用 (`operation/`)
 
