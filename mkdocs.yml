@@ -105,6 +105,7 @@ nav:
       - アプリケーション開発環境セットアップ: operation/app-development-setup.md
       - 開発スクリプトリファレンス: operation/develop-script.md
       - CI/CD パイプライン設計: operation/cicd-pipeline.md
+      - Heroku 開発環境セットアップ: operation/heroku-dev-setup.md
   - リファレンス:
       - 概要: reference/index.md
       - よいソフトウェアとは: reference/よいソフトウェアとは.md

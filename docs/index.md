@@ -72,6 +72,7 @@
 | [アプリケーション開発環境セットアップ手順書](./operation/app-development-setup.md) | 作成済み |
 | [開発スクリプトリファレンス](./operation/develop-script.md) | 作成済み |
 | [CI/CD パイプライン設計](./operation/cicd-pipeline.md) | 作成済み |
+| [Heroku 開発環境セットアップ](./operation/heroku-dev-setup.md) | 作成済み |
 
 ### ADR (`adr/`)
 
