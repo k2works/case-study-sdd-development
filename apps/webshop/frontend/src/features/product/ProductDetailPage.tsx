@@ -1,11 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { catalogApi } from '../../lib/product-api'
+import { useAuth } from '../../providers/AuthProvider'
 import type { Product } from '../../types/product'
 
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const isCustomer = user?.role === 'CUSTOMER'
   const productId = Number(id)
 
   const { data: product, isLoading } = useQuery<Product>({
@@ -74,13 +77,19 @@ export function ProductDetailPage() {
         )}
 
         <div className="mt-8">
-          <button
-            type="button"
-            onClick={() => navigate(`/orders/new/${product.id}`)}
-            className="w-full bg-emerald-600 text-white font-medium rounded-lg px-4 py-3 hover:bg-emerald-700 transition-colors text-sm"
-          >
-            この商品を注文する
-          </button>
+          {isCustomer ? (
+            <button
+              type="button"
+              onClick={() => navigate(`/orders/new/${product.id}`)}
+              className="w-full bg-emerald-600 text-white font-medium rounded-lg px-4 py-3 hover:bg-emerald-700 transition-colors text-sm"
+            >
+              この商品を注文する
+            </button>
+          ) : (
+            <p className="text-sm text-gray-500 text-center py-3 bg-gray-50 rounded-lg">
+              注文するには得意先アカウントでログインしてください
+            </p>
+          )}
         </div>
       </div>
     </div>

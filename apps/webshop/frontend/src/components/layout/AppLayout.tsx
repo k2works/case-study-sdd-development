@@ -30,6 +30,15 @@ export function AppLayout() {
   const showProductManagement = !isCustomer
   const showOrderManagement = role === 'OWNER' || role === 'ORDER_STAFF'
 
+  const roleLabel: Record<string, string> = {
+    OWNER: 'オーナー',
+    ORDER_STAFF: '受注スタッフ',
+    PURCHASE_STAFF: '仕入スタッフ',
+    FLORIST: 'フローリスト',
+    DELIVERY_STAFF: '配送スタッフ',
+    CUSTOMER: '得意先',
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-emerald-700 text-white shadow-md">
@@ -69,9 +78,14 @@ export function AppLayout() {
               )}
             </nav>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-emerald-100">
-                {user?.lastName} {user?.firstName}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-800 text-emerald-200 font-medium">
+                  {roleLabel[role] ?? role}
+                </span>
+                <span className="text-sm text-emerald-100">
+                  {user?.lastName} {user?.firstName}
+                </span>
+              </div>
               <button
                 onClick={handleLogout}
                 className="text-sm bg-emerald-800 hover:bg-emerald-900 text-white px-4 py-2 rounded-lg transition-colors"
