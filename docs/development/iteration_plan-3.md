@@ -59,8 +59,10 @@
 2. 注文確認画面で注文内容を確認できる
 3. 注文確定後、受注が「注文受付」ステータスで登録される
 4. 届け日は翌日〜30 日後の範囲で指定できる
-5. 届け先の必須項目（氏名、住所）が未入力の場合はエラーが表示される
+5. 届け先の必須項目（氏名、郵便番号、住所）が未入力の場合はエラーが表示される
 6. お届けメッセージは最大 200 文字まで入力できる
+7. 1 注文につき 1 商品 × 1 個とする（複数商品注文は対象外）
+8. Customer レコードはユーザー登録時（CUSTOMER ロール）に自動生成される
 
 #### US-006: 受注一覧を確認する
 
@@ -91,12 +93,12 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 1.1 | Order エンティティ（OrderId, OrderStatus, DeliveryDate, Message）の TDD 実装 | 3h | - | [ ] |
-| 1.2 | DeliveryDestination 値オブジェクト（recipientName, postalCode, address, phone）の TDD 実装 | 1.5h | - | [ ] |
+| 1.1 | Order エンティティ（OrderId, OrderStatus, DeliveryDate, Message）の TDD 実装。DeliveryDate は境界値テスト必須（当日=NG、翌日=OK、30日後=OK、31日後=NG、過去日=NG、null=NG）。Message は 200 文字上限テスト必須（0文字=OK、200文字=OK、201文字=NG、null=OK） | 3h | - | [ ] |
+| 1.2 | DeliveryDestination エンティティ（id, customerId, recipientName, postalCode, address, phone）の TDD 実装 | 1.5h | - | [ ] |
 | 1.3 | Customer エンティティ（userId との紐づけ）の TDD 実装 | 1.5h | - | [ ] |
 | 1.4 | OrderRepository / CustomerRepository / DeliveryDestinationRepository ポートインターフェース定義 | 1h | - | [ ] |
-| 1.5 | OrderUseCase アプリケーションサービスの TDD 実装（注文作成、一覧取得、ステータス更新） | 3h | - | [ ] |
-| 1.6 | Flyway V5 マイグレーション（customers, delivery_destinations, orders テーブル作成） | 1.5h | - | [ ] |
+| 1.5 | PlaceOrderUseCase（注文作成）+ OrderQueryService（一覧取得）の TDD 実装。得意先とスタッフで責務を分離 | 3h | - | [ ] |
+| 1.6 | Flyway V5__create_customers_and_orders.sql マイグレーション（customers, delivery_destinations, orders テーブル作成） | 1.5h | - | [ ] |
 | 1.7 | JPA エンティティ・リポジトリインフラ層実装（OrderEntity, CustomerEntity, DeliveryDestinationEntity） | 3h | - | [ ] |
 | 1.8 | OrderController REST API 実装（POST /orders, GET /orders, GET /orders/{id}, PUT /orders/{id}/status） | 3h | - | [ ] |
 | 1.9 | 注文画面（S-005: OrderFormPage）フロントエンド実装 | 3h | - | [ ] |
@@ -122,7 +124,7 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 3.1 | OrderStatus の状態遷移ロジック TDD 実装（ordered → accepted のみ許可） | 1.5h | - | [ ] |
+| 3.1 | OrderStatus enum を全 6 状態（ORDERED, ACCEPTED, PREPARING, SHIPPED, DELIVERED, CANCELLED）で定義し、IT3 では ordered → accepted の遷移テストを実装。未実装遷移は IllegalStateException で防御 | 1.5h | - | [ ] |
 | 3.2 | ステータス更新 API の実装（PUT /api/v1/admin/orders/{id}/accept） | 1h | - | [ ] |
 | 3.3 | 受注詳細画面にステータス更新ボタン追加 | 1h | - | [ ] |
 | 3.4 | E2E テスト（注文→受注一覧→受付済み更新のフロー） | 2.5h | - | [ ] |
@@ -137,6 +139,16 @@
 
 **小計**: 2h（理想時間）
 
+#### 5. テスト（品質保証・SP 外）
+
+| # | タスク | 見積もり | 担当 | 状態 |
+|---|--------|---------|------|------|
+| 5.1 | 統合テスト（OrderRepository CRUD + OrderController API エンドポイント） | 2h | - | [ ] |
+| 5.2 | 認可テスト（得意先→管理 API 403、スタッフ→得意先 API、未認証 401、データ分離） | 2h | - | [ ] |
+| 5.3 | フロントエンドコンポーネントテスト（OrderFormPage バリデーション、OrderListPage フィルタ） | 2h | - | [ ] |
+
+**小計**: 6h（理想時間）
+
 #### タスク合計
 
 | カテゴリ | SP | 理想時間 | 状態 |
@@ -145,9 +157,10 @@
 | 受注一覧・詳細（US-006） | 3 | 9.5h | [ ] |
 | 受注ステータス更新（US-007） | 2 | 6h | [ ] |
 | IT2 レビュー対応（SP 外） | - | 2h | [ ] |
-| **合計** | **13** | **43h** | |
+| テスト（SP 外） | - | 6h | [ ] |
+| **合計** | **13** | **49h** | |
 
-**1 SP あたり**: 約 3.3h
+**1 SP あたり**: 約 3.8h（テスト含む）
 **進捗率**: 0% (0/13 SP)
 
 ---
@@ -185,9 +198,9 @@ gantt
     dateFormat  YYYY-MM-DD
     section US-005 フロントエンド
     注文画面・確認画面                  :a1, 2026-04-28, 1d
-    注文完了画面 + API クライアント     :a2, after a1, 1d
+    注文完了画面 + 受注 API             :a2, after a1, 1d
     section US-006 受注管理
-    受注一覧・詳細 API + 画面          :u1, 2026-04-30, 1d
+    受注一覧・詳細画面                  :u1, 2026-04-30, 1d
     section US-007 ステータス更新
     ステータス遷移 + 更新 UI           :s1, 2026-05-01, 1d
     section 統合・品質
@@ -197,10 +210,10 @@ gantt
 | 日 | タスク |
 |----|--------|
 | Day 6 | 注文画面・確認画面フロントエンド（1.9, 1.10） |
-| Day 7 | 注文完了画面 + API クライアント（1.11, 1.12） |
-| Day 8 | 受注一覧・詳細 API + 画面（2.1, 2.2, 2.3, 2.4, 2.5） |
+| Day 7 | 注文完了画面 + API クライアント + 受注 API（1.11, 1.12, 2.1, 2.2） |
+| Day 8 | 受注一覧・詳細画面フロントエンド + API クライアント（2.3, 2.4, 2.5） |
 | Day 9 | ステータス遷移ロジック + 更新 API + UI（3.1, 3.2, 3.3） |
-| Day 10 | E2E テスト、ロール別メニュー制御、バグ修正（3.4, 4.1） |
+| Day 10 | E2E テスト、認可テスト、ロール別メニュー制御、バグ修正（3.4, 4.1, 5.1, 5.2） |
 
 ---
 
@@ -257,7 +270,6 @@ package "得意先集約" #lightyellow {
     - userId: UserId
     - name: String
     - phone: String
-    - email: String
   }
 
   class DeliveryDestination <<Entity>> {
@@ -303,7 +315,6 @@ entity "customers" as customers {
   user_id : BIGINT <<FK, UNIQUE, NOT NULL>>
   name : VARCHAR(100) <<NOT NULL>>
   phone : VARCHAR(20)
-  email : VARCHAR(255) <<NOT NULL>>
   created_at : TIMESTAMP <<NOT NULL>> DEFAULT CURRENT_TIMESTAMP
   updated_at : TIMESTAMP <<NOT NULL>> DEFAULT CURRENT_TIMESTAMP
 }
@@ -453,7 +464,7 @@ apps/webshop/
 │           ├── JpaCustomerRepository.java
 │           └── JpaDeliveryDestinationRepository.java
 ├── backend/src/main/resources/db/migration/
-│   └── V5__create_orders.sql
+│   └── V5__create_customers_and_orders.sql
 └── frontend/src/
     ├── features/order/
     │   ├── OrderFormPage.tsx
@@ -476,6 +487,8 @@ apps/webshop/
 | GET | /api/v1/admin/orders/{id} | 受注詳細取得 | スタッフ |
 | PUT | /api/v1/admin/orders/{id}/accept | 受注受付（ordered → accepted） | スタッフ |
 
+> **注記**: `GET /api/v1/orders/my` は API のみ IT3 で実装する。注文履歴画面は IT3 スコープ外（将来対応）。
+
 ### データベーススキーマ
 
 ```sql
@@ -486,7 +499,6 @@ CREATE TABLE customers (
     user_id BIGINT NOT NULL UNIQUE REFERENCES users(id),
     name VARCHAR(100) NOT NULL,
     phone VARCHAR(20),
-    email VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -570,6 +582,8 @@ CREATE TABLE orders (
 
 - [リリース計画](./release_plan.md)
 - [イテレーション 2 計画](./iteration_plan-2.md)
+- [イテレーション 2 ふりかえり](./iteration_retrospective-2.md)
+- [イテレーション 2 完了報告書](./iteration_report-2.md)
 - [ドメインモデル設計](../design/domain_model.md)
 - [データモデル設計](../design/data-model.md)
 - [UI 設計](../design/ui-design.md)

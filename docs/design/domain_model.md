@@ -137,7 +137,9 @@ package "得意先集約" #pink {
     + addDeliveryDestination(dest): void
   }
 
-  class DeliveryDestination <<Value Object>> {
+  class DeliveryDestination <<Entity>> {
+    - id: Long
+    - customerId: CustomerId
     - recipientName: String
     - postalCode: String
     - address: String
