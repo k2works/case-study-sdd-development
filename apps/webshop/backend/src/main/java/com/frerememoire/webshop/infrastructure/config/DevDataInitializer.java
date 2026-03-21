@@ -2,10 +2,20 @@ package com.frerememoire.webshop.infrastructure.config;
 
 import com.frerememoire.webshop.application.auth.RegistrationUseCase;
 import com.frerememoire.webshop.application.item.ItemUseCase;
+import com.frerememoire.webshop.application.order.PlaceOrderCommand;
+import com.frerememoire.webshop.application.order.PlaceOrderUseCase;
 import com.frerememoire.webshop.application.product.ProductUseCase;
+import com.frerememoire.webshop.domain.auth.AuthUser;
+import com.frerememoire.webshop.domain.auth.PasswordEncoder;
+import com.frerememoire.webshop.domain.auth.Role;
+import com.frerememoire.webshop.domain.auth.UserProfile;
 import com.frerememoire.webshop.domain.auth.port.AuthUserRepository;
+import com.frerememoire.webshop.domain.customer.Customer;
+import com.frerememoire.webshop.domain.customer.port.CustomerRepository;
 import com.frerememoire.webshop.domain.item.Item;
 import com.frerememoire.webshop.domain.item.port.ItemRepository;
+import com.frerememoire.webshop.domain.order.Order;
+import com.frerememoire.webshop.domain.order.port.OrderRepository;
 import com.frerememoire.webshop.domain.product.Product;
 import com.frerememoire.webshop.domain.product.port.ProductRepository;
 import org.slf4j.Logger;
@@ -16,48 +26,88 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Component
 @Profile("default")
 public class DevDataInitializer implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DevDataInitializer.class);
 
+    private record SeedOrderSpec(
+            String productName,
+            java.time.LocalDate deliveryDate,
+            String recipientName,
+            String postalCode,
+            String address,
+            String phone,
+            String message,
+            boolean accepted) {
+    }
+
     private final RegistrationUseCase registrationUseCase;
     private final AuthUserRepository authUserRepository;
+    private final PasswordEncoder passwordEncoder;
     private final ItemUseCase itemUseCase;
     private final ItemRepository itemRepository;
     private final ProductUseCase productUseCase;
     private final ProductRepository productRepository;
+    private final CustomerRepository customerRepository;
+    private final PlaceOrderUseCase placeOrderUseCase;
+    private final OrderRepository orderRepository;
 
     public DevDataInitializer(RegistrationUseCase registrationUseCase,
                                AuthUserRepository authUserRepository,
+                               PasswordEncoder passwordEncoder,
                                ItemUseCase itemUseCase,
                                ItemRepository itemRepository,
                                ProductUseCase productUseCase,
-                               ProductRepository productRepository) {
+                               ProductRepository productRepository,
+                               CustomerRepository customerRepository,
+                               PlaceOrderUseCase placeOrderUseCase,
+                               OrderRepository orderRepository) {
         this.registrationUseCase = registrationUseCase;
         this.authUserRepository = authUserRepository;
+        this.passwordEncoder = passwordEncoder;
         this.itemUseCase = itemUseCase;
         this.itemRepository = itemRepository;
         this.productUseCase = productUseCase;
         this.productRepository = productRepository;
+        this.customerRepository = customerRepository;
+        this.placeOrderUseCase = placeOrderUseCase;
+        this.orderRepository = orderRepository;
     }
 
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        createDevUser();
+        createOwnerUser();
+        createStaffUser();
+        createCustomerUser();
         createSeedItems();
         createSeedProducts();
+        createSeedOrders();
     }
 
-    private void createDevUser() {
-        if (!authUserRepository.existsByEmail("dev@example.com")) {
-            registrationUseCase.register(
-                    "dev@example.com", "Password1",
-                    "太郎", "開発", null);
-            log.info("開発用ユーザーを作成しました: dev@example.com / Password1");
+    private void createOwnerUser() {
+        ensurePrivilegedUser("dev@example.com", "太郎", "開発", null, Role.OWNER, "オーナー");
+    }
+
+    private void createStaffUser() {
+        ensurePrivilegedUser("staff@example.com", "花子", "受注", null, Role.ORDER_STAFF, "受注スタッフ");
+    }
+
+    private void createCustomerUser() {
+        var existingCustomer = authUserRepository.findByEmail("customer@example.com");
+        if (existingCustomer.isPresent()) {
+            ensureCustomerRecord(existingCustomer.get());
+            return;
         }
+
+        registrationUseCase.register(
+                "customer@example.com", "Password1",
+                "太郎", "山田", "090-1234-5678");
+        log.info("得意先ユーザーを作成しました: customer@example.com / Password1");
     }
 
     private void createSeedItems() {
@@ -122,10 +172,138 @@ public class DevDataInitializer implements ApplicationRunner {
         log.info("開発用商品データを作成しました（5件、構成付き）");
     }
 
+    private void createSeedOrders() {
+        if (!orderRepository.findAll().isEmpty()) {
+            return;
+        }
+
+        var customerUser = authUserRepository.findByEmail("customer@example.com");
+        if (customerUser.isEmpty()) {
+            return;
+        }
+
+        var products = productRepository.findAll();
+        if (products.isEmpty()) {
+            return;
+        }
+
+        createSeedOrder(customerUser.get().getId(), products, new SeedOrderSpec(
+                "赤バラのクラシックブーケ",
+                java.time.LocalDate.now().plusDays(3),
+                "山田 太郎",
+                "150-0001",
+                "東京都渋谷区神宮前 1-2-3",
+                "090-1234-5678",
+                "誕生日祝いです。",
+                false
+        ));
+
+        createSeedOrder(customerUser.get().getId(), products, new SeedOrderSpec(
+                "パステルミックスブーケ",
+                java.time.LocalDate.now().plusDays(5),
+                "山田 太郎",
+                "220-0004",
+                "神奈川県横浜市西区北幸 2-4-6",
+                "090-1234-5678",
+                "午前中着でお願いします。",
+                true
+        ));
+
+        createSeedOrder(customerUser.get().getId(), products, new SeedOrderSpec(
+                "ホワイトエレガンス",
+                java.time.LocalDate.now().plusDays(7),
+                "山田 太郎",
+                "530-0001",
+                "大阪府大阪市北区梅田 3-1-1",
+                "090-1234-5678",
+                null,
+                false
+        ));
+
+        log.info("開発用受注データを作成しました（3件）");
+    }
+
     private void addCompositionIfItemExists(Product product, java.util.List<Item> items, String itemName, int quantity) {
         items.stream()
                 .filter(item -> item.getName().equals(itemName))
                 .findFirst()
                 .ifPresent(item -> productUseCase.addComposition(product.getId(), item.getId(), quantity));
+    }
+
+    private void createSeedOrder(Long userId, java.util.List<Product> products, SeedOrderSpec spec) {
+        products.stream()
+                .filter(product -> product.getName().equals(spec.productName()))
+                .findFirst()
+                .ifPresent(product -> {
+                    Order order = placeOrderUseCase.placeOrder(new PlaceOrderCommand(
+                            userId,
+                            product.getId(),
+                            spec.deliveryDate(),
+                            spec.recipientName(),
+                            spec.postalCode(),
+                            spec.address(),
+                            spec.phone(),
+                            spec.message()
+                    ));
+
+                    if (spec.accepted()) {
+                        order.accept();
+                        orderRepository.save(order);
+                    }
+                });
+    }
+
+    private void ensurePrivilegedUser(String email, String firstName, String lastName,
+                                      String phone, Role expectedRole, String label) {
+        UserProfile expectedProfile = new UserProfile(firstName, lastName, phone);
+        var existingUser = authUserRepository.findByEmail(email);
+
+        if (existingUser.isEmpty()) {
+            AuthUser user = AuthUser.create(
+                    email, passwordEncoder.encode("Password1"),
+                    expectedRole, expectedProfile);
+            authUserRepository.save(user);
+            log.info("{}ユーザーを作成しました: {} / Password1 ({})", label, email, expectedRole);
+            return;
+        }
+
+        AuthUser currentUser = existingUser.get();
+        if (currentUser.getRole() == expectedRole && hasSameProfile(currentUser.getProfile(), expectedProfile)) {
+            return;
+        }
+
+        AuthUser repairedUser = new AuthUser(
+                currentUser.getId(),
+                currentUser.getEmail(),
+                currentUser.getPasswordHash(),
+                expectedRole,
+                expectedProfile,
+                currentUser.getFailedLoginCount(),
+                currentUser.getLockedUntil(),
+                currentUser.getCreatedAt(),
+                LocalDateTime.now()
+        );
+        authUserRepository.save(repairedUser);
+        log.info("{}ユーザーを補正しました: {} ({})", label, email, expectedRole);
+    }
+
+    private void ensureCustomerRecord(AuthUser user) {
+        if (customerRepository.existsByUserId(user.getId())) {
+            return;
+        }
+
+        Customer customer = Customer.create(
+                user.getId(),
+                user.getProfile().getLastName() + " " + user.getProfile().getFirstName(),
+                user.getProfile().getPhone()
+        );
+        customerRepository.save(customer);
+        log.info("得意先レコードを補正しました: userId={}", user.getId());
+    }
+
+    private boolean hasSameProfile(UserProfile currentProfile, UserProfile expectedProfile) {
+        return currentProfile.getFirstName().equals(expectedProfile.getFirstName())
+                && currentProfile.getLastName().equals(expectedProfile.getLastName())
+                && java.util.Objects.equals(currentProfile.getPhone(), expectedProfile.getPhone());
     }
 }

@@ -57,6 +57,8 @@
 | [IT1 計画レビュー](./review/iteration_plan-1_review_20260321.md) | IT1 イテレーション計画のレビュー |
 | [IT2 実装レビュー](./review/it2_product_review_20260321.md) | IT2 商品管理機能のマルチパースペクティブレビュー |
 | [IT3 計画レビュー](./review/it3_plan_review_20260321.md) | IT3 注文フロー・受注管理計画のレビュー |
+| [IT3 開発レビュー](./review/it3_developing_review_20260321.md) | IT3 注文フロー・受注管理実装のマルチパースペクティブレビュー |
+| [UI/UX デザインレビュー](./review/ui_design_uiux_review_20260321.md) | UI 設計の UX・アクセシビリティレビュー |
 
 ### 開発 (`development/`)
 
@@ -69,7 +71,9 @@
 | [IT2 イテレーション計画](./development/iteration_plan-2.md) | 完了（11 SP / 170 テスト） |
 | [IT2 ふりかえり](./development/iteration_retrospective-2.md) | 作成済み |
 | [IT2 完了報告書](./development/iteration_report-2.md) | 作成済み |
-| [IT3 イテレーション計画](./development/iteration_plan-3.md) | 計画済み |
+| [IT3 イテレーション計画](./development/iteration_plan-3.md) | 完了（13 SP / 186 テスト） |
+| [IT3 ふりかえり](./development/iteration_retrospective-3.md) | 作成済み |
+| [IT3 完了報告書](./development/iteration_report-3.md) | 作成済み |
 
 ### 運用 (`operation/`)
 

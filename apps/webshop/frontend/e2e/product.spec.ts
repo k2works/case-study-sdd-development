@@ -1,5 +1,14 @@
 import { test, expect } from '@playwright/test'
 
+async function loginAsOwner(page: import('@playwright/test').Page) {
+  await page.goto('/login')
+  await page.getByLabel('メールアドレス').fill('dev@example.com')
+  await page.getByLabel('パスワード').fill('Password1')
+  await page.getByRole('button', { name: 'ログイン' }).click()
+
+  await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 })
+}
+
 async function loginAsNewUser(page: import('@playwright/test').Page, request: import('@playwright/test').APIRequestContext) {
   const uniqueEmail = `e2e-product-${Date.now()}-${Math.random().toString(36).slice(2, 6)}@example.com`
 
@@ -22,23 +31,23 @@ async function loginAsNewUser(page: import('@playwright/test').Page, request: im
 }
 
 test.describe('商品管理画面', () => {
-  test('ナビゲーションから商品管理画面にアクセスできる', async ({ page, request }) => {
-    await loginAsNewUser(page, request)
+  test('ナビゲーションから商品管理画面にアクセスできる', async ({ page }) => {
+    await loginAsOwner(page)
 
     await page.getByRole('link', { name: '商品管理', exact: true }).click()
     await expect(page).toHaveURL(/\/products/)
     await expect(page.getByRole('heading', { name: '商品管理' })).toBeVisible()
   })
 
-  test('商品管理画面に新規登録ボタンが表示される', async ({ page, request }) => {
-    await loginAsNewUser(page, request)
+  test('商品管理画面に新規登録ボタンが表示される', async ({ page }) => {
+    await loginAsOwner(page)
 
     await page.goto('/products')
     await expect(page.getByText('新規商品を登録')).toBeVisible()
   })
 
-  test('商品登録フォームに遷移できる', async ({ page, request }) => {
-    await loginAsNewUser(page, request)
+  test('商品登録フォームに遷移できる', async ({ page }) => {
+    await loginAsOwner(page)
 
     await page.goto('/products')
     await page.getByText('新規商品を登録').click()
@@ -46,8 +55,8 @@ test.describe('商品管理画面', () => {
     await expect(page.getByRole('heading', { name: '商品登録' })).toBeVisible()
   })
 
-  test('商品を登録して一覧に表示される', async ({ page, request }) => {
-    await loginAsNewUser(page, request)
+  test('商品を登録して一覧に表示される', async ({ page }) => {
+    await loginAsOwner(page)
 
     const productName = `E2Eテスト花束_${Date.now()}`
     await page.goto('/products/new')

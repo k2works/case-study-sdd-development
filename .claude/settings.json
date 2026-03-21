@@ -7,5 +7,18 @@
     "allow": [],
     "deny": [],
     "ask": []
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$TOOL_INPUT\" | grep -q 'git commit'; then npm run check:all; fi"
+          }
+        ]
+      }
+    ]
   }
 }

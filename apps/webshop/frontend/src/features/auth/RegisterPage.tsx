@@ -27,6 +27,7 @@ export function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       setError(null)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { passwordConfirm: _, ...requestData } = data
       const response = await authApi.register(requestData)
       const { token, email, role, firstName, lastName } = response.data

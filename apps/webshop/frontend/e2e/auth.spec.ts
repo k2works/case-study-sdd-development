@@ -4,6 +4,15 @@ function uniqueEmail(prefix: string) {
   return `e2e-${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}@example.com`
 }
 
+async function loginAsOwner(page: import('@playwright/test').Page) {
+  await page.goto('/login')
+  await page.getByLabel('メールアドレス').fill('dev@example.com')
+  await page.getByLabel('パスワード').fill('Password1')
+  await page.getByRole('button', { name: 'ログイン' }).click()
+
+  await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 })
+}
+
 test.describe('ログインページ', () => {
   test('ログインフォームが表示される', async ({ page }) => {
     await page.goto('/login')
@@ -22,6 +31,10 @@ test.describe('ログインページ', () => {
 
   test('空入力で送信するとバリデーションエラーが表示される', async ({ page }) => {
     await page.goto('/login')
+
+    // 開発モードの初期値が有効な場合に備えて明示的に空入力にする
+    await page.getByLabel('メールアドレス').fill('')
+    await page.getByLabel('パスワード').fill('')
 
     await page.getByRole('button', { name: 'ログイン' }).click()
 
@@ -100,25 +113,8 @@ test.describe('新規登録 → ログインフロー', () => {
 })
 
 test.describe('認証済みアクセス', () => {
-  test('ログイン後に単品管理画面にアクセスできる', async ({ page, request }) => {
-    const uniqueEmail = `e2e-items-${Date.now()}@example.com`
-
-    await request.post('/api/v1/auth/register', {
-      data: {
-        email: uniqueEmail,
-        password: 'Password1',
-        firstName: '太郎',
-        lastName: '山田',
-        phone: null,
-      },
-    })
-
-    await page.goto('/login')
-    await page.getByLabel('メールアドレス').fill(uniqueEmail)
-    await page.getByLabel('パスワード').fill('Password1')
-    await page.getByRole('button', { name: 'ログイン' }).click()
-
-    await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 })
+  test('OWNER でログイン後に単品管理画面にアクセスできる', async ({ page }) => {
+    await loginAsOwner(page)
 
     await page.getByRole('link', { name: '単品管理' }).click()
     await expect(page).toHaveURL(/\/items/)

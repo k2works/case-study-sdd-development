@@ -10,8 +10,8 @@ WORK_DIR="$1"
 shift
 
 if command -v java &>/dev/null; then
-  JAVA_MAJOR=$(java -version 2>&1 | head -1 | sed 's/.*version "\([0-9]*\).*/\1/')
-  if [ "$JAVA_MAJOR" -le 23 ] 2>/dev/null; then
+  JAVA_MAJOR=$(java -version 2>&1 | grep -i 'version' | head -1 | sed 's/.*version "\([0-9]*\).*/\1/')
+  if [ -n "$JAVA_MAJOR" ] && [ "$JAVA_MAJOR" -le 23 ] 2>/dev/null; then
     cd "$WORK_DIR" && exec "$@"
   fi
 fi

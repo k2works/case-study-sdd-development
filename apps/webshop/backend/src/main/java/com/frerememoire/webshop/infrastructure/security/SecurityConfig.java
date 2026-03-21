@@ -31,6 +31,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/api/v1/catalog/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/api/v1/admin/**").hasAnyRole("OWNER", "ORDER_STAFF")
+                .requestMatchers("/api/v1/orders/**").hasRole("CUSTOMER")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter,

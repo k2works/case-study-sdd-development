@@ -23,6 +23,13 @@ export function AppLayout() {
         : 'text-emerald-100 hover:bg-emerald-600 hover:text-white'
     }`
 
+  const role = user?.role ?? ''
+
+  const isCustomer = role === 'CUSTOMER'
+  const showItemManagement = !isCustomer
+  const showProductManagement = !isCustomer
+  const showOrderManagement = role === 'OWNER' || role === 'ORDER_STAFF'
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-emerald-700 text-white shadow-md">
@@ -37,15 +44,29 @@ export function AppLayout() {
               <NavLink to="/dashboard" end className={navLinkClass}>
                 ダッシュボード
               </NavLink>
-              <NavLink to="/items" className={navLinkClass}>
-                単品管理
-              </NavLink>
-              <NavLink to="/products" className={navLinkClass}>
-                商品管理
-              </NavLink>
+              {showItemManagement && (
+                <NavLink to="/items" className={navLinkClass}>
+                  単品管理
+                </NavLink>
+              )}
+              {showProductManagement && (
+                <NavLink to="/products" className={navLinkClass}>
+                  商品管理
+                </NavLink>
+              )}
               <NavLink to="/catalog/products" className={navLinkClass}>
                 商品カタログ
               </NavLink>
+              {isCustomer && (
+                <NavLink to="/orders/my" className={navLinkClass}>
+                  注文履歴
+                </NavLink>
+              )}
+              {showOrderManagement && (
+                <NavLink to="/admin/orders" className={navLinkClass}>
+                  受注管理
+                </NavLink>
+              )}
             </nav>
             <div className="flex items-center gap-4">
               <span className="text-sm text-emerald-100">
