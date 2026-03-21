@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { orderApi } from '../../lib/order-api'
+import { useAuth } from '../../providers/AuthProvider'
 import type { OrderRequest } from '../../types/order'
 import type { Product } from '../../types/product'
 
@@ -14,17 +15,78 @@ interface OrderFormData {
   message: string
 }
 
+interface ProblemResponse {
+  detail?: string
+  errors?: string[]
+}
+
+interface ApiErrorLike {
+  response?: {
+    status?: number
+    data?: ProblemResponse
+  }
+}
+
+function getOrderErrorInfo(error: unknown): { message: string; requiresRelogin: boolean } {
+  if (error && typeof error === 'object' && 'response' in error) {
+    const apiError = error as ApiErrorLike
+    const status = apiError.response?.status
+    const detail = apiError.response?.data?.detail
+    const errors = apiError.response?.data?.errors
+
+    if (status === 404 && typeof detail === 'string' && (detail.includes('ユーザー') || detail.includes('得意先'))) {
+      return {
+        message: 'ログイン状態が無効になりました。再度ログインしてください。',
+        requiresRelogin: true,
+      }
+    }
+
+    if (Array.isArray(errors) && errors.length > 0) {
+      return {
+        message: errors[0],
+        requiresRelogin: false,
+      }
+    }
+
+    if (typeof detail === 'string' && detail.trim() !== '') {
+      return {
+        message: detail,
+        requiresRelogin: false,
+      }
+    }
+  }
+
+  return {
+    message: '注文の送信に失敗しました。もう一度お試しください。',
+    requiresRelogin: false,
+  }
+}
+
 export function OrderConfirmPage() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { logout } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [requiresRelogin, setRequiresRelogin] = useState(false)
 
   const state = location.state as { product: Product; form: OrderFormData } | null
 
   const mutation = useMutation({
     mutationFn: (data: OrderRequest) => orderApi.placeOrder(data),
     onSuccess: () => {
+      setErrorMessage(null)
+      setRequiresRelogin(false)
       navigate('/orders/complete', { replace: true })
+    },
+    onError: (error) => {
+      const { message, requiresRelogin: shouldRelogin } = getOrderErrorInfo(error)
+      setErrorMessage(message)
+      setRequiresRelogin(shouldRelogin)
+
+      if (shouldRelogin) {
+        logout()
+      }
     },
     onSettled: () => {
       setIsSubmitting(false)
@@ -49,6 +111,8 @@ export function OrderConfirmPage() {
   const handlePlaceOrder = () => {
     if (isSubmitting) return
     setIsSubmitting(true)
+    setErrorMessage(null)
+    setRequiresRelogin(false)
 
     const request: OrderRequest = {
       productId: product.id,
@@ -110,9 +174,14 @@ export function OrderConfirmPage() {
           </dl>
         </div>
 
-        {mutation.isError && (
+        {errorMessage && (
           <div className="bg-red-50 text-red-700 rounded-lg p-3 text-sm">
-            注文の送信に失敗しました。もう一度お試しください。
+            <p className="m-0">{errorMessage}</p>
+            {requiresRelogin && (
+              <Link to="/login" className="inline-block mt-2 text-sm font-medium text-red-700 underline">
+                ログインページへ
+              </Link>
+            )}
           </div>
         )}
 
