@@ -26,6 +26,9 @@
     "webshop:build": "gulp dev:webshop:build",
     "tdd:webshop:backend": "gulp tdd:webshop:backend",
     "tdd:webshop:frontend": "gulp tdd:webshop:frontend",
+    "check:frontend": "gulp check:frontend",
+    "check:backend": "gulp check:backend",
+    "check:all": "gulp check:all",
     "dev:help": "gulp dev:help",
     "setup:webshop": "gulp setup:webshop",
     "prepare": "husky"

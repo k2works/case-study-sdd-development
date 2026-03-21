@@ -290,6 +290,42 @@ export default function (gulp) {
     'setup:webshop:frontend:build'
   ));
 
+  // --- 品質チェック ---
+
+  gulp.task('check:frontend', (done) => {
+    try {
+      console.log('Running frontend quality checks...');
+      console.log('\n[1/3] ESLint...');
+      localExec('npm run lint', { cwd: FRONTEND_DIR });
+      console.log('\n[2/3] TypeScript type check...');
+      localExec('npx tsc --noEmit', { cwd: FRONTEND_DIR });
+      console.log('\n[3/3] Unit tests...');
+      localExec('npm run test', { cwd: FRONTEND_DIR });
+      console.log('\nFrontend quality checks passed.');
+      done();
+    } catch (error) {
+      done(error);
+    }
+  });
+
+  gulp.task('check:backend', (done) => {
+    try {
+      console.log('Running backend quality checks...');
+      console.log('\n[1/3] Checkstyle...');
+      javaExec('./gradlew checkstyleMain checkstyleTest', { cwd: BACKEND_DIR });
+      console.log('\n[2/3] Unit tests...');
+      javaExec('./gradlew test', { cwd: BACKEND_DIR });
+      console.log('\n[3/3] Coverage verification...');
+      javaExec('./gradlew jacocoTestCoverageVerification', { cwd: BACKEND_DIR });
+      console.log('\nBackend quality checks passed.');
+      done();
+    } catch (error) {
+      done(error);
+    }
+  });
+
+  gulp.task('check:all', gulp.series('check:backend', 'check:frontend'));
+
   // --- ヘルプ ---
 
   gulp.task('dev:help', (done) => {
@@ -318,6 +354,11 @@ TDD:
 
 ビルド:
   dev:webshop:build           バックエンドとフロントエンドをビルド
+
+品質チェック:
+  check:frontend              フロントエンド品質チェック（lint + 型検査 + テスト）
+  check:backend               バックエンド品質チェック（checkstyle + テスト + カバレッジ）
+  check:all                   全品質チェック（バックエンド → フロントエンド）
 
 ヘルプ:
   dev:help                    このヘルプを表示
