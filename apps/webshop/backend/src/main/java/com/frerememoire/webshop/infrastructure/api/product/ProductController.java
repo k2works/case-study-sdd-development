@@ -1,6 +1,8 @@
 package com.frerememoire.webshop.infrastructure.api.product;
 
+import com.frerememoire.webshop.application.item.ItemUseCase;
 import com.frerememoire.webshop.application.product.ProductUseCase;
+import com.frerememoire.webshop.domain.item.Item;
 import com.frerememoire.webshop.domain.product.Product;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -15,21 +17,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductController {
 
     private final ProductUseCase productUseCase;
+    private final ItemUseCase itemUseCase;
 
-    public ProductController(ProductUseCase productUseCase) {
+    public ProductController(ProductUseCase productUseCase, ItemUseCase itemUseCase) {
         this.productUseCase = productUseCase;
+        this.itemUseCase = itemUseCase;
     }
 
     @GetMapping
     public ResponseEntity<List<ProductResponse>> findAll() {
+        Map<Long, String> itemNames = resolveItemNames();
         List<ProductResponse> products = productUseCase.findAll().stream()
-                .map(ProductResponse::fromDomain)
+                .map(p -> ProductResponse.fromDomain(p, itemNames))
                 .toList();
         return ResponseEntity.ok(products);
     }
@@ -37,7 +44,8 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> findById(@PathVariable Long id) {
         Product product = productUseCase.findById(id);
-        return ResponseEntity.ok(ProductResponse.fromDomain(product));
+        Map<Long, String> itemNames = resolveItemNames();
+        return ResponseEntity.ok(ProductResponse.fromDomain(product, itemNames));
     }
 
     @PostMapping
@@ -64,8 +72,9 @@ public class ProductController {
     @GetMapping("/{id}/compositions")
     public ResponseEntity<List<CompositionResponse>> getCompositions(@PathVariable Long id) {
         Product product = productUseCase.findById(id);
+        Map<Long, String> itemNames = resolveItemNames();
         List<CompositionResponse> compositions = product.getCompositions().stream()
-                .map(CompositionResponse::fromDomain)
+                .map(c -> CompositionResponse.fromDomain(c, itemNames.getOrDefault(c.getItemId(), null)))
                 .toList();
         return ResponseEntity.ok(compositions);
     }
@@ -74,13 +83,20 @@ public class ProductController {
     public ResponseEntity<ProductResponse> addComposition(@PathVariable Long id,
                                                            @Valid @RequestBody CompositionRequest request) {
         Product product = productUseCase.addComposition(id, request.itemId(), request.quantity());
-        return ResponseEntity.status(HttpStatus.CREATED).body(ProductResponse.fromDomain(product));
+        Map<Long, String> itemNames = resolveItemNames();
+        return ResponseEntity.status(HttpStatus.CREATED).body(ProductResponse.fromDomain(product, itemNames));
     }
 
     @DeleteMapping("/{productId}/compositions/{itemId}")
     public ResponseEntity<ProductResponse> removeComposition(@PathVariable Long productId,
                                                               @PathVariable Long itemId) {
         Product product = productUseCase.removeComposition(productId, itemId);
-        return ResponseEntity.ok(ProductResponse.fromDomain(product));
+        Map<Long, String> itemNames = resolveItemNames();
+        return ResponseEntity.ok(ProductResponse.fromDomain(product, itemNames));
+    }
+
+    private Map<Long, String> resolveItemNames() {
+        return itemUseCase.findAll().stream()
+                .collect(Collectors.toMap(Item::getId, Item::getName));
     }
 }

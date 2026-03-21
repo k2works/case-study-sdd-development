@@ -34,7 +34,7 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public ProductUseCase productUseCase(ProductRepository productRepository) {
-        return new ProductUseCase(productRepository);
+    public ProductUseCase productUseCase(ProductRepository productRepository, ItemRepository itemRepository) {
+        return new ProductUseCase(productRepository, itemRepository);
     }
 }

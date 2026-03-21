@@ -92,10 +92,12 @@ export function ProductFormPage() {
             <input
               id="price"
               type="number"
-              min="0"
+              min="1"
+              max="999999"
               {...register('price', {
                 required: '価格は必須です',
-                min: { value: 0, message: '価格は0以上で入力してください' },
+                min: { value: 1, message: '価格は1円以上で入力してください' },
+                max: { value: 999999, message: '価格は999,999円以下で入力してください' },
                 valueAsNumber: true,
               })}
               className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"

@@ -1,5 +1,6 @@
 package com.frerememoire.webshop.application.product;
 
+import com.frerememoire.webshop.domain.item.port.ItemRepository;
 import com.frerememoire.webshop.domain.product.Product;
 import com.frerememoire.webshop.domain.product.port.ProductRepository;
 import com.frerememoire.webshop.domain.shared.EntityNotFoundException;
@@ -9,9 +10,11 @@ import java.util.List;
 public class ProductUseCase {
 
     private final ProductRepository productRepository;
+    private final ItemRepository itemRepository;
 
-    public ProductUseCase(ProductRepository productRepository) {
+    public ProductUseCase(ProductRepository productRepository, ItemRepository itemRepository) {
         this.productRepository = productRepository;
+        this.itemRepository = itemRepository;
     }
 
     public List<Product> findAll() {
@@ -25,6 +28,14 @@ public class ProductUseCase {
     public Product findById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("商品", id));
+    }
+
+    public Product findActiveById(Long id) {
+        Product product = findById(id);
+        if (!product.isActive()) {
+            throw new EntityNotFoundException("商品", id);
+        }
+        return product;
     }
 
     public Product create(String name, int price, String description) {
@@ -45,6 +56,9 @@ public class ProductUseCase {
     }
 
     public Product addComposition(Long productId, Long itemId, int quantity) {
+        if (!itemRepository.existsById(itemId)) {
+            throw new EntityNotFoundException("単品", itemId);
+        }
         Product product = findById(productId);
         product.addComposition(itemId, quantity);
         return productRepository.save(product);

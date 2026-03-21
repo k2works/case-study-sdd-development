@@ -7,6 +7,8 @@ import java.util.List;
 public class Product {
 
     private static final int MAX_NAME_LENGTH = 50;
+    private static final int MIN_PRICE = 1;
+    private static final int MAX_PRICE = 999_999;
 
     private Long id;
     private String name;
@@ -97,8 +99,9 @@ public class Product {
     }
 
     private void validatePrice(int price) {
-        if (price < 0) {
-            throw new IllegalArgumentException("価格は0以上である必要があります");
+        if (price < MIN_PRICE || price > MAX_PRICE) {
+            throw new IllegalArgumentException(
+                    "価格は" + MIN_PRICE + "〜" + MAX_PRICE + "円の範囲で設定してください");
         }
     }
 

@@ -9,7 +9,7 @@ public record ProductRequest(
         @Size(max = 50, message = "商品名は50文字以内で入力してください")
         String name,
 
-        @Min(value = 0, message = "価格は0以上である必要があります")
+        @Min(value = 1, message = "価格は1〜999,999円の範囲で設定してください")
         int price,
 
         String description
