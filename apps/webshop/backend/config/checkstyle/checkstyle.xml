@@ -18,6 +18,7 @@
         <module name="NeedBraces"/>
         <module name="ParameterNumber">
             <property name="max" value="7"/>
+            <property name="tokens" value="METHOD_DEF"/>
         </module>
         <module name="CyclomaticComplexity">
             <property name="max" value="10"/>

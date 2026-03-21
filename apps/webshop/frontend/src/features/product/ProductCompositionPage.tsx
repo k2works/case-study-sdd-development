@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { productApi } from '../../lib/product-api'
 import { itemApi } from '../../lib/item-api'
-import type { Product, ProductComposition } from '../../types/product'
+import type { Product } from '../../types/product'
 import type { Item } from '../../types/item'
 
 export function ProductCompositionPage() {
