@@ -55,6 +55,7 @@
 | [初回セットアップレビュー](./review/webshop_initial_setup_review_20260320.md) | webshop 初期セットアップのコードレビュー |
 | [CI/CD パイプラインレビュー](./review/cicd_pipeline_review_20260320.md) | CI/CD パイプラインの運用レビュー |
 | [IT1 計画レビュー](./review/iteration_plan-1_review_20260321.md) | IT1 イテレーション計画のレビュー |
+| [IT2 実装レビュー](./review/it2_product_review_20260321.md) | IT2 商品管理機能のマルチパースペクティブレビュー |
 
 ### 開発 (`development/`)
 
@@ -64,6 +65,9 @@
 | [IT1 イテレーション計画](./development/iteration_plan-1.md) | 完了（11 SP / 102 テスト） |
 | [IT1 ふりかえり](./development/iteration_retrospective-1.md) | 作成済み |
 | [IT1 完了報告書](./development/iteration_report-1.md) | 作成済み |
+| [IT2 イテレーション計画](./development/iteration_plan-2.md) | 完了（11 SP / 170 テスト） |
+| [IT2 ふりかえり](./development/iteration_retrospective-2.md) | 作成済み |
+| [IT2 完了報告書](./development/iteration_report-2.md) | 作成済み |
 
 ### 運用 (`operation/`)
 

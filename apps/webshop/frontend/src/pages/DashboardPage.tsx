@@ -31,6 +31,22 @@ export function DashboardPage() {
             <div className="font-medium text-gray-900 group-hover:text-emerald-700">新しい単品を登録する</div>
             <div className="text-sm text-gray-500 mt-1">花材・資材を新規追加</div>
           </Link>
+          <Link
+            to="/products"
+            className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-emerald-200 transition-all no-underline group"
+          >
+            <div className="text-2xl mb-2">🌸</div>
+            <div className="font-medium text-gray-900 group-hover:text-emerald-700">商品管理</div>
+            <div className="text-sm text-gray-500 mt-1">花束の登録・構成管理</div>
+          </Link>
+          <Link
+            to="/catalog/products"
+            className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-emerald-200 transition-all no-underline group"
+          >
+            <div className="text-2xl mb-2">🛒</div>
+            <div className="font-medium text-gray-900 group-hover:text-emerald-700">商品カタログ</div>
+            <div className="text-sm text-gray-500 mt-1">販売中の花束を確認</div>
+          </Link>
         </div>
       </div>
     </div>

@@ -29,12 +29,20 @@ export function isDockerAvailable() {
 }
 
 /**
- * Java が利用可能か確認する
- * @returns {boolean} Java が利用可能なら true
+ * Java が利用可能かつプロジェクト要件（JDK 21）と互換性があるか確認する
+ * @returns {boolean} 互換性のある Java が利用可能なら true
  */
 export function isJavaAvailable() {
   try {
-    execSync('java -version', { stdio: 'ignore' });
+    const version = execSync('java -version 2>&1', { encoding: 'utf-8' });
+    const match = version.match(/version "(\d+)/);
+    if (match) {
+      const major = parseInt(match[1], 10);
+      // Gradle 8.12 supports up to Java 23; project requires JDK 21
+      if (major > 23) {
+        return false;
+      }
+    }
     return true;
   } catch {
     return false;

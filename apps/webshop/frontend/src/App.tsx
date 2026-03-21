@@ -8,6 +8,11 @@ import { AppLayout } from './components/layout/AppLayout'
 import { DashboardPage } from './pages/DashboardPage'
 import { ItemListPage } from './features/item/ItemListPage'
 import { ItemFormPage } from './features/item/ItemFormPage'
+import { ProductListPage } from './features/product/ProductListPage'
+import { ProductFormPage } from './features/product/ProductFormPage'
+import { ProductCompositionPage } from './features/product/ProductCompositionPage'
+import { ProductCatalogPage } from './features/product/ProductCatalogPage'
+import { ProductDetailPage } from './features/product/ProductDetailPage'
 import './App.css'
 
 const queryClient = new QueryClient()
@@ -36,6 +41,12 @@ function App() {
               <Route path="/items" element={<ItemListPage />} />
               <Route path="/items/new" element={<ItemFormPage />} />
               <Route path="/items/:id/edit" element={<ItemFormPage />} />
+              <Route path="/products" element={<ProductListPage />} />
+              <Route path="/products/new" element={<ProductFormPage />} />
+              <Route path="/products/:id/edit" element={<ProductFormPage />} />
+              <Route path="/products/:id/compositions" element={<ProductCompositionPage />} />
+              <Route path="/catalog/products" element={<ProductCatalogPage />} />
+              <Route path="/catalog/products/:id" element={<ProductDetailPage />} />
             </Route>
             <Route path="*" element={<DefaultRedirect />} />
           </Routes>
