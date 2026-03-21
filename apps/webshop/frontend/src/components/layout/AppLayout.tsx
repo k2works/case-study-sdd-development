@@ -25,8 +25,9 @@ export function AppLayout() {
 
   const role = user?.role ?? ''
 
-  const showItemManagement = role !== 'CUSTOMER'
-  const showProductManagement = role !== 'CUSTOMER'
+  const isCustomer = role === 'CUSTOMER'
+  const showItemManagement = !isCustomer
+  const showProductManagement = !isCustomer
   const showOrderManagement = role === 'OWNER' || role === 'ORDER_STAFF'
 
   return (
@@ -56,6 +57,11 @@ export function AppLayout() {
               <NavLink to="/catalog/products" className={navLinkClass}>
                 商品カタログ
               </NavLink>
+              {isCustomer && (
+                <NavLink to="/orders/my" className={navLinkClass}>
+                  注文履歴
+                </NavLink>
+              )}
               {showOrderManagement && (
                 <NavLink to="/admin/orders" className={navLinkClass}>
                   受注管理

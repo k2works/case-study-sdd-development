@@ -13,6 +13,7 @@ import { ProductFormPage } from './features/product/ProductFormPage'
 import { ProductCompositionPage } from './features/product/ProductCompositionPage'
 import { ProductCatalogPage } from './features/product/ProductCatalogPage'
 import { ProductDetailPage } from './features/product/ProductDetailPage'
+import { MyOrdersPage } from './features/order/MyOrdersPage'
 import { OrderFormPage } from './features/order/OrderFormPage'
 import { OrderConfirmPage } from './features/order/OrderConfirmPage'
 import { OrderCompletePage } from './features/order/OrderCompletePage'
@@ -52,6 +53,7 @@ function App() {
               <Route path="/products/:id/compositions" element={<ProductCompositionPage />} />
               <Route path="/catalog/products" element={<ProductCatalogPage />} />
               <Route path="/catalog/products/:id" element={<ProductDetailPage />} />
+              <Route path="/orders/my" element={<MyOrdersPage />} />
               <Route path="/orders/new/:productId" element={<OrderFormPage />} />
               <Route path="/orders/confirm" element={<OrderConfirmPage />} />
               <Route path="/orders/complete" element={<OrderCompletePage />} />
