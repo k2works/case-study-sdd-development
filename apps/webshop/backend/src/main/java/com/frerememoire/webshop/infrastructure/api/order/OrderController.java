@@ -1,6 +1,7 @@
 package com.frerememoire.webshop.infrastructure.api.order;
 
 import com.frerememoire.webshop.application.order.OrderQueryService;
+import com.frerememoire.webshop.application.order.PlaceOrderCommand;
 import com.frerememoire.webshop.application.order.PlaceOrderUseCase;
 import com.frerememoire.webshop.domain.auth.port.AuthUserRepository;
 import com.frerememoire.webshop.domain.order.Order;
@@ -37,10 +38,11 @@ public class OrderController {
     public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody OrderRequest request,
                                                      Authentication authentication) {
         Long userId = getUserId(authentication);
-        Order order = placeOrderUseCase.placeOrder(
+        PlaceOrderCommand command = new PlaceOrderCommand(
                 userId, request.productId(), request.deliveryDate(),
                 request.recipientName(), request.postalCode(), request.address(),
                 request.phone(), request.message());
+        Order order = placeOrderUseCase.placeOrder(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(OrderResponse.fromDomain(order));
     }
 

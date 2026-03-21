@@ -9,8 +9,6 @@ import com.frerememoire.webshop.domain.order.port.OrderRepository;
 import com.frerememoire.webshop.domain.product.port.ProductRepository;
 import com.frerememoire.webshop.domain.shared.EntityNotFoundException;
 
-import java.time.LocalDate;
-
 public class PlaceOrderUseCase {
 
     private final OrderRepository orderRepository;
@@ -28,22 +26,21 @@ public class PlaceOrderUseCase {
         this.productRepository = productRepository;
     }
 
-    public Order placeOrder(Long userId, Long productId, LocalDate deliveryDate,
-                            String recipientName, String postalCode, String address,
-                            String phone, String message) {
-        Customer customer = customerRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("得意先", userId));
+    public Order placeOrder(PlaceOrderCommand command) {
+        Customer customer = customerRepository.findByUserId(command.userId())
+                .orElseThrow(() -> new EntityNotFoundException("得意先", command.userId()));
 
-        if (!productRepository.existsById(productId)) {
-            throw new EntityNotFoundException("商品", productId);
+        if (!productRepository.existsById(command.productId())) {
+            throw new EntityNotFoundException("商品", command.productId());
         }
 
         DeliveryDestination destination = DeliveryDestination.create(
-                customer.getId(), recipientName, postalCode, address, phone);
+                customer.getId(), command.recipientName(), command.postalCode(),
+                command.address(), command.phone());
         destination = deliveryDestinationRepository.save(destination);
 
-        Order order = Order.create(customer.getId(), productId,
-                destination.getId(), deliveryDate, message);
+        Order order = Order.create(customer.getId(), command.productId(),
+                destination.getId(), command.deliveryDate(), command.message());
 
         return orderRepository.save(order);
     }

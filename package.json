@@ -60,7 +60,7 @@
   },
   "lint-staged": {
     "apps/webshop/backend/src/**/*.java": [
-      "bash ops/scripts/nix-java-exec.sh apps/webshop/backend ./gradlew checkstyleMain checkstyleTest"
+      "bash -c 'bash ops/scripts/nix-java-exec.sh apps/webshop/backend ./gradlew checkstyleMain checkstyleTest'"
     ],
     "apps/webshop/frontend/src/**/*.{ts,tsx}": [
       "bash -c 'cd apps/webshop/frontend && npx tsc --noEmit'"

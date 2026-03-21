@@ -72,8 +72,10 @@ class PlaceOrderUseCaseTest {
                     return order;
                 });
 
-        Order result = useCase.placeOrder(userId, productId, deliveryDate,
+        PlaceOrderCommand command = new PlaceOrderCommand(
+                userId, productId, deliveryDate,
                 recipientName, postalCode, address, phone, message);
+        Order result = useCase.placeOrder(command);
 
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getCustomerId()).isEqualTo(1L);
@@ -86,8 +88,9 @@ class PlaceOrderUseCaseTest {
     void 存在しない得意先の場合は例外が発生する() {
         when(customerRepository.findByUserId(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> useCase.placeOrder(99L, 1L,
-                LocalDate.now().plusDays(5), "氏名", "123", "住所", null, null))
+        PlaceOrderCommand cmd = new PlaceOrderCommand(99L, 1L,
+                LocalDate.now().plusDays(5), "氏名", "123", "住所", null, null);
+        assertThatThrownBy(() -> useCase.placeOrder(cmd))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("得意先");
     }
@@ -99,8 +102,9 @@ class PlaceOrderUseCaseTest {
         when(customerRepository.findByUserId(1L)).thenReturn(Optional.of(customer));
         when(productRepository.existsById(99L)).thenReturn(false);
 
-        assertThatThrownBy(() -> useCase.placeOrder(1L, 99L,
-                LocalDate.now().plusDays(5), "氏名", "123", "住所", null, null))
+        PlaceOrderCommand cmd = new PlaceOrderCommand(1L, 99L,
+                LocalDate.now().plusDays(5), "氏名", "123", "住所", null, null);
+        assertThatThrownBy(() -> useCase.placeOrder(cmd))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("商品");
     }
