@@ -17,9 +17,10 @@
     },
     {
       "name": "webshop-db",
-      "runtimeExecutable": "docker",
-      "runtimeArgs": ["compose", "-f", "apps/webshop/docker-compose.yml", "up", "-d", "db"],
-      "port": 5432
+      "runtimeExecutable": "/usr/local/bin/docker",
+      "runtimeArgs": ["compose", "-f", "apps/webshop/docker-compose.yml", "up", "db"],
+      "port": 5432,
+      "autoPort": false
     },
     {
       "name": "docs",
