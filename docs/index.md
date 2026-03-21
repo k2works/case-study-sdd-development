@@ -54,12 +54,14 @@
 | [統合レビュー](./review/integrated_review_20260320.md) | カテゴリ横断の統合分析 |
 | [初回セットアップレビュー](./review/webshop_initial_setup_review_20260320.md) | webshop 初期セットアップのコードレビュー |
 | [CI/CD パイプラインレビュー](./review/cicd_pipeline_review_20260320.md) | CI/CD パイプラインの運用レビュー |
+| [IT1 計画レビュー](./review/iteration_plan-1_review_20260321.md) | IT1 イテレーション計画のレビュー |
 
 ### 開発 (`development/`)
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| [リリース計画](./development/release_plan.md) | 未着手 |
+| [リリース計画](./development/release_plan.md) | 作成済み |
+| [IT1 イテレーション計画](./development/iteration_plan-1.md) | 完了（11 SP / 102 テスト） |
 
 ### 運用 (`operation/`)
 
