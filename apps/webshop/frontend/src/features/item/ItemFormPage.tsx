@@ -5,6 +5,9 @@ import { useState, useEffect } from 'react'
 import { itemApi } from '../../lib/item-api'
 import type { ItemRequest, Item } from '../../types/item'
 
+const inputClass =
+  'w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors'
+
 export function ItemFormPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -74,83 +77,101 @@ export function ItemFormPage() {
   }
 
   return (
-    <div className="item-form-page">
-      <h2>{isEdit ? '単品編集' : '単品登録'}</h2>
-      {error && <p className="error-message" role="alert">{error}</p>}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="form-group">
-          <label htmlFor="name">商品名</label>
-          <input
-            id="name"
-            type="text"
-            {...register('name', { required: '商品名は必須です' })}
-          />
-          {errors.name && (
-            <span className="field-error">{errors.name.message}</span>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="shelfLifeDays">品質保持日数</label>
-          <input
-            id="shelfLifeDays"
-            type="number"
-            {...register('shelfLifeDays', {
-              required: '品質保持日数は必須です',
-              min: { value: 1, message: '1以上を入力してください' },
-            })}
-          />
-          {errors.shelfLifeDays && (
-            <span className="field-error">{errors.shelfLifeDays.message}</span>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="purchaseUnit">発注単位</label>
-          <input
-            id="purchaseUnit"
-            type="number"
-            {...register('purchaseUnit', {
-              required: '発注単位は必須です',
-              min: { value: 1, message: '1以上を入力してください' },
-            })}
-          />
-          {errors.purchaseUnit && (
-            <span className="field-error">{errors.purchaseUnit.message}</span>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="leadTimeDays">リードタイム（日）</label>
-          <input
-            id="leadTimeDays"
-            type="number"
-            {...register('leadTimeDays', {
-              required: 'リードタイムは必須です',
-              min: { value: 1, message: '1以上を入力してください' },
-            })}
-          />
-          {errors.leadTimeDays && (
-            <span className="field-error">{errors.leadTimeDays.message}</span>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="supplierName">仕入先名</label>
-          <input
-            id="supplierName"
-            type="text"
-            {...register('supplierName', { required: '仕入先名は必須です' })}
-          />
-          {errors.supplierName && (
-            <span className="field-error">{errors.supplierName.message}</span>
-          )}
-        </div>
-        <div className="form-actions">
-          <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? '保存中...' : '保存'}
-          </button>
-          <button type="button" onClick={() => navigate('/items')}>
-            キャンセル
-          </button>
-        </div>
-      </form>
+    <div className="max-w-2xl mx-auto">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+        {isEdit ? '単品編集' : '単品登録'}
+      </h2>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-6" role="alert">
+            {error}
+          </div>
+        )}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              商品名
+            </label>
+            <input id="name" type="text" className={inputClass} placeholder="バラ（赤）"
+              {...register('name', { required: '商品名は必須です' })}
+            />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+            )}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label htmlFor="shelfLifeDays" className="block text-sm font-medium text-gray-700 mb-1">
+                品質保持日数
+              </label>
+              <input id="shelfLifeDays" type="number" className={inputClass} placeholder="7"
+                {...register('shelfLifeDays', {
+                  required: '品質保持日数は必須です',
+                  min: { value: 1, message: '1以上を入力してください' },
+                })}
+              />
+              {errors.shelfLifeDays && (
+                <p className="text-red-500 text-sm mt-1">{errors.shelfLifeDays.message}</p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="purchaseUnit" className="block text-sm font-medium text-gray-700 mb-1">
+                発注単位
+              </label>
+              <input id="purchaseUnit" type="number" className={inputClass} placeholder="10"
+                {...register('purchaseUnit', {
+                  required: '発注単位は必須です',
+                  min: { value: 1, message: '1以上を入力してください' },
+                })}
+              />
+              {errors.purchaseUnit && (
+                <p className="text-red-500 text-sm mt-1">{errors.purchaseUnit.message}</p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="leadTimeDays" className="block text-sm font-medium text-gray-700 mb-1">
+                リードタイム（日）
+              </label>
+              <input id="leadTimeDays" type="number" className={inputClass} placeholder="3"
+                {...register('leadTimeDays', {
+                  required: 'リードタイムは必須です',
+                  min: { value: 1, message: '1以上を入力してください' },
+                })}
+              />
+              {errors.leadTimeDays && (
+                <p className="text-red-500 text-sm mt-1">{errors.leadTimeDays.message}</p>
+              )}
+            </div>
+          </div>
+          <div>
+            <label htmlFor="supplierName" className="block text-sm font-medium text-gray-700 mb-1">
+              仕入先名
+            </label>
+            <input id="supplierName" type="text" className={inputClass} placeholder="花卸問屋A"
+              {...register('supplierName', { required: '仕入先名は必須です' })}
+            />
+            {errors.supplierName && (
+              <p className="text-red-500 text-sm mt-1">{errors.supplierName.message}</p>
+            )}
+          </div>
+          <div className="flex gap-3 pt-4">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-emerald-600 text-white font-medium rounded-lg px-6 py-3 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? '保存中...' : '保存'}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/items')}
+              className="bg-white text-gray-700 font-medium rounded-lg px-6 py-3 border border-gray-300 hover:bg-gray-50 transition-colors"
+            >
+              キャンセル
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }
