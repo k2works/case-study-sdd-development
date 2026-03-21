@@ -15,6 +15,17 @@ public class DeliveryDate {
         this.value = value;
     }
 
+    private DeliveryDate(LocalDate value, boolean skipValidation) {
+        this.value = value;
+    }
+
+    /**
+     * DB からの復元用。バリデーションをスキップする。
+     */
+    public static DeliveryDate reconstruct(LocalDate value) {
+        return new DeliveryDate(value, true);
+    }
+
     private void validate(LocalDate value) {
         if (value == null) {
             throw new IllegalArgumentException("届け日は必須です");
