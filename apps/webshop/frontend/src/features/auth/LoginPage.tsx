@@ -15,12 +15,19 @@ export function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoginRequest>({
     defaultValues: isDev
-      ? { email: 'dev@example.com', password: 'Password1' }
+      ? { email: 'customer@example.com', password: 'Password1' }
       : undefined,
   })
+
+  const devAccounts = [
+    { label: '得意先', email: 'customer@example.com' },
+    { label: 'オーナー', email: 'dev@example.com' },
+    { label: '受注スタッフ', email: 'staff@example.com' },
+  ]
 
   const onSubmit = async (data: LoginRequest) => {
     try {
@@ -102,6 +109,26 @@ export function LoginPage() {
               新規登録はこちら
             </Link>
           </p>
+          {isDev && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <p className="text-xs text-gray-400 mb-2 text-center">開発用アカウント切り替え</p>
+              <div className="flex gap-2">
+                {devAccounts.map((acc) => (
+                  <button
+                    key={acc.email}
+                    type="button"
+                    onClick={() => {
+                      setValue('email', acc.email)
+                      setValue('password', 'Password1')
+                    }}
+                    className="flex-1 text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 hover:bg-gray-50 transition-colors"
+                  >
+                    {acc.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
