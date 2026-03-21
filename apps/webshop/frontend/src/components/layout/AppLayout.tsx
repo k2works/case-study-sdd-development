@@ -40,6 +40,12 @@ export function AppLayout() {
               <NavLink to="/items" className={navLinkClass}>
                 単品管理
               </NavLink>
+              <NavLink to="/products" className={navLinkClass}>
+                商品管理
+              </NavLink>
+              <NavLink to="/catalog/products" className={navLinkClass}>
+                商品カタログ
+              </NavLink>
             </nav>
             <div className="flex items-center gap-4">
               <span className="text-sm text-emerald-100">
