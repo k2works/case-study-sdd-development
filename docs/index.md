@@ -68,6 +68,7 @@
 | [IT2 イテレーション計画](./development/iteration_plan-2.md) | 完了（11 SP / 170 テスト） |
 | [IT2 ふりかえり](./development/iteration_retrospective-2.md) | 作成済み |
 | [IT2 完了報告書](./development/iteration_report-2.md) | 作成済み |
+| [IT3 イテレーション計画](./development/iteration_plan-3.md) | 計画済み |
 
 ### 運用 (`operation/`)
 
