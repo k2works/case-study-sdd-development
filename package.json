@@ -27,7 +27,8 @@
     "tdd:webshop:backend": "gulp tdd:webshop:backend",
     "tdd:webshop:frontend": "gulp tdd:webshop:frontend",
     "dev:help": "gulp dev:help",
-    "setup:webshop": "gulp setup:webshop"
+    "setup:webshop": "gulp setup:webshop",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -49,5 +50,17 @@
     "@k2works/claude-code-booster": "^2.7.1",
     "dotenv": "^17.2.3",
     "gulp": "^5.0.0"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0"
+  },
+  "lint-staged": {
+    "apps/webshop/backend/src/**/*.java": [
+      "bash ops/scripts/nix-java-exec.sh apps/webshop/backend ./gradlew checkstyleMain checkstyleTest"
+    ],
+    "apps/webshop/frontend/src/**/*.{ts,tsx}": [
+      "bash -c 'cd apps/webshop/frontend && npx tsc --noEmit'"
+    ]
   }
 }
