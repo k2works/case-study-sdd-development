@@ -93,18 +93,18 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 1.1 | Order エンティティ（OrderId, OrderStatus, DeliveryDate, Message）の TDD 実装。DeliveryDate は境界値テスト必須（当日=NG、翌日=OK、30日後=OK、31日後=NG、過去日=NG、null=NG）。Message は 200 文字上限テスト必須（0文字=OK、200文字=OK、201文字=NG、null=OK） | 3h | - | [ ] |
-| 1.2 | DeliveryDestination エンティティ（id, customerId, recipientName, postalCode, address, phone）の TDD 実装 | 1.5h | - | [ ] |
-| 1.3 | Customer エンティティ（userId との紐づけ）の TDD 実装 | 1.5h | - | [ ] |
-| 1.4 | OrderRepository / CustomerRepository / DeliveryDestinationRepository ポートインターフェース定義 | 1h | - | [ ] |
-| 1.5 | PlaceOrderUseCase（注文作成）+ OrderQueryService（一覧取得）の TDD 実装。得意先とスタッフで責務を分離 | 3h | - | [ ] |
-| 1.6 | Flyway V5__create_customers_and_orders.sql マイグレーション（customers, delivery_destinations, orders テーブル作成） | 1.5h | - | [ ] |
-| 1.7 | JPA エンティティ・リポジトリインフラ層実装（OrderEntity, CustomerEntity, DeliveryDestinationEntity） | 3h | - | [ ] |
-| 1.8 | OrderController REST API 実装（POST /orders, GET /orders, GET /orders/{id}, PUT /orders/{id}/status） | 3h | - | [ ] |
-| 1.9 | 注文画面（S-005: OrderFormPage）フロントエンド実装。「商品詳細に戻る」導線、カレンダーピッカー（在庫不足日の無効化）、スケルトンローディングを含む | 3.5h | - | [ ] |
-| 1.10 | 注文確認画面（S-006: OrderConfirmPage）フロントエンド実装。「注文を確定」ボタンの二重送信防止（disabled + スピナー）を含む | 2h | - | [ ] |
-| 1.11 | 注文完了画面（S-007: OrderCompletePage）フロントエンド実装 | 1h | - | [ ] |
-| 1.12 | order-api.ts API クライアント作成 | 1h | - | [ ] |
+| 1.1 | Order エンティティ（OrderId, OrderStatus, DeliveryDate, Message）の TDD 実装。DeliveryDate は境界値テスト必須（当日=NG、翌日=OK、30日後=OK、31日後=NG、過去日=NG、null=NG）。Message は 200 文字上限テスト必須（0文字=OK、200文字=OK、201文字=NG、null=OK） | 3h | - | [x] |
+| 1.2 | DeliveryDestination エンティティ（id, customerId, recipientName, postalCode, address, phone）の TDD 実装 | 1.5h | - | [x] |
+| 1.3 | Customer エンティティ（userId との紐づけ）の TDD 実装 | 1.5h | - | [x] |
+| 1.4 | OrderRepository / CustomerRepository / DeliveryDestinationRepository ポートインターフェース定義 | 1h | - | [x] |
+| 1.5 | PlaceOrderUseCase（注文作成）+ OrderQueryService（一覧取得）の TDD 実装。得意先とスタッフで責務を分離 | 3h | - | [x] |
+| 1.6 | Flyway V5__create_customers_and_orders.sql マイグレーション（customers, delivery_destinations, orders テーブル作成） | 1.5h | - | [x] |
+| 1.7 | JPA エンティティ・リポジトリインフラ層実装（OrderEntity, CustomerEntity, DeliveryDestinationEntity） | 3h | - | [x] |
+| 1.8 | OrderController REST API 実装（POST /orders, GET /orders, GET /orders/{id}, PUT /orders/{id}/status） | 3h | - | [x] |
+| 1.9 | 注文画面（S-005: OrderFormPage）フロントエンド実装。「商品詳細に戻る」導線、カレンダーピッカー（在庫不足日の無効化）、スケルトンローディングを含む | 3.5h | - | [x] |
+| 1.10 | 注文確認画面（S-006: OrderConfirmPage）フロントエンド実装。「注文を確定」ボタンの二重送信防止（disabled + スピナー）を含む | 2h | - | [x] |
+| 1.11 | 注文完了画面（S-007: OrderCompletePage）フロントエンド実装 | 1h | - | [x] |
+| 1.12 | order-api.ts API クライアント作成 | 1h | - | [x] |
 
 **小計**: 26h（理想時間）
 
@@ -112,11 +112,11 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 2.1 | 受注一覧 API（ステータス・期間フィルタ対応）の実装 | 2h | - | [ ] |
-| 2.2 | 受注詳細 API（得意先・届け先・商品情報を含む）の実装 | 1.5h | - | [ ] |
-| 2.3 | 受注一覧画面（S-101: OrderListPage）フロントエンド実装。6 状態ステータスフィルタ（届け完了・キャンセル含む）、チェックボックス一括受付、空状態表示、スケルトンローディングを含む | 4h | - | [ ] |
-| 2.4 | 受注詳細画面（S-102: OrderDetailPage）フロントエンド実装。アクションボタン二重送信防止を含む | 2h | - | [ ] |
-| 2.5 | order-admin-api.ts 管理用 API クライアント作成（一括受付 API 含む） | 1.5h | - | [ ] |
+| 2.1 | 受注一覧 API（ステータス・期間フィルタ対応）の実装 | 2h | - | [x] |
+| 2.2 | 受注詳細 API（得意先・届け先・商品情報を含む）の実装 | 1.5h | - | [x] |
+| 2.3 | 受注一覧画面（S-101: OrderListPage）フロントエンド実装。6 状態ステータスフィルタ（届け完了・キャンセル含む）、チェックボックス一括受付、空状態表示、スケルトンローディングを含む | 4h | - | [x] |
+| 2.4 | 受注詳細画面（S-102: OrderDetailPage）フロントエンド実装。アクションボタン二重送信防止を含む | 2h | - | [x] |
+| 2.5 | order-admin-api.ts 管理用 API クライアント作成（一括受付 API 含む） | 1.5h | - | [x] |
 
 **小計**: 11h（理想時間）
 
@@ -124,10 +124,10 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 3.1 | OrderStatus enum を全 6 状態（ORDERED, ACCEPTED, PREPARING, SHIPPED, DELIVERED, CANCELLED）で定義し、IT3 では ordered → accepted の遷移テストを実装。未実装遷移は IllegalStateException で防御 | 1.5h | - | [ ] |
-| 3.2 | ステータス更新 API の実装（PUT /api/v1/admin/orders/{id}/accept） | 1h | - | [ ] |
-| 3.3 | 受注詳細画面にステータス更新ボタン追加 | 1h | - | [ ] |
-| 3.4 | E2E テスト（注文→受注一覧→受付済み更新のフロー） | 2.5h | - | [ ] |
+| 3.1 | OrderStatus enum を全 6 状態（ORDERED, ACCEPTED, PREPARING, SHIPPED, DELIVERED, CANCELLED）で定義し、IT3 では ordered → accepted の遷移テストを実装。未実装遷移は IllegalStateException で防御 | 1.5h | - | [x] |
+| 3.2 | ステータス更新 API の実装（PUT /api/v1/admin/orders/{id}/accept） | 1h | - | [x] |
+| 3.3 | 受注詳細画面にステータス更新ボタン追加 | 1h | - | [x] |
+| 3.4 | E2E テスト（注文→受注一覧→受付済み更新のフロー） | 2.5h | - | [x] |
 
 **小計**: 6h（理想時間）
 
@@ -135,7 +135,7 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 4.1 | ロール別メニュー制御（AppLayout.tsx）。UI 設計のロール別表示制御マトリックスに基づき、得意先は顧客向けヘッダー、スタッフはロール別に管理画面メニューの表示/非表示を制御する（IT2-L-1 + UI/UX-M-1） | 2.5h | - | [ ] |
+| 4.1 | ロール別メニュー制御（AppLayout.tsx）。UI 設計のロール別表示制御マトリックスに基づき、得意先は顧客向けヘッダー、スタッフはロール別に管理画面メニューの表示/非表示を制御する（IT2-L-1 + UI/UX-M-1） | 2.5h | - | [x] |
 | 4.2 | 商品カタログ画面（ProductCatalogPage.tsx）に商品画像プレースホルダーエリアを追加（UI/UX-H-1） | 1h | - | [ ] |
 | 4.3 | 商品詳細画面（ProductDetailPage.tsx）を画像左 + 情報右の 2 カラムレイアウトに変更。Mobile では 1 カラムに切り替え（UI/UX-H-5） | 1.5h | - | [ ] |
 | 4.4 | ダッシュボード画面（DashboardPage.tsx）に業務サマリカード（本日の受注件数・在庫アラート・出荷予定）を追加（UI/UX-M-7）。受注・在庫 API 実装後に接続 | 2h | - | [ ] |
@@ -146,9 +146,9 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 5.1 | 統合テスト（OrderRepository CRUD + OrderController API エンドポイント） | 2h | - | [ ] |
-| 5.2 | 認可テスト（得意先→管理 API 403、スタッフ→得意先 API、未認証 401、データ分離） | 2h | - | [ ] |
-| 5.3 | フロントエンドコンポーネントテスト（OrderFormPage バリデーション、OrderListPage フィルタ） | 2h | - | [ ] |
+| 5.1 | 統合テスト（OrderRepository CRUD + OrderController API エンドポイント） | 2h | - | [x] |
+| 5.2 | 認可テスト（得意先→管理 API 403、スタッフ→得意先 API、未認証 401、データ分離） | 2h | - | [x] |
+| 5.3 | フロントエンドコンポーネントテスト（OrderFormPage バリデーション、OrderListPage フィルタ） | 2h | - | [x] |
 
 **小計**: 6h（理想時間）
 
@@ -159,7 +159,7 @@
 | 受注ドメイン・バックエンド・フロントエンド（US-005） | 8 | 26h | [x] |
 | 受注一覧・詳細（US-006） | 3 | 11h | [x] |
 | 受注ステータス更新（US-007） | 2 | 6h | [x] |
-| レビュー指摘対応（SP 外） | - | 7h | [x] |
+| レビュー指摘対応（SP 外） | - | 7h | 4.1[x] 4.2[ ] 4.3[ ] 4.4[ ] |
 | テスト（SP 外） | - | 6h | [x] |
 | **合計** | **13** | **56h** | |
 
