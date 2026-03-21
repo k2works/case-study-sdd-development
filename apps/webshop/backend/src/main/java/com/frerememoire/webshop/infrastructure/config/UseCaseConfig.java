@@ -3,9 +3,11 @@ package com.frerememoire.webshop.infrastructure.config;
 import com.frerememoire.webshop.application.auth.AuthenticationUseCase;
 import com.frerememoire.webshop.application.auth.RegistrationUseCase;
 import com.frerememoire.webshop.application.item.ItemUseCase;
+import com.frerememoire.webshop.application.product.ProductUseCase;
 import com.frerememoire.webshop.domain.auth.PasswordEncoder;
 import com.frerememoire.webshop.domain.auth.port.AuthUserRepository;
 import com.frerememoire.webshop.domain.item.port.ItemRepository;
+import com.frerememoire.webshop.domain.product.port.ProductRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,5 +31,10 @@ public class UseCaseConfig {
     @Bean
     public ItemUseCase itemUseCase(ItemRepository itemRepository) {
         return new ItemUseCase(itemRepository);
+    }
+
+    @Bean
+    public ProductUseCase productUseCase(ProductRepository productRepository) {
+        return new ProductUseCase(productRepository);
     }
 }
