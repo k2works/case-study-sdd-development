@@ -10,11 +10,17 @@ export function LoginPage() {
   const { login } = useAuth()
   const [error, setError] = useState<string | null>(null)
 
+  const isDev = import.meta.env.MODE === 'development'
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginRequest>()
+  } = useForm<LoginRequest>({
+    defaultValues: isDev
+      ? { email: 'dev@example.com', password: 'Password1' }
+      : undefined,
+  })
 
   const onSubmit = async (data: LoginRequest) => {
     try {
