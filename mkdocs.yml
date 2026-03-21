@@ -1,4 +1,4 @@
-site_name: ケーススタディ SDD 開発
+site_name: 花束問題のケーススタディ
 site_description: 仕様駆動開発（SDD）のケーススタディ
 site_author: Project Team
 repo_url: https://github.com/k2works/case-study-sdd-development
@@ -93,14 +93,19 @@ nav:
       - 統合レビュー: review/integrated_review_20260320.md
       - 初回セットアップレビュー: review/webshop_initial_setup_review_20260320.md
       - CI/CD パイプラインレビュー: review/cicd_pipeline_review_20260320.md
+      - IT1 計画レビュー: review/iteration_plan-1_review_20260321.md
   - 開発:
       - 概要: development/index.md
       - リリース計画: development/release_plan.md
+      - イテレーション 1 計画: development/iteration_plan-1.md
+      - イテレーション 1 ふりかえり: development/iteration_retrospective-1.md
+      - イテレーション 1 完了報告書: development/iteration_report-1.md
   - 運用:
       - 概要: operation/index.md
       - アプリケーション開発環境セットアップ: operation/app-development-setup.md
       - 開発スクリプトリファレンス: operation/develop-script.md
       - CI/CD パイプライン設計: operation/cicd-pipeline.md
+      - Heroku 開発環境セットアップ: operation/heroku-dev-setup.md
   - リファレンス:
       - 概要: reference/index.md
       - よいソフトウェアとは: reference/よいソフトウェアとは.md

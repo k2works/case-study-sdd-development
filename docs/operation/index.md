@@ -16,6 +16,10 @@
 
 - [CI/CD パイプライン設計](./cicd-pipeline.md) - GitHub Actions による CI/CD パイプラインの設計と設定
 
+### デプロイ
+
+- [Heroku 開発環境セットアップ手順書](./heroku-dev-setup.md) - Heroku Container Registry によるデモ環境のデプロイ手順
+
 ### インフラ
 
 インフラ構成の一覧を追加予定です。
