@@ -23,6 +23,18 @@ const STATUS_LABELS: Record<string, string> = {
   CANCELLED: 'キャンセル',
 }
 
+function getStatusColor(status: string): string {
+  switch (status) {
+    case 'ORDERED': return 'bg-red-100 text-red-700'
+    case 'ACCEPTED': return 'bg-blue-100 text-blue-700'
+    case 'PREPARING': return 'bg-yellow-100 text-yellow-700'
+    case 'SHIPPED': return 'bg-purple-100 text-purple-700'
+    case 'DELIVERED': return 'bg-green-100 text-green-700'
+    case 'CANCELLED': return 'bg-gray-100 text-gray-500'
+    default: return 'bg-gray-100 text-gray-700'
+  }
+}
+
 export function OrderListPage() {
   const queryClient = useQueryClient()
   const [statusFilter, setStatusFilter] = useState('')
@@ -176,9 +188,9 @@ export function OrderListPage() {
                     aria-label="すべて選択"
                   />
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">注文 ID</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">商品 ID</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">顧客 ID</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">注文番号</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">商品名</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">得意先</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">配達日</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ステータス</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">操作</th>
@@ -200,12 +212,12 @@ export function OrderListPage() {
                       <span className="w-4 inline-block" />
                     )}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{order.id}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{order.productId}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{order.customerId}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">ORD-{String(order.id).padStart(3, '0')}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{order.productName ?? `商品#${order.productId}`}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{order.customerName ?? `顧客#${order.customerId}`}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{order.deliveryDate}</td>
                   <td className="px-4 py-3">
-                    <span className="inline-block text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                    <span className={`inline-block text-xs font-medium px-2.5 py-0.5 rounded-full ${getStatusColor(order.status)}`}>
                       {STATUS_LABELS[order.status] ?? order.status}
                     </span>
                   </td>

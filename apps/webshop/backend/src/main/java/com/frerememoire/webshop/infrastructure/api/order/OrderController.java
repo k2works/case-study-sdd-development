@@ -3,7 +3,6 @@ package com.frerememoire.webshop.infrastructure.api.order;
 import com.frerememoire.webshop.application.order.OrderQueryService;
 import com.frerememoire.webshop.application.order.PlaceOrderUseCase;
 import com.frerememoire.webshop.domain.auth.port.AuthUserRepository;
-import com.frerememoire.webshop.domain.customer.port.CustomerRepository;
 import com.frerememoire.webshop.domain.order.Order;
 import com.frerememoire.webshop.domain.shared.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -25,16 +24,13 @@ public class OrderController {
     private final PlaceOrderUseCase placeOrderUseCase;
     private final OrderQueryService orderQueryService;
     private final AuthUserRepository authUserRepository;
-    private final CustomerRepository customerRepository;
 
     public OrderController(PlaceOrderUseCase placeOrderUseCase,
                            OrderQueryService orderQueryService,
-                           AuthUserRepository authUserRepository,
-                           CustomerRepository customerRepository) {
+                           AuthUserRepository authUserRepository) {
         this.placeOrderUseCase = placeOrderUseCase;
         this.orderQueryService = orderQueryService;
         this.authUserRepository = authUserRepository;
-        this.customerRepository = customerRepository;
     }
 
     @PostMapping
@@ -51,9 +47,7 @@ public class OrderController {
     @GetMapping("/my")
     public ResponseEntity<List<OrderResponse>> getMyOrders(Authentication authentication) {
         Long userId = getUserId(authentication);
-        var customer = customerRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("得意先", userId));
-        List<OrderResponse> orders = orderQueryService.findByCustomerId(customer.getId()).stream()
+        List<OrderResponse> orders = orderQueryService.findByUserId(userId).stream()
                 .map(OrderResponse::fromDomain)
                 .toList();
         return ResponseEntity.ok(orders);

@@ -4,6 +4,7 @@ import com.frerememoire.webshop.domain.order.Order;
 import com.frerememoire.webshop.domain.order.OrderStatus;
 import com.frerememoire.webshop.domain.order.port.OrderRepository;
 import com.frerememoire.webshop.domain.shared.EntityNotFoundException;
+import com.frerememoire.webshop.application.order.dto.DashboardSummary;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,9 +12,12 @@ import java.util.List;
 public class OrderQueryService {
 
     private final OrderRepository orderRepository;
+    private final com.frerememoire.webshop.domain.customer.port.CustomerRepository customerRepository;
 
-    public OrderQueryService(OrderRepository orderRepository) {
+    public OrderQueryService(OrderRepository orderRepository,
+                              com.frerememoire.webshop.domain.customer.port.CustomerRepository customerRepository) {
         this.orderRepository = orderRepository;
+        this.customerRepository = customerRepository;
     }
 
     public List<Order> findAll() {
@@ -27,6 +31,12 @@ public class OrderQueryService {
 
     public List<Order> findByCustomerId(Long customerId) {
         return orderRepository.findByCustomerId(customerId);
+    }
+
+    public List<Order> findByUserId(Long userId) {
+        var customer = customerRepository.findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("得意先", userId));
+        return orderRepository.findByCustomerId(customer.getId());
     }
 
     public List<Order> findByStatusAndDateRange(OrderStatus status, LocalDate from, LocalDate to) {
@@ -46,5 +56,14 @@ public class OrderQueryService {
         return orderIds.stream()
                 .map(this::acceptOrder)
                 .toList();
+    }
+
+    public DashboardSummary getDashboardSummary() {
+        List<Order> allOrders = orderRepository.findAll();
+        long orderedCount = allOrders.stream()
+                .filter(o -> o.getStatus() == OrderStatus.ORDERED).count();
+        long acceptedCount = allOrders.stream()
+                .filter(o -> o.getStatus() == OrderStatus.ACCEPTED).count();
+        return new DashboardSummary(allOrders.size(), orderedCount, acceptedCount);
     }
 }

@@ -4,6 +4,7 @@ import com.frerememoire.webshop.domain.order.DeliveryDate;
 import com.frerememoire.webshop.domain.order.Message;
 import com.frerememoire.webshop.domain.order.Order;
 import com.frerememoire.webshop.domain.order.OrderStatus;
+import com.frerememoire.webshop.domain.customer.port.CustomerRepository;
 import com.frerememoire.webshop.domain.order.port.OrderRepository;
 import com.frerememoire.webshop.domain.shared.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,12 +28,14 @@ class OrderQueryServiceTest {
 
     @Mock
     private OrderRepository orderRepository;
+    @Mock
+    private CustomerRepository customerRepository;
 
     private OrderQueryService service;
 
     @BeforeEach
     void setUp() {
-        service = new OrderQueryService(orderRepository);
+        service = new OrderQueryService(orderRepository, customerRepository);
     }
 
     private Order createTestOrder(Long id, OrderStatus status) {
@@ -108,5 +111,42 @@ class OrderQueryServiceTest {
         List<Order> result = service.findByStatusAndDateRange(OrderStatus.ORDERED, from, to);
 
         assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void ステータスがnullの場合は期間のみで受注を検索できる() {
+        LocalDate from = LocalDate.now();
+        LocalDate to = LocalDate.now().plusDays(30);
+        List<Order> orders = List.of(createTestOrder(1L, OrderStatus.ORDERED));
+        when(orderRepository.findByDateRange(from, to)).thenReturn(orders);
+
+        List<Order> result = service.findByStatusAndDateRange(null, from, to);
+
+        assertThat(result).hasSize(1);
+        verify(orderRepository).findByDateRange(from, to);
+    }
+
+    @Test
+    void 複数の注文を一括で受付済みにできる() {
+        Order order1 = createTestOrder(1L, OrderStatus.ORDERED);
+        Order order2 = createTestOrder(2L, OrderStatus.ORDERED);
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order1));
+        when(orderRepository.findById(2L)).thenReturn(Optional.of(order2));
+        when(orderRepository.save(order1)).thenReturn(order1);
+        when(orderRepository.save(order2)).thenReturn(order2);
+
+        List<Order> result = service.bulkAcceptOrders(List.of(1L, 2L));
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        assertThat(result.get(1).getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
+    @Test
+    void 一括受付で存在しない注文IDが含まれる場合は例外が発生する() {
+        when(orderRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.bulkAcceptOrders(List.of(99L)))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 }

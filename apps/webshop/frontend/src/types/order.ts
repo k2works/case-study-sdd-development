@@ -8,6 +8,10 @@ export interface OrderResponse {
   status: string
   orderedAt: string
   updatedAt: string
+  productName: string | null
+  customerName: string | null
+  recipientName: string | null
+  deliveryAddress: string | null
 }
 
 export interface OrderRequest {

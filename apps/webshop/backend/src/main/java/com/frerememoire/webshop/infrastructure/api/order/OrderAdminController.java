@@ -1,8 +1,14 @@
 package com.frerememoire.webshop.infrastructure.api.order;
 
 import com.frerememoire.webshop.application.order.OrderQueryService;
+import com.frerememoire.webshop.domain.customer.Customer;
+import com.frerememoire.webshop.domain.customer.DeliveryDestination;
+import com.frerememoire.webshop.domain.customer.port.CustomerRepository;
+import com.frerememoire.webshop.domain.customer.port.DeliveryDestinationRepository;
 import com.frerememoire.webshop.domain.order.Order;
 import com.frerememoire.webshop.domain.order.OrderStatus;
+import com.frerememoire.webshop.domain.product.Product;
+import com.frerememoire.webshop.domain.product.port.ProductRepository;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -16,16 +22,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin/orders")
 public class OrderAdminController {
 
     private final OrderQueryService orderQueryService;
+    private final ProductRepository productRepository;
+    private final CustomerRepository customerRepository;
+    private final DeliveryDestinationRepository deliveryDestinationRepository;
 
-    public OrderAdminController(OrderQueryService orderQueryService) {
+    public OrderAdminController(OrderQueryService orderQueryService,
+                                 ProductRepository productRepository,
+                                 CustomerRepository customerRepository,
+                                 DeliveryDestinationRepository deliveryDestinationRepository) {
         this.orderQueryService = orderQueryService;
+        this.productRepository = productRepository;
+        this.customerRepository = customerRepository;
+        this.deliveryDestinationRepository = deliveryDestinationRepository;
     }
 
     @GetMapping
@@ -40,7 +54,7 @@ public class OrderAdminController {
             orders = orderQueryService.findAll();
         }
         List<OrderResponse> response = orders.stream()
-                .map(OrderResponse::fromDomain)
+                .map(this::toResponseWithDetails)
                 .toList();
         return ResponseEntity.ok(response);
     }
@@ -48,13 +62,13 @@ public class OrderAdminController {
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> findById(@PathVariable Long id) {
         Order order = orderQueryService.findById(id);
-        return ResponseEntity.ok(OrderResponse.fromDomain(order));
+        return ResponseEntity.ok(toResponseWithDetails(order));
     }
 
     @PutMapping("/{id}/accept")
     public ResponseEntity<OrderResponse> acceptOrder(@PathVariable Long id) {
         Order order = orderQueryService.acceptOrder(id);
-        return ResponseEntity.ok(OrderResponse.fromDomain(order));
+        return ResponseEntity.ok(toResponseWithDetails(order));
     }
 
     @PutMapping("/bulk-accept")
@@ -62,24 +76,34 @@ public class OrderAdminController {
             @Valid @RequestBody BulkAcceptRequest request) {
         List<Order> orders = orderQueryService.bulkAcceptOrders(request.orderIds());
         List<OrderResponse> response = orders.stream()
-                .map(OrderResponse::fromDomain)
+                .map(this::toResponseWithDetails)
                 .toList();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/dashboard/summary")
-    public ResponseEntity<Map<String, Object>> getDashboardSummary() {
-        List<Order> allOrders = orderQueryService.findAll();
-        long orderedCount = allOrders.stream()
-                .filter(o -> o.getStatus() == OrderStatus.ORDERED).count();
-        long acceptedCount = allOrders.stream()
-                .filter(o -> o.getStatus() == OrderStatus.ACCEPTED).count();
-        long totalCount = allOrders.size();
+    public ResponseEntity<DashboardSummaryResponse> getDashboardSummary() {
+        var summary = orderQueryService.getDashboardSummary();
+        return ResponseEntity.ok(new DashboardSummaryResponse(
+                summary.totalOrders(), summary.orderedCount(), summary.acceptedCount()));
+    }
 
-        return ResponseEntity.ok(Map.of(
-                "totalOrders", totalCount,
-                "orderedCount", orderedCount,
-                "acceptedCount", acceptedCount
-        ));
+    private OrderResponse toResponseWithDetails(Order order) {
+        String productName = productRepository.findById(order.getProductId())
+                .map(Product::getName)
+                .orElse("不明");
+        String customerName = customerRepository.findById(order.getCustomerId())
+                .map(Customer::getName)
+                .orElse("不明");
+        String recipientName = null;
+        String deliveryAddress = null;
+        var dest = deliveryDestinationRepository.findById(order.getDeliveryDestinationId());
+        if (dest.isPresent()) {
+            DeliveryDestination d = dest.get();
+            recipientName = d.getRecipientName();
+            deliveryAddress = d.getAddress();
+        }
+        return OrderResponse.fromDomainWithDetails(order, productName, customerName,
+                recipientName, deliveryAddress);
     }
 }

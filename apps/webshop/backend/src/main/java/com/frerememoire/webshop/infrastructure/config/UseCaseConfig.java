@@ -53,7 +53,8 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public OrderQueryService orderQueryService(OrderRepository orderRepository) {
-        return new OrderQueryService(orderRepository);
+    public OrderQueryService orderQueryService(OrderRepository orderRepository,
+                                                CustomerRepository customerRepository) {
+        return new OrderQueryService(orderRepository, customerRepository);
     }
 }
