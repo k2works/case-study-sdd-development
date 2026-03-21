@@ -3,7 +3,10 @@ package com.frerememoire.webshop.infrastructure.config;
 import com.frerememoire.webshop.application.auth.RegistrationUseCase;
 import com.frerememoire.webshop.application.item.ItemUseCase;
 import com.frerememoire.webshop.application.product.ProductUseCase;
+import com.frerememoire.webshop.domain.auth.AuthUser;
 import com.frerememoire.webshop.domain.auth.port.AuthUserRepository;
+import com.frerememoire.webshop.domain.customer.Customer;
+import com.frerememoire.webshop.domain.customer.port.CustomerRepository;
 import com.frerememoire.webshop.domain.item.Item;
 import com.frerememoire.webshop.domain.item.port.ItemRepository;
 import com.frerememoire.webshop.domain.product.Product;
@@ -28,25 +31,29 @@ public class DevDataInitializer implements ApplicationRunner {
     private final ItemRepository itemRepository;
     private final ProductUseCase productUseCase;
     private final ProductRepository productRepository;
+    private final CustomerRepository customerRepository;
 
     public DevDataInitializer(RegistrationUseCase registrationUseCase,
                                AuthUserRepository authUserRepository,
                                ItemUseCase itemUseCase,
                                ItemRepository itemRepository,
                                ProductUseCase productUseCase,
-                               ProductRepository productRepository) {
+                               ProductRepository productRepository,
+                               CustomerRepository customerRepository) {
         this.registrationUseCase = registrationUseCase;
         this.authUserRepository = authUserRepository;
         this.itemUseCase = itemUseCase;
         this.itemRepository = itemRepository;
         this.productUseCase = productUseCase;
         this.productRepository = productRepository;
+        this.customerRepository = customerRepository;
     }
 
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
         createDevUser();
+        createCustomerUser();
         createSeedItems();
         createSeedProducts();
     }
@@ -57,6 +64,22 @@ public class DevDataInitializer implements ApplicationRunner {
                     "dev@example.com", "Password1",
                     "太郎", "開発", null);
             log.info("開発用ユーザーを作成しました: dev@example.com / Password1");
+        }
+    }
+
+    private void createCustomerUser() {
+        if (!authUserRepository.existsByEmail("customer@example.com")) {
+            AuthUser user = registrationUseCase.register(
+                    "customer@example.com", "Password1",
+                    "太郎", "山田", "090-1234-5678");
+            // CUSTOMER ロール登録時に Customer レコードを自動作成
+            if (!customerRepository.existsByUserId(user.getId())) {
+                Customer customer = Customer.create(user.getId(),
+                        user.getProfile().getLastName() + " " + user.getProfile().getFirstName(),
+                        user.getProfile().getPhone());
+                customerRepository.save(customer);
+            }
+            log.info("得意先ユーザーを作成しました: customer@example.com / Password1");
         }
     }
 
