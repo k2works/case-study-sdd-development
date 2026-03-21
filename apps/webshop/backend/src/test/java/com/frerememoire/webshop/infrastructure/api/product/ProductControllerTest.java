@@ -1,6 +1,7 @@
 package com.frerememoire.webshop.infrastructure.api.product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.frerememoire.webshop.application.item.ItemUseCase;
 import com.frerememoire.webshop.application.product.ProductUseCase;
 import com.frerememoire.webshop.domain.product.Product;
 import com.frerememoire.webshop.domain.shared.EntityNotFoundException;
@@ -45,6 +46,9 @@ class ProductControllerTest {
     private ProductUseCase productUseCase;
 
     @MockitoBean
+    private ItemUseCase itemUseCase;
+
+    @MockitoBean
     private JwtTokenProvider jwtTokenProvider;
 
     @Test
@@ -53,6 +57,7 @@ class ProductControllerTest {
         Product product = Product.create("花束A", 3000, "バラの花束");
         product.setId(1L);
         when(productUseCase.findAll()).thenReturn(List.of(product));
+        when(itemUseCase.findAll()).thenReturn(List.of());
 
         mockMvc.perform(get("/api/v1/products"))
                 .andExpect(status().isOk())
@@ -67,6 +72,7 @@ class ProductControllerTest {
         Product product = Product.create("花束A", 3000, "バラの花束");
         product.setId(1L);
         when(productUseCase.findById(1L)).thenReturn(product);
+        when(itemUseCase.findAll()).thenReturn(List.of());
 
         mockMvc.perform(get("/api/v1/products/1"))
                 .andExpect(status().isOk())
@@ -140,6 +146,7 @@ class ProductControllerTest {
         product.setId(1L);
         product.addComposition(10L, 3);
         when(productUseCase.findById(1L)).thenReturn(product);
+        when(itemUseCase.findAll()).thenReturn(List.of());
 
         mockMvc.perform(get("/api/v1/products/1/compositions"))
                 .andExpect(status().isOk())
@@ -155,6 +162,7 @@ class ProductControllerTest {
         product.addComposition(10L, 3);
         when(productUseCase.addComposition(anyLong(), anyLong(), anyInt()))
                 .thenReturn(product);
+        when(itemUseCase.findAll()).thenReturn(List.of());
 
         CompositionRequest request = new CompositionRequest(10L, 3);
 
@@ -173,6 +181,7 @@ class ProductControllerTest {
         product.setId(1L);
         when(productUseCase.removeComposition(anyLong(), anyLong()))
                 .thenReturn(product);
+        when(itemUseCase.findAll()).thenReturn(List.of());
 
         mockMvc.perform(delete("/api/v1/products/1/compositions/10"))
                 .andExpect(status().isOk())

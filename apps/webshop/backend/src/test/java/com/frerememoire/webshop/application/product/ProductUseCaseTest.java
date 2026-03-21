@@ -1,5 +1,6 @@
 package com.frerememoire.webshop.application.product;
 
+import com.frerememoire.webshop.domain.item.port.ItemRepository;
 import com.frerememoire.webshop.domain.product.Product;
 import com.frerememoire.webshop.domain.product.port.ProductRepository;
 import com.frerememoire.webshop.domain.shared.EntityNotFoundException;
@@ -18,12 +19,14 @@ import static org.mockito.Mockito.*;
 class ProductUseCaseTest {
 
     private ProductRepository productRepository;
+    private ItemRepository itemRepository;
     private ProductUseCase productUseCase;
 
     @BeforeEach
     void setUp() {
         productRepository = Mockito.mock(ProductRepository.class);
-        productUseCase = new ProductUseCase(productRepository);
+        itemRepository = Mockito.mock(ItemRepository.class);
+        productUseCase = new ProductUseCase(productRepository, itemRepository);
     }
 
     @Test
@@ -113,6 +116,65 @@ class ProductUseCaseTest {
         when(productRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> productUseCase.delete(999L))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void 構成を追加できる() {
+        Product product = Product.create("春の花束", 5000, "説明");
+        product.setId(1L);
+        when(itemRepository.existsById(10L)).thenReturn(true);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Product result = productUseCase.addComposition(1L, 10L, 3);
+
+        assertThat(result.getCompositions()).hasSize(1);
+        assertThat(result.getCompositions().get(0).getItemId()).isEqualTo(10L);
+        assertThat(result.getCompositions().get(0).getQuantity()).isEqualTo(3);
+    }
+
+    @Test
+    void 存在しないItemIDで構成追加すると例外が発生する() {
+        when(itemRepository.existsById(999L)).thenReturn(false);
+
+        assertThatThrownBy(() -> productUseCase.addComposition(1L, 999L, 3))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void 構成を削除できる() {
+        Product product = Product.create("春の花束", 5000, "説明");
+        product.setId(1L);
+        product.addComposition(10L, 3);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Product result = productUseCase.removeComposition(1L, 10L);
+
+        assertThat(result.getCompositions()).isEmpty();
+    }
+
+    @Test
+    void findActiveByIdでアクティブな商品を取得できる() {
+        Product product = Product.create("春の花束", 5000, "説明");
+        product.setId(1L);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        Product result = productUseCase.findActiveById(1L);
+
+        assertThat(result.getName()).isEqualTo("春の花束");
+        assertThat(result.isActive()).isTrue();
+    }
+
+    @Test
+    void findActiveByIdで非アクティブな商品は例外が発生する() {
+        Product product = Product.create("春の花束", 5000, "説明");
+        product.setId(1L);
+        product.deactivate();
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        assertThatThrownBy(() -> productUseCase.findActiveById(1L))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 }
