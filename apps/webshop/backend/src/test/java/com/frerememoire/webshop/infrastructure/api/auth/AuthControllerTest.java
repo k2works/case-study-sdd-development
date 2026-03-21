@@ -48,7 +48,7 @@ class AuthControllerTest {
     @Test
     void ログインが成功する() throws Exception {
         AuthUser user = AuthUser.create("test@example.com", "encoded",
-                Role.CUSTOMER, new UserProfile("山田", "太郎", null));
+                Role.CUSTOMER, new UserProfile("太郎", "山田", null));
         when(authenticationUseCase.authenticate("test@example.com", "Password1"))
                 .thenReturn(user);
         when(jwtTokenProvider.generateToken("test@example.com", "CUSTOMER"))
@@ -105,7 +105,7 @@ class AuthControllerTest {
     @Test
     void 新規登録が成功する() throws Exception {
         AuthUser user = AuthUser.create("new@example.com", "encoded",
-                Role.CUSTOMER, new UserProfile("山田", "太郎", "090-1234-5678"));
+                Role.CUSTOMER, new UserProfile("太郎", "山田", "090-1234-5678"));
         user.setId(1L);
         when(registrationUseCase.register(anyString(), anyString(),
                 anyString(), anyString(), any()))
@@ -114,7 +114,7 @@ class AuthControllerTest {
                 .thenReturn("jwt-token");
 
         RegisterRequest request = new RegisterRequest(
-                "new@example.com", "Password1", "山田", "太郎", "090-1234-5678");
+                "new@example.com", "Password1", "太郎", "山田", "090-1234-5678");
 
         mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -122,7 +122,7 @@ class AuthControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.token").value("jwt-token"))
                 .andExpect(jsonPath("$.email").value("new@example.com"))
-                .andExpect(jsonPath("$.firstName").value("山田"));
+                .andExpect(jsonPath("$.firstName").value("太郎"));
     }
 
     @Test

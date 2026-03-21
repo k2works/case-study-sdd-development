@@ -22,7 +22,7 @@ class JpaAuthUserRepositoryTest {
 
     @Test
     void ユーザーを保存して取得できる() {
-        UserProfile profile = new UserProfile("山田", "太郎", "090-1234-5678");
+        UserProfile profile = new UserProfile("太郎", "山田", "090-1234-5678");
         AuthUser user = AuthUser.create("test@example.com", "encoded_pass",
                 Role.CUSTOMER, profile);
 
@@ -30,12 +30,12 @@ class JpaAuthUserRepositoryTest {
 
         assertThat(saved.getId()).isNotNull();
         assertThat(saved.getEmail()).isEqualTo("test@example.com");
-        assertThat(saved.getProfile().getFirstName()).isEqualTo("山田");
+        assertThat(saved.getProfile().getFirstName()).isEqualTo("太郎");
     }
 
     @Test
     void メールアドレスでユーザーを検索できる() {
-        UserProfile profile = new UserProfile("山田", "太郎", null);
+        UserProfile profile = new UserProfile("太郎", "山田", null);
         AuthUser user = AuthUser.create("find@example.com", "encoded_pass",
                 Role.CUSTOMER, profile);
         repository.save(user);
@@ -55,7 +55,7 @@ class JpaAuthUserRepositoryTest {
 
     @Test
     void メールアドレスの存在確認ができる() {
-        UserProfile profile = new UserProfile("山田", "太郎", null);
+        UserProfile profile = new UserProfile("太郎", "山田", null);
         AuthUser user = AuthUser.create("exists@example.com", "encoded_pass",
                 Role.CUSTOMER, profile);
         repository.save(user);
@@ -66,7 +66,7 @@ class JpaAuthUserRepositoryTest {
 
     @Test
     void ユーザー情報を更新できる() {
-        UserProfile profile = new UserProfile("山田", "太郎", null);
+        UserProfile profile = new UserProfile("太郎", "山田", null);
         AuthUser user = AuthUser.create("update@example.com", "encoded_pass",
                 Role.CUSTOMER, profile);
         AuthUser saved = repository.save(user);

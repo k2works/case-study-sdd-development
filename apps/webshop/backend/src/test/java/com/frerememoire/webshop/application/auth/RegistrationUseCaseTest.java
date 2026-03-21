@@ -47,11 +47,12 @@ class RegistrationUseCaseTest {
         });
 
         AuthUser result = useCase.register("new@example.com", "Password1",
-                "山田", "太郎", "090-1234-5678");
+                "太郎", "山田", "090-1234-5678");
 
         assertThat(result.getEmail()).isEqualTo("new@example.com");
         assertThat(result.getRole()).isEqualTo(Role.CUSTOMER);
-        assertThat(result.getProfile().getFirstName()).isEqualTo("山田");
+        assertThat(result.getProfile().getFirstName()).isEqualTo("太郎");
+        assertThat(result.getProfile().getLastName()).isEqualTo("山田");
     }
 
     @Test
@@ -60,7 +61,7 @@ class RegistrationUseCaseTest {
 
         assertThatThrownBy(() ->
                 useCase.register("existing@example.com", "Password1",
-                        "山田", "太郎", null))
+                        "太郎", "山田", null))
                 .isInstanceOf(BusinessRuleViolationException.class)
                 .hasMessageContaining("既に登録");
     }
@@ -69,7 +70,7 @@ class RegistrationUseCaseTest {
     void パスワードポリシー違反で例外が発生する() {
         assertThatThrownBy(() ->
                 useCase.register("new@example.com", "short",
-                        "山田", "太郎", null))
+                        "太郎", "山田", null))
                 .isInstanceOf(BusinessRuleViolationException.class)
                 .hasMessageContaining("8文字以上");
     }

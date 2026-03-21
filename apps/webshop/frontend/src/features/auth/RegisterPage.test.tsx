@@ -42,6 +42,7 @@ describe('RegisterPage', () => {
     renderRegisterPage()
     expect(screen.getByLabelText('メールアドレス')).toBeInTheDocument()
     expect(screen.getByLabelText('パスワード')).toBeInTheDocument()
+    expect(screen.getByLabelText('パスワード（確認）')).toBeInTheDocument()
     expect(screen.getByLabelText('姓')).toBeInTheDocument()
     expect(screen.getByLabelText('名')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '登録' })).toBeInTheDocument()
@@ -84,6 +85,7 @@ describe('RegisterPage', () => {
 
     await user.type(screen.getByLabelText('メールアドレス'), 'new@example.com')
     await user.type(screen.getByLabelText('パスワード'), 'Password1')
+    await user.type(screen.getByLabelText('パスワード（確認）'), 'Password1')
     await user.type(screen.getByLabelText('姓'), '山田')
     await user.type(screen.getByLabelText('名'), '太郎')
     await user.click(screen.getByRole('button', { name: '登録' }))
@@ -92,8 +94,8 @@ describe('RegisterPage', () => {
       expect(authApi.register).toHaveBeenCalledWith({
         email: 'new@example.com',
         password: 'Password1',
-        firstName: '山田',
-        lastName: '太郎',
+        firstName: '太郎',
+        lastName: '山田',
         phone: '',
       })
     })

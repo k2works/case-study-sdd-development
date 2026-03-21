@@ -8,16 +8,16 @@ public class UserProfile {
 
     public UserProfile(String firstName, String lastName, String phone) {
         if (firstName == null || firstName.isBlank()) {
-            throw new IllegalArgumentException("姓は必須です");
-        }
-        if (lastName == null || lastName.isBlank()) {
             throw new IllegalArgumentException("名は必須です");
         }
+        if (lastName == null || lastName.isBlank()) {
+            throw new IllegalArgumentException("姓は必須です");
+        }
         if (firstName.length() > 100) {
-            throw new IllegalArgumentException("姓は100文字以内で入力してください");
+            throw new IllegalArgumentException("名は100文字以内で入力してください");
         }
         if (lastName.length() > 100) {
-            throw new IllegalArgumentException("名は100文字以内で入力してください");
+            throw new IllegalArgumentException("姓は100文字以内で入力してください");
         }
         this.firstName = firstName;
         this.lastName = lastName;

@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { AuthProvider } from './providers/AuthProvider'
+import { AuthProvider, useAuth } from './providers/AuthProvider'
 import { ProtectedRoute } from './features/auth/ProtectedRoute'
 import { LoginPage } from './features/auth/LoginPage'
 import { RegisterPage } from './features/auth/RegisterPage'
@@ -11,6 +11,11 @@ import { ItemFormPage } from './features/item/ItemFormPage'
 import './App.css'
 
 const queryClient = new QueryClient()
+
+function DefaultRedirect() {
+  const { isAuthenticated } = useAuth()
+  return <Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />
+}
 
 function App() {
   return (
@@ -32,7 +37,7 @@ function App() {
               <Route path="/items/new" element={<ItemFormPage />} />
               <Route path="/items/:id/edit" element={<ItemFormPage />} />
             </Route>
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<DefaultRedirect />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

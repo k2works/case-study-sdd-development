@@ -5,6 +5,10 @@ import { authApi } from '../../lib/auth-api'
 import { useAuth } from '../../providers/AuthProvider'
 import type { RegisterRequest } from '../../types/auth'
 
+interface RegisterFormData extends RegisterRequest {
+  passwordConfirm: string
+}
+
 export function RegisterPage() {
   const navigate = useNavigate()
   const { login } = useAuth()
@@ -13,13 +17,15 @@ export function RegisterPage() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterRequest>()
+  } = useForm<RegisterFormData>()
 
-  const onSubmit = async (data: RegisterRequest) => {
+  const onSubmit = async (data: RegisterFormData) => {
     try {
       setError(null)
-      const response = await authApi.register(data)
+      const { passwordConfirm: _, ...requestData } = data
+      const response = await authApi.register(requestData)
       const { token, email, role, firstName, lastName } = response.data
       login(token, { email, role, firstName, lastName })
       navigate('/dashboard')
@@ -49,10 +55,11 @@ export function RegisterPage() {
           <input
             id="email"
             type="email"
+            aria-required="true"
             {...register('email', { required: 'メールアドレスは必須です' })}
           />
           {errors.email && (
-            <span className="field-error">{errors.email.message}</span>
+            <span className="field-error" role="alert">{errors.email.message}</span>
           )}
         </div>
         <div className="form-group">
@@ -60,35 +67,56 @@ export function RegisterPage() {
           <input
             id="password"
             type="password"
+            aria-required="true"
             {...register('password', {
               required: 'パスワードは必須です',
               minLength: { value: 8, message: '8文字以上で入力してください' },
             })}
           />
           {errors.password && (
-            <span className="field-error">{errors.password.message}</span>
+            <span className="field-error" role="alert">{errors.password.message}</span>
           )}
         </div>
         <div className="form-group">
-          <label htmlFor="firstName">姓</label>
+          <label htmlFor="passwordConfirm">パスワード（確認）</label>
           <input
-            id="firstName"
-            type="text"
-            {...register('firstName', { required: '姓は必須です' })}
+            id="passwordConfirm"
+            type="password"
+            aria-required="true"
+            {...register('passwordConfirm', {
+              required: 'パスワード（確認）は必須です',
+              validate: (value) =>
+                value === watch('password') || 'パスワードが一致しません',
+            })}
           />
-          {errors.firstName && (
-            <span className="field-error">{errors.firstName.message}</span>
+          {errors.passwordConfirm && (
+            <span className="field-error" role="alert">
+              {errors.passwordConfirm.message}
+            </span>
           )}
         </div>
         <div className="form-group">
-          <label htmlFor="lastName">名</label>
+          <label htmlFor="lastName">姓</label>
           <input
             id="lastName"
             type="text"
-            {...register('lastName', { required: '名は必須です' })}
+            aria-required="true"
+            {...register('lastName', { required: '姓は必須です' })}
           />
           {errors.lastName && (
-            <span className="field-error">{errors.lastName.message}</span>
+            <span className="field-error" role="alert">{errors.lastName.message}</span>
+          )}
+        </div>
+        <div className="form-group">
+          <label htmlFor="firstName">名</label>
+          <input
+            id="firstName"
+            type="text"
+            aria-required="true"
+            {...register('firstName', { required: '名は必須です' })}
+          />
+          {errors.firstName && (
+            <span className="field-error" role="alert">{errors.firstName.message}</span>
           )}
         </div>
         <div className="form-group">

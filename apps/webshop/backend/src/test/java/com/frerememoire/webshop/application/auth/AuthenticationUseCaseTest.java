@@ -46,7 +46,7 @@ class AuthenticationUseCaseTest {
     void 正しい認証情報でログインできる() {
         AuthUser user = AuthUser.create("test@example.com",
                 passwordEncoder.encode("Password1"), Role.CUSTOMER,
-                new UserProfile("山田", "太郎", null));
+                new UserProfile("太郎", "山田", null));
         when(userRepository.findByEmail("test@example.com"))
                 .thenReturn(Optional.of(user));
         when(userRepository.save(any())).thenReturn(user);
@@ -71,7 +71,7 @@ class AuthenticationUseCaseTest {
     void 誤ったパスワードで例外が発生する() {
         AuthUser user = AuthUser.create("test@example.com",
                 passwordEncoder.encode("Password1"), Role.CUSTOMER,
-                new UserProfile("山田", "太郎", null));
+                new UserProfile("太郎", "山田", null));
         when(userRepository.findByEmail("test@example.com"))
                 .thenReturn(Optional.of(user));
         when(userRepository.save(any())).thenReturn(user);

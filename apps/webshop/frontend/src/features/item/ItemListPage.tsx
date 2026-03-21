@@ -37,11 +37,12 @@ export function ItemListPage() {
       </div>
 
       {isLoading ? (
-        <p>読み込み中...</p>
+        <p aria-live="polite">読み込み中...</p>
       ) : items.length === 0 ? (
         <p>登録された単品はありません。</p>
       ) : (
         <table className="item-table">
+          <caption>単品一覧</caption>
           <thead>
             <tr>
               <th>商品名</th>
