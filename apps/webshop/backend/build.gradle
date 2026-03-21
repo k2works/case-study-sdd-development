@@ -75,10 +75,10 @@ tasks.named('test') {
 
 // JaCoCo
 jacoco {
-    toolVersion = "0.8.12"
+    toolVersion = "0.8.13"
 }
 
-jacocoTestReport {
+tasks.named('jacocoTestReport') {
     dependsOn test
     reports {
         xml.required = true
@@ -86,8 +86,8 @@ jacocoTestReport {
     }
 }
 
-jacocoTestCoverageVerification {
-    dependsOn jacocoTestReport
+tasks.named('jacocoTestCoverageVerification') {
+    dependsOn tasks.named('jacocoTestReport')
     violationRules {
         rule {
             limit {
@@ -98,7 +98,7 @@ jacocoTestCoverageVerification {
 }
 
 tasks.named('check') {
-    dependsOn jacocoTestCoverageVerification
+    dependsOn tasks.named('jacocoTestCoverageVerification')
 }
 
 // Checkstyle

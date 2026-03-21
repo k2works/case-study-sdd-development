@@ -24,6 +24,11 @@ spring:
     livereload:
       enabled: true
 
+logging:
+  level:
+    com.frerememoire.webshop.infrastructure.security: DEBUG
+    org.springframework.security: DEBUG
+
 server:
   port: 8080
 
