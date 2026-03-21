@@ -95,6 +95,7 @@ nav:
       - CI/CD パイプラインレビュー: review/cicd_pipeline_review_20260320.md
       - IT1 計画レビュー: review/iteration_plan-1_review_20260321.md
       - IT2 実装レビュー: review/it2_product_review_20260321.md
+      - IT3 計画レビュー: review/it3_plan_review_20260321.md
   - 開発:
       - 概要: development/index.md
       - リリース計画: development/release_plan.md

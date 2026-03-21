@@ -56,6 +56,7 @@
 | [CI/CD パイプラインレビュー](./review/cicd_pipeline_review_20260320.md) | CI/CD パイプラインの運用レビュー |
 | [IT1 計画レビュー](./review/iteration_plan-1_review_20260321.md) | IT1 イテレーション計画のレビュー |
 | [IT2 実装レビュー](./review/it2_product_review_20260321.md) | IT2 商品管理機能のマルチパースペクティブレビュー |
+| [IT3 計画レビュー](./review/it3_plan_review_20260321.md) | IT3 注文フロー・受注管理計画のレビュー |
 
 ### 開発 (`development/`)
 
