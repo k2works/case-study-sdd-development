@@ -4,6 +4,9 @@ import com.frerememoire.webshop.application.auth.RegistrationUseCase;
 import com.frerememoire.webshop.application.item.ItemUseCase;
 import com.frerememoire.webshop.application.product.ProductUseCase;
 import com.frerememoire.webshop.domain.auth.AuthUser;
+import com.frerememoire.webshop.domain.auth.PasswordEncoder;
+import com.frerememoire.webshop.domain.auth.Role;
+import com.frerememoire.webshop.domain.auth.UserProfile;
 import com.frerememoire.webshop.domain.auth.port.AuthUserRepository;
 import com.frerememoire.webshop.domain.customer.Customer;
 import com.frerememoire.webshop.domain.customer.port.CustomerRepository;
@@ -27,6 +30,7 @@ public class DevDataInitializer implements ApplicationRunner {
 
     private final RegistrationUseCase registrationUseCase;
     private final AuthUserRepository authUserRepository;
+    private final PasswordEncoder passwordEncoder;
     private final ItemUseCase itemUseCase;
     private final ItemRepository itemRepository;
     private final ProductUseCase productUseCase;
@@ -35,6 +39,7 @@ public class DevDataInitializer implements ApplicationRunner {
 
     public DevDataInitializer(RegistrationUseCase registrationUseCase,
                                AuthUserRepository authUserRepository,
+                               PasswordEncoder passwordEncoder,
                                ItemUseCase itemUseCase,
                                ItemRepository itemRepository,
                                ProductUseCase productUseCase,
@@ -42,6 +47,7 @@ public class DevDataInitializer implements ApplicationRunner {
                                CustomerRepository customerRepository) {
         this.registrationUseCase = registrationUseCase;
         this.authUserRepository = authUserRepository;
+        this.passwordEncoder = passwordEncoder;
         this.itemUseCase = itemUseCase;
         this.itemRepository = itemRepository;
         this.productUseCase = productUseCase;
@@ -52,18 +58,32 @@ public class DevDataInitializer implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        createDevUser();
+        createOwnerUser();
+        createStaffUser();
         createCustomerUser();
         createSeedItems();
         createSeedProducts();
     }
 
-    private void createDevUser() {
+    private void createOwnerUser() {
         if (!authUserRepository.existsByEmail("dev@example.com")) {
-            registrationUseCase.register(
-                    "dev@example.com", "Password1",
-                    "太郎", "開発", null);
-            log.info("開発用ユーザーを作成しました: dev@example.com / Password1");
+            UserProfile profile = new UserProfile("太郎", "開発", null);
+            AuthUser user = AuthUser.create(
+                    "dev@example.com", passwordEncoder.encode("Password1"),
+                    Role.OWNER, profile);
+            authUserRepository.save(user);
+            log.info("オーナーユーザーを作成しました: dev@example.com / Password1 (OWNER)");
+        }
+    }
+
+    private void createStaffUser() {
+        if (!authUserRepository.existsByEmail("staff@example.com")) {
+            UserProfile profile = new UserProfile("花子", "受注", null);
+            AuthUser user = AuthUser.create(
+                    "staff@example.com", passwordEncoder.encode("Password1"),
+                    Role.ORDER_STAFF, profile);
+            authUserRepository.save(user);
+            log.info("受注スタッフユーザーを作成しました: staff@example.com / Password1 (ORDER_STAFF)");
         }
     }
 
