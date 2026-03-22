@@ -3,17 +3,8 @@ import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { orderApi } from '../../lib/order-api'
 import { useAuth } from '../../providers/AuthProvider'
-import type { OrderRequest } from '../../types/order'
+import type { OrderRequest, OrderFormData } from '../../types/order'
 import type { Product } from '../../types/product'
-
-interface OrderFormData {
-  recipientName: string
-  postalCode: string
-  address: string
-  phone: string
-  deliveryDate: string
-  message: string
-}
 
 interface ProblemResponse {
   detail?: string

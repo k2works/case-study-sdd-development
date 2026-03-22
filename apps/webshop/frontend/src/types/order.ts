@@ -24,6 +24,15 @@ export interface OrderRequest {
   message?: string
 }
 
+export interface OrderFormData {
+  recipientName: string
+  postalCode: string
+  address: string
+  phone: string
+  deliveryDate: string
+  message: string
+}
+
 export interface DashboardSummary {
   totalOrders: number
   orderedCount: number

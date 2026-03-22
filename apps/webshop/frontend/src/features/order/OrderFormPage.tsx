@@ -3,15 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { catalogApi } from '../../lib/product-api'
 import type { Product } from '../../types/product'
-
-interface OrderFormData {
-  recipientName: string
-  postalCode: string
-  address: string
-  phone: string
-  deliveryDate: string
-  message: string
-}
+import type { OrderFormData } from '../../types/order'
 
 function toLocalDateString(date: Date): string {
   const y = date.getFullYear()
