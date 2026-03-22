@@ -10,6 +10,16 @@ function formatDate(date: Date): string {
   return date.toISOString().split('T')[0]
 }
 
+const DAY_NAMES = ['日', '月', '火', '水', '木', '金', '土']
+
+function formatDateWithDay(dateStr: string): string {
+  const date = new Date(dateStr + 'T00:00:00')
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  const day = DAY_NAMES[date.getDay()]
+  return `${m}/${d}(${day})`
+}
+
 export function InventoryTransitionPage() {
   const today = new Date()
   const twoWeeksLater = new Date(today)
@@ -148,7 +158,7 @@ export function InventoryTransitionPage() {
             <h3 className="text-lg font-medium text-gray-900">在庫推移テーブル</h3>
             <Link
               to={`/admin/purchase-orders?itemId=${selectedItemId}`}
-              className="bg-emerald-600 text-white font-medium rounded-lg px-4 py-2 hover:bg-emerald-700 shadow-sm transition-all no-underline text-sm"
+              className="bg-emerald-600 text-white font-medium rounded-lg px-4 py-2 hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 shadow-sm transition-all no-underline text-sm"
             >
               発注する
             </Link>
@@ -167,9 +177,15 @@ export function InventoryTransitionPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {transition.map((day) => (
-                <tr key={day.date} className={`${getRowClass(day.projectedStock)} transition-colors`}>
-                  <td className="px-4 py-3 text-sm font-medium">{day.date}</td>
+              {transition.map((day) => {
+                const ariaLabel = day.projectedStock <= 0
+                  ? `${formatDateWithDay(day.date)} 在庫不足`
+                  : selectedItem && day.projectedStock < selectedItem.purchaseUnit
+                    ? `${formatDateWithDay(day.date)} 要発注`
+                    : undefined
+                return (
+                <tr key={day.date} className={`${getRowClass(day.projectedStock)} transition-colors hover:bg-gray-50`} aria-label={ariaLabel}>
+                  <td className="px-4 py-3 text-sm font-medium">{formatDateWithDay(day.date)}</td>
                   <td className="px-4 py-3 text-sm text-right">{day.previousStock}</td>
                   <td className="px-4 py-3 text-sm text-right text-emerald-600 font-medium">
                     {day.expectedArrivals > 0 ? `+${day.expectedArrivals}` : '0'}
@@ -183,7 +199,8 @@ export function InventoryTransitionPage() {
                   <td className="px-4 py-3 text-sm text-right font-bold">{day.projectedStock}</td>
                   <td className="px-4 py-3 text-sm text-center">{getStatusBadge(day.projectedStock)}</td>
                 </tr>
-              ))}
+                )
+              })}
             </tbody>
           </table>
         </div>
