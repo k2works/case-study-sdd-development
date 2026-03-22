@@ -40,16 +40,23 @@ export function ProductDetailPage() {
         ← 商品一覧に戻る
       </Link>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 max-w-3xl">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h2>
-        <p className="text-3xl font-bold text-emerald-600 mb-6">{formatPrice(product.price)}</p>
-
-        {product.description && (
-          <div className="mb-8">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">説明</h3>
-            <p className="text-gray-700">{product.description}</p>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 max-w-4xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="aspect-square bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl flex items-center justify-center">
+            <span className="text-8xl">🌸</span>
           </div>
-        )}
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h2>
+            <p className="text-3xl font-bold text-emerald-600 mb-6">{formatPrice(product.price)}</p>
+
+            {product.description && (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">説明</h3>
+                <p className="text-gray-700">{product.description}</p>
+              </div>
+            )}
+          </div>
+        </div>
 
         {product.compositions && product.compositions.length > 0 && (
           <div>
