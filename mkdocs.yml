@@ -100,6 +100,8 @@ nav:
       - UI/UX デザインレビュー: review/ui_design_uiux_review_20260321.md
       - IT4 計画レビュー: review/it4_plan_review_20260322.md
       - IT4 UI/UX レビュー: review/it4_uiux_review_20260322.md
+      - IT4 開発レビュー: review/it4_developing_review_20260322.md
+      - IT4 実装 UI/UX レビュー: review/it4_impl_uiux_review_20260322.md
   - 開発:
       - 概要: development/index.md
       - リリース計画: development/release_plan.md
