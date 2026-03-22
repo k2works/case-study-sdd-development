@@ -1,5 +1,6 @@
 package com.frerememoire.webshop.infrastructure.config;
 
+import com.frerememoire.webshop.application.bundling.BundleOrderUseCase;
 import com.frerememoire.webshop.application.bundling.BundlingQueryService;
 import com.frerememoire.webshop.application.auth.AuthenticationUseCase;
 import com.frerememoire.webshop.application.auth.RegistrationUseCase;
@@ -20,6 +21,7 @@ import com.frerememoire.webshop.domain.item.port.ItemRepository;
 import com.frerememoire.webshop.domain.order.port.OrderRepository;
 import com.frerememoire.webshop.domain.product.port.ProductRepository;
 import com.frerememoire.webshop.domain.purchaseorder.port.PurchaseOrderRepository;
+import com.frerememoire.webshop.domain.stock.StockConsumptionService;
 import com.frerememoire.webshop.domain.stock.InventoryTransitionService;
 import com.frerememoire.webshop.domain.stock.port.InventoryQueryPort;
 import com.frerememoire.webshop.domain.stock.port.StockRepository;
@@ -99,6 +101,21 @@ public class UseCaseConfig {
     public PurchaseOrderQueryService purchaseOrderQueryService(
             PurchaseOrderRepository purchaseOrderRepository) {
         return new PurchaseOrderQueryService(purchaseOrderRepository);
+    }
+
+    @Bean
+    public StockConsumptionService stockConsumptionService() {
+        return new StockConsumptionService();
+    }
+
+    @Bean
+    public BundleOrderUseCase bundleOrderUseCase(
+            OrderRepository orderRepository,
+            ProductRepository productRepository,
+            StockRepository stockRepository,
+            StockConsumptionService stockConsumptionService) {
+        return new BundleOrderUseCase(orderRepository, productRepository,
+                stockRepository, stockConsumptionService);
     }
 
     @Bean

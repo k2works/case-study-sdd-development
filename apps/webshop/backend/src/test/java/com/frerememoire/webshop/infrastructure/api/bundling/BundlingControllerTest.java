@@ -1,5 +1,6 @@
 package com.frerememoire.webshop.infrastructure.api.bundling;
 
+import com.frerememoire.webshop.application.bundling.BundleOrderUseCase;
 import com.frerememoire.webshop.application.bundling.BundlingQueryService;
 import com.frerememoire.webshop.application.bundling.BundlingTarget;
 import com.frerememoire.webshop.application.bundling.BundlingTargetsResult;
@@ -19,8 +20,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.frerememoire.webshop.domain.order.DeliveryDate;
+import com.frerememoire.webshop.domain.order.Message;
+import com.frerememoire.webshop.domain.order.Order;
+import com.frerememoire.webshop.domain.order.OrderStatus;
+
+import java.time.LocalDateTime;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,6 +42,9 @@ class BundlingControllerTest {
 
     @MockitoBean
     private BundlingQueryService bundlingQueryService;
+
+    @MockitoBean
+    private BundleOrderUseCase bundleOrderUseCase;
 
     @MockitoBean
     private JwtTokenProvider jwtTokenProvider;
@@ -81,6 +93,29 @@ class BundlingControllerTest {
     @Test
     void 未認証ユーザーは結束対象にアクセスできない() throws Exception {
         mockMvc.perform(get("/api/v1/admin/bundling/targets"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "FLORIST")
+    void FLORISTが結束完了を実行できる() throws Exception {
+        LocalDate deliveryDate = LocalDate.now().plusDays(3);
+        Order order = new Order(1L, 10L, 100L, 50L,
+                DeliveryDate.reconstruct(deliveryDate),
+                new Message(null),
+                OrderStatus.PREPARING, LocalDateTime.now(), LocalDateTime.now());
+        when(bundleOrderUseCase.execute(1L)).thenReturn(order);
+
+        mockMvc.perform(put("/api/v1/admin/bundling/orders/1/bundle"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.orderId").value(1))
+                .andExpect(jsonPath("$.status").value("PREPARING"));
+    }
+
+    @Test
+    @WithMockUser(roles = "CUSTOMER")
+    void CUSTOMERは結束完了を実行できない() throws Exception {
+        mockMvc.perform(put("/api/v1/admin/bundling/orders/1/bundle"))
                 .andExpect(status().isForbidden());
     }
 }

@@ -22,6 +22,7 @@ import { OrderDetailPage } from './features/order/OrderDetailPage'
 import { InventoryTransitionPage } from './features/inventory/InventoryTransitionPage'
 import { PurchaseOrderPage } from './features/purchase/PurchaseOrderPage'
 import { ArrivalRegistrationPage } from './features/purchase/ArrivalRegistrationPage'
+import { BundlingTargetsPage } from './features/shipping/BundlingTargetsPage'
 import './App.css'
 
 const queryClient = new QueryClient()
@@ -65,6 +66,7 @@ function App() {
               <Route path="/admin/inventory" element={<InventoryTransitionPage />} />
               <Route path="/admin/purchase-orders" element={<PurchaseOrderPage />} />
               <Route path="/admin/purchase-orders/:id/arrivals/new" element={<ArrivalRegistrationPage />} />
+              <Route path="/admin/bundling" element={<BundlingTargetsPage />} />
             </Route>
             <Route path="*" element={<DefaultRedirect />} />
           </Routes>
