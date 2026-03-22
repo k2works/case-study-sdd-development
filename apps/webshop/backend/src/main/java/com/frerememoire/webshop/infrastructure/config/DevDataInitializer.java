@@ -5,6 +5,7 @@ import com.frerememoire.webshop.application.item.ItemUseCase;
 import com.frerememoire.webshop.application.order.PlaceOrderCommand;
 import com.frerememoire.webshop.application.order.PlaceOrderUseCase;
 import com.frerememoire.webshop.application.product.ProductUseCase;
+import com.frerememoire.webshop.application.purchaseorder.PlacePurchaseOrderUseCase;
 import com.frerememoire.webshop.domain.auth.AuthUser;
 import com.frerememoire.webshop.domain.auth.PasswordEncoder;
 import com.frerememoire.webshop.domain.auth.Role;
@@ -18,6 +19,10 @@ import com.frerememoire.webshop.domain.order.Order;
 import com.frerememoire.webshop.domain.order.port.OrderRepository;
 import com.frerememoire.webshop.domain.product.Product;
 import com.frerememoire.webshop.domain.product.port.ProductRepository;
+import com.frerememoire.webshop.domain.purchaseorder.PurchaseOrder;
+import com.frerememoire.webshop.domain.purchaseorder.port.PurchaseOrderRepository;
+import com.frerememoire.webshop.domain.stock.Stock;
+import com.frerememoire.webshop.domain.stock.port.StockRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -55,6 +60,9 @@ public class DevDataInitializer implements ApplicationRunner {
     private final CustomerRepository customerRepository;
     private final PlaceOrderUseCase placeOrderUseCase;
     private final OrderRepository orderRepository;
+    private final PlacePurchaseOrderUseCase placePurchaseOrderUseCase;
+    private final PurchaseOrderRepository purchaseOrderRepository;
+    private final StockRepository stockRepository;
 
     public DevDataInitializer(RegistrationUseCase registrationUseCase,
                                AuthUserRepository authUserRepository,
@@ -65,7 +73,10 @@ public class DevDataInitializer implements ApplicationRunner {
                                ProductRepository productRepository,
                                CustomerRepository customerRepository,
                                PlaceOrderUseCase placeOrderUseCase,
-                               OrderRepository orderRepository) {
+                               OrderRepository orderRepository,
+                               PlacePurchaseOrderUseCase placePurchaseOrderUseCase,
+                               PurchaseOrderRepository purchaseOrderRepository,
+                               StockRepository stockRepository) {
         this.registrationUseCase = registrationUseCase;
         this.authUserRepository = authUserRepository;
         this.passwordEncoder = passwordEncoder;
@@ -76,6 +87,9 @@ public class DevDataInitializer implements ApplicationRunner {
         this.customerRepository = customerRepository;
         this.placeOrderUseCase = placeOrderUseCase;
         this.orderRepository = orderRepository;
+        this.placePurchaseOrderUseCase = placePurchaseOrderUseCase;
+        this.purchaseOrderRepository = purchaseOrderRepository;
+        this.stockRepository = stockRepository;
     }
 
     @Override
@@ -87,6 +101,7 @@ public class DevDataInitializer implements ApplicationRunner {
         createSeedItems();
         createSeedProducts();
         createSeedOrders();
+        createSeedStocksAndPurchaseOrders();
     }
 
     private void createOwnerUser() {
@@ -221,6 +236,45 @@ public class DevDataInitializer implements ApplicationRunner {
         ));
 
         log.info("開発用受注データを作成しました（3件）");
+    }
+
+    private void createSeedStocksAndPurchaseOrders() {
+        if (!stockRepository.findAll().isEmpty()) {
+            return;
+        }
+        var items = itemRepository.findAll();
+        if (items.isEmpty()) {
+            return;
+        }
+        java.time.LocalDate today = java.time.LocalDate.now();
+        createSeedStocks(items, today);
+        createSeedPurchaseOrders(items, today);
+        log.info("開発用在庫・発注データを作成しました（在庫 {}件、発注 2件）", items.size());
+    }
+
+    private void createSeedStocks(java.util.List<Item> items, java.time.LocalDate today) {
+        for (Item item : items) {
+            Stock stock = Stock.create(
+                    item.getId(), item.getPurchaseUnit() * 3,
+                    today.minusDays(2), item.getQualityRetentionDays());
+            stockRepository.save(stock);
+        }
+    }
+
+    private void createSeedPurchaseOrders(java.util.List<Item> items, java.time.LocalDate today) {
+        createPurchaseOrderForItem(items, "赤バラ", 2, today);
+        createPurchaseOrderForItem(items, "カスミソウ", 1, today);
+    }
+
+    private void createPurchaseOrderForItem(java.util.List<Item> items, String name,
+                                             int unitMultiplier, java.time.LocalDate today) {
+        items.stream().filter(item -> item.getName().equals(name)).findFirst()
+                .ifPresent(item -> {
+                    int qty = item.getPurchaseUnit() * unitMultiplier;
+                    PurchaseOrder po = placePurchaseOrderUseCase.place(
+                            item.getId(), qty, today.plusDays(item.getLeadTimeDays()));
+                    log.info("発注を作成: {} x {} 本（{}）", item.getName(), qty, po.getStatus());
+                });
     }
 
     private void addCompositionIfItemExists(Product product, java.util.List<Item> items, String itemName, int quantity) {
