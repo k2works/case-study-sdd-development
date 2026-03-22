@@ -98,6 +98,8 @@ test.describe('発注管理ページ', () => {
     await loginAsOwner(page)
 
     await page.goto('/admin/purchase-orders')
+    // 単品を選択してボタンを有効化し、数量・日付は空のまま送信
+    await page.getByLabel('単品').selectOption({ label: '赤バラ' })
     await page.getByRole('button', { name: '発注する' }).click()
 
     await expect(page.getByText('全ての項目を入力してください')).toBeVisible()
@@ -112,14 +114,15 @@ test.describe('発注管理ページ', () => {
     await page.getByLabel('希望納品日').fill(futureDate(7))
     await page.getByRole('button', { name: '発注する' }).click()
 
-    await expect(page.getByRole('table')).toBeVisible({ timeout: 10000 })
-    await expect(page.getByRole('columnheader', { name: '単品' })).toBeVisible()
-    await expect(page.getByRole('columnheader', { name: '仕入先' })).toBeVisible()
-    await expect(page.getByRole('columnheader', { name: '数量' })).toBeVisible()
-    await expect(page.getByRole('columnheader', { name: '希望納品日' })).toBeVisible()
-    await expect(page.getByRole('columnheader', { name: 'ステータス' })).toBeVisible()
-    await expect(page.getByText('赤バラ')).toBeVisible()
-    await expect(page.getByText('発注済み')).toBeVisible()
+    const table = page.locator('table')
+    await expect(table).toBeVisible({ timeout: 10000 })
+    await expect(table.locator('th', { hasText: '単品' })).toBeVisible()
+    await expect(table.locator('th', { hasText: '仕入先' })).toBeVisible()
+    await expect(table.locator('th', { hasText: '数量' })).toBeVisible()
+    await expect(table.locator('th', { hasText: '希望納品日' })).toBeVisible()
+    await expect(table.locator('th', { hasText: 'ステータス' })).toBeVisible()
+    await expect(table.getByText('赤バラ').first()).toBeVisible()
+    await expect(table.getByText('発注済み').first()).toBeVisible()
   })
 
   test('ステータスフィルタで発注一覧を絞り込める', async ({ page }) => {

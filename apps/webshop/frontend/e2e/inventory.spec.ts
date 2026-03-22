@@ -84,13 +84,15 @@ test.describe('在庫推移ページ', () => {
     await expect(page.getByRole('heading', { name: '在庫推移テーブル' })).toBeVisible({
       timeout: 10000,
     })
-    await expect(page.getByRole('columnheader', { name: '日付' })).toBeVisible()
-    await expect(page.getByRole('columnheader', { name: '前日在庫' })).toBeVisible()
-    await expect(page.getByRole('columnheader', { name: '入荷予定' })).toBeVisible()
-    await expect(page.getByRole('columnheader', { name: '受注引当' })).toBeVisible()
-    await expect(page.getByRole('columnheader', { name: '廃棄予定' })).toBeVisible()
-    await expect(page.getByRole('columnheader', { name: '在庫予定' })).toBeVisible()
-    await expect(page.getByRole('columnheader', { name: '状態' })).toBeVisible()
+    const table = page.locator('table')
+    await expect(table).toBeVisible()
+    await expect(table.locator('th', { hasText: '日付' })).toBeVisible()
+    await expect(table.locator('th', { hasText: '前日在庫' })).toBeVisible()
+    await expect(table.locator('th', { hasText: '入荷予定' })).toBeVisible()
+    await expect(table.locator('th', { hasText: '受注引当' })).toBeVisible()
+    await expect(table.locator('th', { hasText: '廃棄予定' })).toBeVisible()
+    await expect(table.locator('th', { hasText: '在庫予定' })).toBeVisible()
+    await expect(table.locator('th', { hasText: '状態' })).toBeVisible()
   })
 
   test('「発注する」リンクから発注管理ページに遷移できる', async ({ page }) => {
