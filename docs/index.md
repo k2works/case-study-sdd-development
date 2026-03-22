@@ -59,6 +59,8 @@
 | [IT3 計画レビュー](./review/it3_plan_review_20260321.md) | IT3 注文フロー・受注管理計画のレビュー |
 | [IT3 開発レビュー](./review/it3_developing_review_20260321.md) | IT3 注文フロー・受注管理実装のマルチパースペクティブレビュー |
 | [UI/UX デザインレビュー](./review/ui_design_uiux_review_20260321.md) | UI 設計の UX・アクセシビリティレビュー |
+| [IT4 計画レビュー](./review/it4_plan_review_20260322.md) | IT4 在庫推移・発注・入荷計画のマルチパースペクティブレビュー |
+| [IT4 UI/UX レビュー](./review/it4_uiux_review_20260322.md) | S-201 在庫推移・S-301 発注画面の UI/UX レビュー |
 
 ### 開発 (`development/`)
 
