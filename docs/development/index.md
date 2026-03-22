@@ -18,7 +18,7 @@
 | IT2 | [計画](iteration_plan-2.md) | [ふりかえり](iteration_retrospective-2.md) | [報告書](iteration_report-2.md) | 完了 |
 | IT3 | [計画](iteration_plan-3.md) | [ふりかえり](iteration_retrospective-3.md) | [報告書](iteration_report-3.md) | 完了 |
 | IT4 | [計画](iteration_plan-4.md) | [ふりかえり](iteration_retrospective-4.md) | [報告書](iteration_report-4.md) | 完了 |
-| IT5 | [計画](iteration_plan-5.md) | - | - | 計画済み |
+| IT5 | [計画](iteration_plan-5.md) | [ふりかえり](iteration_retrospective-5.md) | [報告書](iteration_report-5.md) | 完了 |
 
 ### 進捗サマリー
 
@@ -28,13 +28,14 @@
 | IT2 | 11 | 11 | 100% |
 | IT3 | 13 | 13 | 100% |
 | IT4 | 13 | 13 | 100% |
-| **累計** | **48** | **48** | **100%** |
+| IT5 | 11 | 11 | 100% |
+| **累計** | **59** | **59** | **100%** |
 
 ### フェーズ進捗
 
 | フェーズ | 内容 | SP | 完了 SP | 状態 |
 |---------|------|-----|---------|------|
-| Phase 1（MVP） | 認証・商品マスタ・受注・在庫推移・発注・入荷 | 51 | 48 | 進行中（残 US-011 入荷 3SP） |
-| Phase 2 | 出荷管理・届け日変更・注文キャンセル | 24 | 0 | 未着手 |
+| Phase 1（MVP） | 認証・商品マスタ・受注・在庫推移・発注・入荷 | 51 | 51 | 完了 |
+| Phase 2 | 出荷管理・届け日変更・注文キャンセル | 24 | 8 | 進行中（US-012, US-013 完了） |
 | Phase 3 | 届け先コピー・顧客情報管理 | 8 | 0 | 未着手 |
-| **合計** | | **83** | **48** | |
+| **合計** | | **83** | **59** | |
