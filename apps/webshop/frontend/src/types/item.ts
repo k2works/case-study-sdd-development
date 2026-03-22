@@ -1,7 +1,7 @@
 export interface Item {
   id: number
   name: string
-  shelfLifeDays: number
+  qualityRetentionDays: number
   purchaseUnit: number
   leadTimeDays: number
   supplierName: string
@@ -9,7 +9,7 @@ export interface Item {
 
 export interface ItemRequest {
   name: string
-  shelfLifeDays: number
+  qualityRetentionDays: number
   purchaseUnit: number
   leadTimeDays: number
   supplierName: string

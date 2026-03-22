@@ -6,6 +6,9 @@ import com.frerememoire.webshop.application.item.ItemUseCase;
 import com.frerememoire.webshop.application.order.OrderQueryService;
 import com.frerememoire.webshop.application.order.PlaceOrderUseCase;
 import com.frerememoire.webshop.application.product.ProductUseCase;
+import com.frerememoire.webshop.application.purchaseorder.PlacePurchaseOrderUseCase;
+import com.frerememoire.webshop.application.purchaseorder.PurchaseOrderQueryService;
+import com.frerememoire.webshop.application.stock.InventoryTransitionUseCase;
 import com.frerememoire.webshop.domain.auth.PasswordEncoder;
 import com.frerememoire.webshop.domain.auth.port.AuthUserRepository;
 import com.frerememoire.webshop.domain.customer.port.CustomerRepository;
@@ -13,8 +16,13 @@ import com.frerememoire.webshop.domain.customer.port.DeliveryDestinationReposito
 import com.frerememoire.webshop.domain.item.port.ItemRepository;
 import com.frerememoire.webshop.domain.order.port.OrderRepository;
 import com.frerememoire.webshop.domain.product.port.ProductRepository;
+import com.frerememoire.webshop.domain.purchaseorder.port.PurchaseOrderRepository;
+import com.frerememoire.webshop.domain.stock.InventoryTransitionService;
+import com.frerememoire.webshop.domain.stock.port.InventoryQueryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.Clock;
 
 @Configuration
 public class UseCaseConfig {
@@ -57,5 +65,35 @@ public class UseCaseConfig {
     public OrderQueryService orderQueryService(OrderRepository orderRepository,
                                                 CustomerRepository customerRepository) {
         return new OrderQueryService(orderRepository, customerRepository);
+    }
+
+    @Bean
+    public Clock clock() {
+        return Clock.systemDefaultZone();
+    }
+
+    @Bean
+    public InventoryTransitionService inventoryTransitionService(Clock clock,
+                                                                  InventoryQueryPort queryPort) {
+        return new InventoryTransitionService(clock, queryPort);
+    }
+
+    @Bean
+    public InventoryTransitionUseCase inventoryTransitionUseCase(
+            InventoryTransitionService transitionService) {
+        return new InventoryTransitionUseCase(transitionService);
+    }
+
+    @Bean
+    public PlacePurchaseOrderUseCase placePurchaseOrderUseCase(
+            PurchaseOrderRepository purchaseOrderRepository,
+            ItemRepository itemRepository) {
+        return new PlacePurchaseOrderUseCase(purchaseOrderRepository, itemRepository);
+    }
+
+    @Bean
+    public PurchaseOrderQueryService purchaseOrderQueryService(
+            PurchaseOrderRepository purchaseOrderRepository) {
+        return new PurchaseOrderQueryService(purchaseOrderRepository);
     }
 }

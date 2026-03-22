@@ -29,6 +29,7 @@ export function AppLayout() {
   const showItemManagement = !isCustomer
   const showProductManagement = !isCustomer
   const showOrderManagement = role === 'OWNER' || role === 'ORDER_STAFF'
+  const showInventoryManagement = role === 'OWNER' || role === 'PURCHASE_STAFF'
 
   const roleLabel: Record<string, string> = {
     OWNER: 'オーナー',
@@ -74,6 +75,16 @@ export function AppLayout() {
               {showOrderManagement && (
                 <NavLink to="/admin/orders" className={navLinkClass}>
                   受注管理
+                </NavLink>
+              )}
+              {showInventoryManagement && (
+                <NavLink to="/admin/inventory" className={navLinkClass}>
+                  在庫管理
+                </NavLink>
+              )}
+              {showInventoryManagement && (
+                <NavLink to="/admin/purchase-orders" className={navLinkClass}>
+                  発注管理
                 </NavLink>
               )}
             </nav>

@@ -35,6 +35,9 @@ export function ProductCatalogPage() {
               key={product.id}
               className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
             >
+              <div className="aspect-square bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center">
+                <span className="text-6xl">🌸</span>
+              </div>
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
                 <p className="text-2xl font-bold text-emerald-600 mb-3">{formatPrice(product.price)}</p>

@@ -12,7 +12,7 @@ class ItemTest {
         Item item = Item.create("バラ（赤）", 7, 10, 3, "花卸問屋A");
 
         assertThat(item.getName()).isEqualTo("バラ（赤）");
-        assertThat(item.getShelfLifeDays()).isEqualTo(7);
+        assertThat(item.getQualityRetentionDays()).isEqualTo(7);
         assertThat(item.getPurchaseUnit()).isEqualTo(10);
         assertThat(item.getLeadTimeDays()).isEqualTo(3);
         assertThat(item.getSupplierName()).isEqualTo("花卸問屋A");
@@ -68,7 +68,7 @@ class ItemTest {
         item.update("チューリップ", 5, 20, 2, "花卸問屋B");
 
         assertThat(item.getName()).isEqualTo("チューリップ");
-        assertThat(item.getShelfLifeDays()).isEqualTo(5);
+        assertThat(item.getQualityRetentionDays()).isEqualTo(5);
         assertThat(item.getPurchaseUnit()).isEqualTo(20);
     }
 }

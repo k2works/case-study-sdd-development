@@ -35,7 +35,7 @@ export function ItemFormPage() {
     if (existingItem) {
       reset({
         name: existingItem.name,
-        shelfLifeDays: existingItem.shelfLifeDays,
+        qualityRetentionDays: existingItem.qualityRetentionDays,
         purchaseUnit: existingItem.purchaseUnit,
         leadTimeDays: existingItem.leadTimeDays,
         supplierName: existingItem.supplierName,
@@ -65,7 +65,7 @@ export function ItemFormPage() {
     setError(null)
     const request = {
       ...data,
-      shelfLifeDays: Number(data.shelfLifeDays),
+      qualityRetentionDays: Number(data.qualityRetentionDays),
       purchaseUnit: Number(data.purchaseUnit),
       leadTimeDays: Number(data.leadTimeDays),
     }
@@ -101,17 +101,17 @@ export function ItemFormPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="shelfLifeDays" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="qualityRetentionDays" className="block text-sm font-medium text-gray-700 mb-1">
                 品質保持日数
               </label>
-              <input id="shelfLifeDays" type="number" className={inputClass} placeholder="7"
-                {...register('shelfLifeDays', {
+              <input id="qualityRetentionDays" type="number" className={inputClass} placeholder="7"
+                {...register('qualityRetentionDays', {
                   required: '品質保持日数は必須です',
                   min: { value: 1, message: '1以上を入力してください' },
                 })}
               />
-              {errors.shelfLifeDays && (
-                <p className="text-red-500 text-sm mt-1">{errors.shelfLifeDays.message}</p>
+              {errors.qualityRetentionDays && (
+                <p className="text-red-500 text-sm mt-1">{errors.qualityRetentionDays.message}</p>
               )}
             </div>
             <div>

@@ -19,6 +19,8 @@ import { OrderConfirmPage } from './features/order/OrderConfirmPage'
 import { OrderCompletePage } from './features/order/OrderCompletePage'
 import { OrderListPage } from './features/order/OrderListPage'
 import { OrderDetailPage } from './features/order/OrderDetailPage'
+import { InventoryTransitionPage } from './features/inventory/InventoryTransitionPage'
+import { PurchaseOrderPage } from './features/purchase/PurchaseOrderPage'
 import './App.css'
 
 const queryClient = new QueryClient()
@@ -59,6 +61,8 @@ function App() {
               <Route path="/orders/complete" element={<OrderCompletePage />} />
               <Route path="/admin/orders" element={<OrderListPage />} />
               <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
+              <Route path="/admin/inventory" element={<InventoryTransitionPage />} />
+              <Route path="/admin/purchase-orders" element={<PurchaseOrderPage />} />
             </Route>
             <Route path="*" element={<DefaultRedirect />} />
           </Routes>

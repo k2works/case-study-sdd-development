@@ -21,8 +21,8 @@ public class ItemEntity {
     @Column(nullable = false, length = 200)
     private String name;
 
-    @Column(name = "shelf_life_days", nullable = false)
-    private int shelfLifeDays;
+    @Column(name = "quality_retention_days", nullable = false)
+    private int qualityRetentionDays;
 
     @Column(name = "purchase_unit", nullable = false)
     private int purchaseUnit;
@@ -46,7 +46,7 @@ public class ItemEntity {
         ItemEntity entity = new ItemEntity();
         entity.id = item.getId();
         entity.name = item.getName();
-        entity.shelfLifeDays = item.getShelfLifeDays();
+        entity.qualityRetentionDays = item.getQualityRetentionDays();
         entity.purchaseUnit = item.getPurchaseUnit();
         entity.leadTimeDays = item.getLeadTimeDays();
         entity.supplierName = item.getSupplierName();
@@ -56,7 +56,7 @@ public class ItemEntity {
     }
 
     public Item toDomain() {
-        return new Item(id, name, shelfLifeDays, purchaseUnit,
+        return new Item(id, name, qualityRetentionDays, purchaseUnit,
                 leadTimeDays, supplierName, createdAt, updatedAt);
     }
 }

@@ -71,7 +71,7 @@ export function ItemListPage() {
               {items.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{item.shelfLifeDays}日</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.qualityRetentionDays}日</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{item.purchaseUnit}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{item.leadTimeDays}日</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{item.supplierName}</td>

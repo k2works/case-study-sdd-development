@@ -5,7 +5,7 @@ import com.frerememoire.webshop.domain.item.Item;
 public record ItemResponse(
         Long id,
         String name,
-        int shelfLifeDays,
+        int qualityRetentionDays,
         int purchaseUnit,
         int leadTimeDays,
         String supplierName
@@ -14,7 +14,7 @@ public record ItemResponse(
         return new ItemResponse(
                 item.getId(),
                 item.getName(),
-                item.getShelfLifeDays(),
+                item.getQualityRetentionDays(),
                 item.getPurchaseUnit(),
                 item.getLeadTimeDays(),
                 item.getSupplierName());
