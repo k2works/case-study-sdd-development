@@ -97,12 +97,13 @@ class PurchaseOrderTest {
     }
 
     @Test
-    void PARTIALからreceivePartialは不可() {
-        PurchaseOrder po = PurchaseOrder.create(1L, "花卸問屋A", 10, LocalDate.of(2026, 5, 10), 10);
+    void PARTIALからPARTIALへ遷移できる() {
+        PurchaseOrder po = PurchaseOrder.create(1L, "花卸問屋A", 20, LocalDate.of(2026, 5, 10), 10);
         po.receivePartial();
 
-        assertThatThrownBy(po::receivePartial)
-                .isInstanceOf(IllegalStateException.class);
+        po.receivePartial();
+
+        assertThat(po.getStatus()).isEqualTo(PurchaseOrderStatus.PARTIAL);
     }
 
     @Test
@@ -114,5 +115,52 @@ class PurchaseOrderTest {
 
         po.receiveAll();
         assertThat(po.getStatus()).isEqualTo(PurchaseOrderStatus.RECEIVED);
+    }
+
+    @Test
+    void 残数量を計算できる() {
+        PurchaseOrder po = PurchaseOrder.create(1L, "花卸問屋A", 20, LocalDate.of(2026, 5, 10), 10);
+
+        assertThat(po.remainingQuantity(5)).isEqualTo(15);
+        assertThat(po.remainingQuantity(0)).isEqualTo(20);
+        assertThat(po.remainingQuantity(20)).isEqualTo(0);
+    }
+
+    @Test
+    void 一部入荷でPARTIALに遷移する() {
+        PurchaseOrder po = PurchaseOrder.create(1L, "花卸問屋A", 20, LocalDate.of(2026, 5, 10), 10);
+
+        po.registerArrival(5, 0);
+
+        assertThat(po.getStatus()).isEqualTo(PurchaseOrderStatus.PARTIAL);
+    }
+
+    @Test
+    void 全数入荷でRECEIVEDに遷移する() {
+        PurchaseOrder po = PurchaseOrder.create(1L, "花卸問屋A", 20, LocalDate.of(2026, 5, 10), 10);
+
+        po.registerArrival(20, 0);
+
+        assertThat(po.getStatus()).isEqualTo(PurchaseOrderStatus.RECEIVED);
+    }
+
+    @Test
+    void 複数回の入荷で全数入荷するとRECEIVEDになる() {
+        PurchaseOrder po = PurchaseOrder.create(1L, "花卸問屋A", 20, LocalDate.of(2026, 5, 10), 10);
+
+        po.registerArrival(10, 0);
+        assertThat(po.getStatus()).isEqualTo(PurchaseOrderStatus.PARTIAL);
+
+        po.registerArrival(10, 10);
+        assertThat(po.getStatus()).isEqualTo(PurchaseOrderStatus.RECEIVED);
+    }
+
+    @Test
+    void 入荷数量が残数量を超える場合は例外() {
+        PurchaseOrder po = PurchaseOrder.create(1L, "花卸問屋A", 20, LocalDate.of(2026, 5, 10), 10);
+
+        assertThatThrownBy(() -> po.registerArrival(21, 0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("残数量");
     }
 }

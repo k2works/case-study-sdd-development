@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { purchaseOrderApi } from '../../lib/purchase-order-api'
 import { itemApi } from '../../lib/item-api'
 import type { Item } from '../../types/item'
@@ -22,6 +22,7 @@ export function PurchaseOrderPage() {
   const [searchParams] = useSearchParams()
   const preselectedItemId = searchParams.get('itemId')
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const [selectedItemId, setSelectedItemId] = useState<number | null>(
     preselectedItemId ? Number(preselectedItemId) : null
@@ -217,6 +218,7 @@ export function PurchaseOrderPage() {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">希望納品日</th>
                 <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase">ステータス</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">発注日時</th>
+                <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -235,6 +237,17 @@ export function PurchaseOrderPage() {
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600">
                     {new Date(order.orderedAt).toLocaleString('ja-JP')}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-center">
+                    {(order.status === 'ORDERED' || order.status === 'PARTIAL') && (
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/admin/purchase-orders/${order.id}/arrivals/new`)}
+                        className="text-emerald-600 hover:text-emerald-800 font-medium text-xs px-2 py-1 border border-emerald-300 rounded-lg hover:bg-emerald-50 transition-colors"
+                      >
+                        入荷登録
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

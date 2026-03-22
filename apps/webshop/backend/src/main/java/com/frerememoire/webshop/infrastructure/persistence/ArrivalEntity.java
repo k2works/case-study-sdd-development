@@ -1,5 +1,6 @@
 package com.frerememoire.webshop.infrastructure.persistence;
 
+import com.frerememoire.webshop.domain.purchaseorder.Arrival;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +31,20 @@ public class ArrivalEntity {
     private LocalDateTime arrivedAt;
 
     protected ArrivalEntity() {
+    }
+
+    public static ArrivalEntity fromDomain(Arrival arrival) {
+        ArrivalEntity entity = new ArrivalEntity();
+        entity.id = arrival.getId();
+        entity.purchaseOrderId = arrival.getPurchaseOrderId();
+        entity.itemId = arrival.getItemId();
+        entity.quantity = arrival.getQuantity();
+        entity.arrivedAt = arrival.getArrivedAt();
+        return entity;
+    }
+
+    public Arrival toDomain() {
+        return new Arrival(id, purchaseOrderId, itemId, quantity, arrivedAt);
     }
 
     public Long getId() {

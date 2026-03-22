@@ -81,6 +81,25 @@ public class PurchaseOrder {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public int remainingQuantity(int totalArrived) {
+        return this.quantity - totalArrived;
+    }
+
+    public void registerArrival(int arrivedQty, int totalArrived) {
+        int remaining = remainingQuantity(totalArrived);
+        if (arrivedQty > remaining) {
+            throw new IllegalArgumentException(
+                    String.format("入荷数量(%d)が残数量(%d)を超えています", arrivedQty, remaining));
+        }
+        int newTotal = totalArrived + arrivedQty;
+        if (newTotal >= this.quantity) {
+            this.status = this.status.transitionTo(PurchaseOrderStatus.RECEIVED);
+        } else {
+            this.status = this.status.transitionTo(PurchaseOrderStatus.PARTIAL);
+        }
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public Long getId() {
         return id;
     }

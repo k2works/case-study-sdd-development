@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +37,12 @@ public class PurchaseOrderController {
                 request.itemId(), request.quantity(), request.desiredDeliveryDate());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(PurchaseOrderResponse.fromDomain(po));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PurchaseOrderResponse> findById(@PathVariable Long id) {
+        PurchaseOrder po = queryService.findById(id);
+        return ResponseEntity.ok(PurchaseOrderResponse.fromDomain(po));
     }
 
     @GetMapping

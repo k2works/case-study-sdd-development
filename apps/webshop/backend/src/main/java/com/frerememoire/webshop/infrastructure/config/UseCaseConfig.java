@@ -8,6 +8,8 @@ import com.frerememoire.webshop.application.order.PlaceOrderUseCase;
 import com.frerememoire.webshop.application.product.ProductUseCase;
 import com.frerememoire.webshop.application.purchaseorder.PlacePurchaseOrderUseCase;
 import com.frerememoire.webshop.application.purchaseorder.PurchaseOrderQueryService;
+import com.frerememoire.webshop.application.purchaseorder.RegisterArrivalUseCase;
+import com.frerememoire.webshop.domain.purchaseorder.port.ArrivalRepository;
 import com.frerememoire.webshop.application.stock.InventoryTransitionUseCase;
 import com.frerememoire.webshop.domain.auth.PasswordEncoder;
 import com.frerememoire.webshop.domain.auth.port.AuthUserRepository;
@@ -19,6 +21,7 @@ import com.frerememoire.webshop.domain.product.port.ProductRepository;
 import com.frerememoire.webshop.domain.purchaseorder.port.PurchaseOrderRepository;
 import com.frerememoire.webshop.domain.stock.InventoryTransitionService;
 import com.frerememoire.webshop.domain.stock.port.InventoryQueryPort;
+import com.frerememoire.webshop.domain.stock.port.StockRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -95,5 +98,15 @@ public class UseCaseConfig {
     public PurchaseOrderQueryService purchaseOrderQueryService(
             PurchaseOrderRepository purchaseOrderRepository) {
         return new PurchaseOrderQueryService(purchaseOrderRepository);
+    }
+
+    @Bean
+    public RegisterArrivalUseCase registerArrivalUseCase(
+            PurchaseOrderRepository purchaseOrderRepository,
+            ArrivalRepository arrivalRepository,
+            ItemRepository itemRepository,
+            StockRepository stockRepository) {
+        return new RegisterArrivalUseCase(
+                purchaseOrderRepository, arrivalRepository, itemRepository, stockRepository);
     }
 }
