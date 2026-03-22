@@ -85,7 +85,8 @@
 | [IT4 イテレーション計画](./development/iteration_plan-4.md) | 完了（13 SP / 47.5h） |
 | [IT4 ふりかえり](./development/iteration_retrospective-4.md) | 作成済み |
 | [IT4 完了報告書](./development/iteration_report-4.md) | 作成済み |
-| [IT5 イテレーション計画](./development/iteration_plan-5.md) | 計画済み（11 SP / 45h） |
+| [IT5 イテレーション計画](./development/iteration_plan-5.md) | 完了（11 SP） |
+| [IT5 ふりかえり](./development/iteration_retrospective-5.md) | 作成済み |
 
 ### 運用 (`operation/`)
 
