@@ -41,53 +41,50 @@ public class BundlingQueryService {
             return new BundlingTargetsResult(shippingDate, List.of(), List.of());
         }
 
-        List<BundlingTarget> targets = new ArrayList<>();
         Map<Long, Integer> totalRequiredByItem = new HashMap<>();
+        List<BundlingTarget> targets = buildTargets(orders, totalRequiredByItem);
+        List<MaterialSummary> materialSummary = buildMaterialSummary(totalRequiredByItem);
 
+        return new BundlingTargetsResult(shippingDate, targets, materialSummary);
+    }
+
+    private List<BundlingTarget> buildTargets(List<Order> orders, Map<Long, Integer> totalRequiredByItem) {
+        List<BundlingTarget> targets = new ArrayList<>();
         for (Order order : orders) {
             Product product = productRepository.findById(order.getProductId())
                     .orElseThrow(() -> new EntityNotFoundException("商品", order.getProductId()));
 
-            Map<Long, Integer> requiredItems = product.getRequiredItems();
             List<RequiredItem> requiredItemList = new ArrayList<>();
-
-            for (Map.Entry<Long, Integer> entry : requiredItems.entrySet()) {
+            for (Map.Entry<Long, Integer> entry : product.getRequiredItems().entrySet()) {
                 Long itemId = entry.getKey();
                 int qty = entry.getValue();
-
-                String itemName = itemRepository.findById(itemId)
-                        .map(Item::getName)
-                        .orElse("不明");
-
+                String itemName = resolveItemName(itemId);
                 requiredItemList.add(new RequiredItem(itemId, itemName, qty));
                 totalRequiredByItem.merge(itemId, qty, Integer::sum);
             }
 
             targets.add(new BundlingTarget(
-                    order.getId(),
-                    product.getName(),
-                    order.getDeliveryDateValue(),
-                    order.getStatus().name(),
-                    requiredItemList
-            ));
+                    order.getId(), product.getName(),
+                    order.getDeliveryDateValue(), order.getStatus().name(), requiredItemList));
         }
+        return targets;
+    }
 
-        List<MaterialSummary> materialSummary = new ArrayList<>();
+    private List<MaterialSummary> buildMaterialSummary(Map<Long, Integer> totalRequiredByItem) {
+        List<MaterialSummary> summary = new ArrayList<>();
         for (Map.Entry<Long, Integer> entry : totalRequiredByItem.entrySet()) {
             Long itemId = entry.getKey();
             int requiredQty = entry.getValue();
-
-            String itemName = itemRepository.findById(itemId)
-                    .map(Item::getName)
-                    .orElse("不明");
-
+            String itemName = resolveItemName(itemId);
             List<Stock> availableStocks = stockRepository.findAvailableByItemIdOrderByArrivedDate(itemId);
             int availableQty = availableStocks.stream().mapToInt(Stock::getQuantity).sum();
-
             int shortage = Math.max(0, requiredQty - availableQty);
-            materialSummary.add(new MaterialSummary(itemId, itemName, requiredQty, availableQty, shortage));
+            summary.add(new MaterialSummary(itemId, itemName, requiredQty, availableQty, shortage));
         }
+        return summary;
+    }
 
-        return new BundlingTargetsResult(shippingDate, targets, materialSummary);
+    private String resolveItemName(Long itemId) {
+        return itemRepository.findById(itemId).map(Item::getName).orElse("不明");
     }
 }

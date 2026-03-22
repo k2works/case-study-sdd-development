@@ -97,11 +97,12 @@ public class DevDataInitializer implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         createOwnerUser();
         createStaffUser();
+        createPurchaseStaffUser();
         createCustomerUser();
         createSeedItems();
         createSeedProducts();
-        createSeedOrders();
         createSeedStocksAndPurchaseOrders();
+        createSeedOrders();
     }
 
     private void createOwnerUser() {
@@ -110,6 +111,10 @@ public class DevDataInitializer implements ApplicationRunner {
 
     private void createStaffUser() {
         ensurePrivilegedUser("staff@example.com", "花子", "受注", null, Role.ORDER_STAFF, "受注スタッフ");
+    }
+
+    private void createPurchaseStaffUser() {
+        ensurePrivilegedUser("purchase@example.com", "次郎", "仕入", null, Role.PURCHASE_STAFF, "仕入スタッフ");
     }
 
     private void createCustomerUser() {
@@ -249,7 +254,7 @@ public class DevDataInitializer implements ApplicationRunner {
         java.time.LocalDate today = java.time.LocalDate.now();
         createSeedStocks(items, today);
         createSeedPurchaseOrders(items, today);
-        log.info("開発用在庫・発注データを作成しました（在庫 {}件、発注 2件）", items.size());
+        log.info("開発用在庫・発注データを作成しました（在庫 {}件、発注 8件）", items.size());
     }
 
     private void createSeedStocks(java.util.List<Item> items, java.time.LocalDate today) {
@@ -262,8 +267,18 @@ public class DevDataInitializer implements ApplicationRunner {
     }
 
     private void createSeedPurchaseOrders(java.util.List<Item> items, java.time.LocalDate today) {
+        // 受注商品の構成単品に対応する発注を作成
+        // 赤バラのクラシックブーケ: 赤バラ5, カスミソウ3, ユーカリ2
+        // パステルミックスブーケ: ピンクバラ3, ガーベラ3, カスミソウ2, ユーカリ2
+        // ホワイトエレガンス: 白バラ5, ユリ3, スターチス2
         createPurchaseOrderForItem(items, "赤バラ", 2, today);
+        createPurchaseOrderForItem(items, "ピンクバラ", 1, today);
+        createPurchaseOrderForItem(items, "白バラ", 1, today);
         createPurchaseOrderForItem(items, "カスミソウ", 1, today);
+        createPurchaseOrderForItem(items, "ユリ", 1, today);
+        createPurchaseOrderForItem(items, "ガーベラ", 1, today);
+        createPurchaseOrderForItem(items, "スターチス", 1, today);
+        createPurchaseOrderForItem(items, "ユーカリ（グリーン）", 1, today);
     }
 
     private void createPurchaseOrderForItem(java.util.List<Item> items, String name,
