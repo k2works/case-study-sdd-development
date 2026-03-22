@@ -79,4 +79,24 @@ class OrderTest {
         assertThatThrownBy(order::accept)
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    @Test
+    void 受付済みの注文を準備中に更新できる() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        order.accept();
+
+        order.prepare();
+
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.PREPARING);
+    }
+
+    @Test
+    void 注文済みの注文を準備中にはできない() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+
+        assertThatThrownBy(order::prepare)
+                .isInstanceOf(IllegalStateException.class);
+    }
 }

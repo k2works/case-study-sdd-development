@@ -20,4 +20,6 @@ public interface OrderRepository {
     List<Order> findByStatusAndDateRange(OrderStatus status, LocalDate from, LocalDate to);
 
     List<Order> findByDateRange(LocalDate from, LocalDate to);
+
+    List<Order> findByDeliveryDateAndStatus(LocalDate deliveryDate, OrderStatus status);
 }

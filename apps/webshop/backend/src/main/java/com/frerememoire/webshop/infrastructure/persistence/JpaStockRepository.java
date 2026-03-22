@@ -46,4 +46,11 @@ public class JpaStockRepository implements StockRepository {
     public void deleteById(Long id) {
         springDataRepository.deleteById(id);
     }
+
+    @Override
+    public List<Stock> findAvailableByItemIdOrderByArrivedDate(Long itemId) {
+        return springDataRepository.findAvailableByItemIdOrderByArrivedDate(itemId).stream()
+                .map(StockEntity::toDomain)
+                .toList();
+    }
 }

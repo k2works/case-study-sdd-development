@@ -16,4 +16,6 @@ public interface StockRepository {
     List<Stock> findAll();
 
     void deleteById(Long id);
+
+    List<Stock> findAvailableByItemIdOrderByArrivedDate(Long itemId);
 }

@@ -2,6 +2,8 @@ package com.frerememoire.webshop.domain.product;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -187,5 +189,27 @@ class ProductTest {
         assertThatThrownBy(() -> product.addComposition(1L, 0))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("1以上");
+    }
+
+    @Test
+    void 必要単品マップを取得できる() {
+        Product product = Product.create("春の花束", 5000, null);
+        product.addComposition(1L, 3);
+        product.addComposition(2L, 5);
+
+        Map<Long, Integer> requiredItems = product.getRequiredItems();
+
+        assertThat(requiredItems).hasSize(2);
+        assertThat(requiredItems.get(1L)).isEqualTo(3);
+        assertThat(requiredItems.get(2L)).isEqualTo(5);
+    }
+
+    @Test
+    void 構成がない商品の必要単品マップは空である() {
+        Product product = Product.create("春の花束", 5000, null);
+
+        Map<Long, Integer> requiredItems = product.getRequiredItems();
+
+        assertThat(requiredItems).isEmpty();
     }
 }

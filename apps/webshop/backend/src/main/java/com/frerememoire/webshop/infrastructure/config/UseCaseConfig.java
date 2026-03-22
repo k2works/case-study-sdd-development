@@ -1,5 +1,6 @@
 package com.frerememoire.webshop.infrastructure.config;
 
+import com.frerememoire.webshop.application.bundling.BundlingQueryService;
 import com.frerememoire.webshop.application.auth.AuthenticationUseCase;
 import com.frerememoire.webshop.application.auth.RegistrationUseCase;
 import com.frerememoire.webshop.application.item.ItemUseCase;
@@ -98,6 +99,15 @@ public class UseCaseConfig {
     public PurchaseOrderQueryService purchaseOrderQueryService(
             PurchaseOrderRepository purchaseOrderRepository) {
         return new PurchaseOrderQueryService(purchaseOrderRepository);
+    }
+
+    @Bean
+    public BundlingQueryService bundlingQueryService(
+            OrderRepository orderRepository,
+            ProductRepository productRepository,
+            StockRepository stockRepository,
+            ItemRepository itemRepository) {
+        return new BundlingQueryService(orderRepository, productRepository, stockRepository, itemRepository);
     }
 
     @Bean

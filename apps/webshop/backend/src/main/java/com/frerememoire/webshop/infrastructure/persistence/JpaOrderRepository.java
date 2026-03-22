@@ -58,4 +58,11 @@ public class JpaOrderRepository implements OrderRepository {
                 .map(OrderEntity::toDomain)
                 .toList();
     }
+
+    @Override
+    public List<Order> findByDeliveryDateAndStatus(LocalDate deliveryDate, OrderStatus status) {
+        return springDataRepository.findByDeliveryDateAndStatus(deliveryDate, status).stream()
+                .map(OrderEntity::toDomain)
+                .toList();
+    }
 }

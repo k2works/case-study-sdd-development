@@ -16,6 +16,8 @@ public interface SpringDataOrderRepository extends JpaRepository<OrderEntity, Lo
 
     List<OrderEntity> findByDeliveryDateBetween(LocalDate from, LocalDate to);
 
+    List<OrderEntity> findByDeliveryDateAndStatus(LocalDate deliveryDate, OrderStatus status);
+
     @Query("SELECT COALESCE(SUM(pc.quantity), 0) FROM OrderEntity o "
             + "JOIN ProductCompositionEntity pc ON pc.productEntity.id = o.productId "
             + "WHERE o.deliveryDate = :date "
