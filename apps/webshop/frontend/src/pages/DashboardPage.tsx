@@ -32,12 +32,12 @@ export function DashboardPage() {
           <h3 className="text-lg font-medium text-gray-900 mb-4">業務サマリ</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <div className="text-sm text-gray-500 mb-1">本日の受注</div>
-              <div className="text-2xl font-bold text-gray-900">{summary.todayOrderCount}件</div>
+              <div className="text-sm text-gray-500 mb-1">総受注数</div>
+              <div className="text-2xl font-bold text-gray-900">{summary.totalOrders}件</div>
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <div className="text-sm text-gray-500 mb-1">未受付の受注</div>
-              <div className="text-2xl font-bold text-amber-600">{summary.pendingOrderCount}件</div>
+              <div className="text-2xl font-bold text-amber-600">{summary.orderedCount}件</div>
             </div>
             <Link
               to="/admin/inventory"
