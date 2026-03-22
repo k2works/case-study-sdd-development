@@ -102,6 +102,8 @@ nav:
       - IT4 UI/UX レビュー: review/it4_uiux_review_20260322.md
       - IT4 開発レビュー: review/it4_developing_review_20260322.md
       - IT4 実装 UI/UX レビュー: review/it4_impl_uiux_review_20260322.md
+      - IT5 計画レビュー: review/iteration_plan-5_review_20260322.md
+      - IT5 UI/UX レビュー: review/iteration_plan-5_uiux_review_20260322.md
   - 開発:
       - 概要: development/index.md
       - リリース計画: development/release_plan.md
@@ -117,6 +119,7 @@ nav:
       - イテレーション 4 計画: development/iteration_plan-4.md
       - イテレーション 4 ふりかえり: development/iteration_retrospective-4.md
       - イテレーション 4 完了報告書: development/iteration_report-4.md
+      - イテレーション 5 計画: development/iteration_plan-5.md
   - 運用:
       - 概要: operation/index.md
       - アプリケーション開発環境セットアップ: operation/app-development-setup.md

@@ -61,6 +61,10 @@
 | [UI/UX デザインレビュー](./review/ui_design_uiux_review_20260321.md) | UI 設計の UX・アクセシビリティレビュー |
 | [IT4 計画レビュー](./review/it4_plan_review_20260322.md) | IT4 在庫推移・発注・入荷計画のマルチパースペクティブレビュー |
 | [IT4 UI/UX レビュー](./review/it4_uiux_review_20260322.md) | S-201 在庫推移・S-301 発注画面の UI/UX レビュー |
+| [IT4 開発レビュー](./review/it4_developing_review_20260322.md) | IT4 在庫推移・発注実装のマルチパースペクティブレビュー |
+| [IT4 実装 UI/UX レビュー](./review/it4_impl_uiux_review_20260322.md) | IT4 実装後の UI/UX レビュー |
+| [IT5 計画レビュー](./review/iteration_plan-5_review_20260322.md) | IT5 イテレーション計画のマルチパースペクティブレビュー |
+| [IT5 UI/UX レビュー](./review/iteration_plan-5_uiux_review_20260322.md) | S-302 入荷登録・S-401 結束対象一覧の UI/UX レビュー |
 
 ### 開発 (`development/`)
 
@@ -79,6 +83,7 @@
 | [IT4 イテレーション計画](./development/iteration_plan-4.md) | 完了（13 SP / 47.5h） |
 | [IT4 ふりかえり](./development/iteration_retrospective-4.md) | 作成済み |
 | [IT4 完了報告書](./development/iteration_report-4.md) | 作成済み |
+| [IT5 イテレーション計画](./development/iteration_plan-5.md) | 計画済み（11 SP / 45h） |
 
 ### 運用 (`operation/`)
 
