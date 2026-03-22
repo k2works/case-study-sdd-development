@@ -3,6 +3,8 @@ package com.frerememoire.webshop.domain.product;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Product {
 
@@ -86,6 +88,11 @@ public class Product {
 
     public List<ProductComposition> getCompositions() {
         return List.copyOf(compositions);
+    }
+
+    public Map<Long, Integer> getRequiredItems() {
+        return compositions.stream()
+                .collect(Collectors.toMap(ProductComposition::getItemId, ProductComposition::getQuantity));
     }
 
     private void validateName(String name) {

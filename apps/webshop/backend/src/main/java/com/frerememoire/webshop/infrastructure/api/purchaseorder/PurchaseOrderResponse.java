@@ -12,9 +12,14 @@ public record PurchaseOrderResponse(
         int quantity,
         LocalDate desiredDeliveryDate,
         String status,
-        LocalDateTime orderedAt
+        LocalDateTime orderedAt,
+        int arrivedQuantity
 ) {
     public static PurchaseOrderResponse fromDomain(PurchaseOrder po) {
+        return fromDomain(po, 0);
+    }
+
+    public static PurchaseOrderResponse fromDomain(PurchaseOrder po, int arrivedQuantity) {
         return new PurchaseOrderResponse(
                 po.getId(),
                 po.getItemId(),
@@ -22,6 +27,7 @@ public record PurchaseOrderResponse(
                 po.getQuantity(),
                 po.getDesiredDeliveryDate(),
                 po.getStatus().name(),
-                po.getOrderedAt());
+                po.getOrderedAt(),
+                arrivedQuantity);
     }
 }

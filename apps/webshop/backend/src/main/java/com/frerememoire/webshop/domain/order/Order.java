@@ -58,6 +58,11 @@ public class Order {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void prepare() {
+        this.status = this.status.transitionTo(OrderStatus.PREPARING);
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public Long getId() {
         return id;
     }

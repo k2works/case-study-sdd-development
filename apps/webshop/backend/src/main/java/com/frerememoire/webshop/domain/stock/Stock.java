@@ -68,6 +68,10 @@ public class Stock {
         this.quantity -= qty;
     }
 
+    public boolean isEmpty() {
+        return this.quantity == 0;
+    }
+
     public boolean isExpired(LocalDate today) {
         return !today.isBefore(expiryDate);
     }

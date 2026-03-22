@@ -10,7 +10,7 @@ public enum PurchaseOrderStatus {
 
     private static final Map<PurchaseOrderStatus, Set<PurchaseOrderStatus>> TRANSITIONS = Map.of(
             ORDERED, Set.of(PARTIAL, RECEIVED),
-            PARTIAL, Set.of(RECEIVED)
+            PARTIAL, Set.of(PARTIAL, RECEIVED)
     );
 
     public PurchaseOrderStatus transitionTo(PurchaseOrderStatus next) {

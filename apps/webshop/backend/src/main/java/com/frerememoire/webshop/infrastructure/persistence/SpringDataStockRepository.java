@@ -19,4 +19,9 @@ public interface SpringDataStockRepository extends JpaRepository<StockEntity, Lo
             + "WHERE s.itemId = :itemId AND s.expiryDate = :date")
     int sumExpiringQuantityByItemIdAndDate(@Param("itemId") Long itemId,
                                            @Param("date") LocalDate date);
+
+    @Query("SELECT s FROM StockEntity s "
+            + "WHERE s.itemId = :itemId AND s.status = 'AVAILABLE' AND s.quantity > 0 "
+            + "ORDER BY s.arrivedDate ASC")
+    List<StockEntity> findAvailableByItemIdOrderByArrivedDate(@Param("itemId") Long itemId);
 }

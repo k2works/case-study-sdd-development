@@ -104,4 +104,22 @@ class StockTest {
 
         assertThat(stock.getStatus()).isEqualTo(StockStatus.AVAILABLE);
     }
+
+    @Test
+    void isEmptyで数量が0のときtrueを返す() {
+        Stock stock = Stock.create(1L, 5, LocalDate.of(2026, 5, 1), 7);
+
+        stock.consume(5);
+
+        assertThat(stock.isEmpty()).isTrue();
+    }
+
+    @Test
+    void isEmptyで数量が残っているときfalseを返す() {
+        Stock stock = Stock.create(1L, 5, LocalDate.of(2026, 5, 1), 7);
+
+        stock.consume(3);
+
+        assertThat(stock.isEmpty()).isFalse();
+    }
 }
