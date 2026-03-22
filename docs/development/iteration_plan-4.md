@@ -94,13 +94,13 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 1.1 | Stock エンティティ（StockId, itemId, quantity, arrivedDate, expiryDate, StockStatus）の TDD 実装。品質維持日数に基づく expiryDate 計算、consume/isExpired のテスト | 3h | - | [ ] |
-| 1.2 | InventoryTransitionService ドメインサービスの TDD 実装。**Clock 注入**で日付テスタビリティを確保（レビュー H-2）。日別在庫予定数の計算ロジック（前日在庫 + 入荷予定 - 受注引当 - 廃棄予定 = 在庫予定）。エッジケース: 在庫 0、廃棄日=当日、複数ロット、マイナス在庫、品質維持日数 0/1 日 | 4.5h | - | [ ] |
-| 1.3 | StockRepository + **InventoryQueryPort**（受注引当・入荷予定の取得を抽象化、レビュー H-4）ポートインターフェース定義 | 1.5h | - | [ ] |
-| 1.4 | Flyway V6__create_purchase_orders_and_stocks.sql マイグレーション（purchase_orders, arrivals, stocks テーブル作成） | 1.5h | - | [ ] |
-| 1.5 | JPA エンティティ・リポジトリインフラ層実装（StockEntity, PurchaseOrderEntity, ArrivalEntity） | 3h | - | [ ] |
-| 1.6 | 在庫推移 API 実装（GET /api/v1/admin/inventory/transition?itemId=&from=&to=） | 2h | - | [ ] |
-| 1.7 | 在庫推移画面（S-201: InventoryTransitionPage）フロントエンド実装。単品フィルタ、期間選択、在庫アラート（警告色/危険色ハイライト）、スケルトンローディング | 4h | - | [ ] |
+| 1.1 | Stock エンティティ（StockId, itemId, quantity, arrivedDate, expiryDate, StockStatus）の TDD 実装。品質維持日数に基づく expiryDate 計算、consume/isExpired のテスト | 3h | - | [x] |
+| 1.2 | InventoryTransitionService ドメインサービスの TDD 実装。**Clock 注入**で日付テスタビリティを確保（レビュー H-2）。日別在庫予定数の計算ロジック（前日在庫 + 入荷予定 - 受注引当 - 廃棄予定 = 在庫予定）。エッジケース: 在庫 0、廃棄日=当日、複数ロット、マイナス在庫、品質維持日数 0/1 日 | 4.5h | - | [x] |
+| 1.3 | StockRepository + **InventoryQueryPort**（受注引当・入荷予定の取得を抽象化、レビュー H-4）ポートインターフェース定義 | 1.5h | - | [x] |
+| 1.4 | Flyway V6__create_purchase_orders_and_stocks.sql マイグレーション（purchase_orders, arrivals, stocks テーブル作成） | 1.5h | - | [x] |
+| 1.5 | JPA エンティティ・リポジトリインフラ層実装（StockEntity, PurchaseOrderEntity, ArrivalEntity） | 3h | - | [x] |
+| 1.6 | 在庫推移 API 実装（GET /api/v1/admin/inventory/transition?itemId=&from=&to=） | 2h | - | [x] |
+| 1.7 | 在庫推移画面（S-201: InventoryTransitionPage）フロントエンド実装。単品フィルタ、期間選択、在庫アラート（警告色/危険色ハイライト）、スケルトンローディング | 4h | - | [x] |
 
 **小計**: 18.5h（理想時間）
 
@@ -108,11 +108,11 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 2.1 | PurchaseOrder エンティティ（PurchaseOrderId, itemId, **supplierName**: String, quantity, desiredDeliveryDate, PurchaseOrderStatus）の TDD 実装。購入単位の倍数バリデーション（購入単位未満→切り上げ提案）、ステータス遷移テスト（レビュー H-3: supplier_name 文字列で統一） | 2.5h | - | [ ] |
-| 2.2 | PlacePurchaseOrderUseCase（発注作成）の TDD 実装 | 2h | - | [ ] |
-| 2.3 | 発注 API 実装（POST /api/v1/admin/purchase-orders, GET /api/v1/admin/purchase-orders） | 2h | - | [ ] |
-| 2.4 | 発注画面（S-301: PurchaseOrderPage）フロントエンド実装。新規発注フォーム（単品選択→仕入先・購入単位・リードタイム自動表示）、発注一覧、二重送信防止 | 3.5h | - | [ ] |
-| 2.5 | purchase-order-api.ts API クライアント作成 | 1h | - | [ ] |
+| 2.1 | PurchaseOrder エンティティ（PurchaseOrderId, itemId, **supplierName**: String, quantity, desiredDeliveryDate, PurchaseOrderStatus）の TDD 実装。購入単位の倍数バリデーション（購入単位未満→切り上げ提案）、ステータス遷移テスト（レビュー H-3: supplier_name 文字列で統一） | 2.5h | - | [x] |
+| 2.2 | PlacePurchaseOrderUseCase（発注作成）の TDD 実装 | 2h | - | [x] |
+| 2.3 | 発注 API 実装（POST /api/v1/admin/purchase-orders, GET /api/v1/admin/purchase-orders） | 2h | - | [x] |
+| 2.4 | 発注画面（S-301: PurchaseOrderPage）フロントエンド実装。新規発注フォーム（単品選択→仕入先・購入単位・リードタイム自動表示）、発注一覧、二重送信防止 | 3.5h | - | [x] |
+| 2.5 | purchase-order-api.ts API クライアント作成 | 1h | - | [x] |
 
 **小計**: 11h（理想時間）
 
@@ -126,12 +126,12 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 4.1 | IT3 残: 商品カタログに画像プレースホルダー追加（UI/UX-H-1） | 1h | - | [ ] |
-| 4.2 | IT3 残: 商品詳細の 2 カラムレイアウト化（UI/UX-H-5） | 1.5h | - | [ ] |
-| 4.3 | IT3 残: ダッシュボードに業務サマリカード追加（UI/UX-M-7）。受注 API + 在庫アラート API 接続 | 2h | - | [ ] |
-| 4.4 | GlobalExceptionHandler + SecurityConfig の認可ルール統合テスト追加（レビュー H-6） | 2h | - | [ ] |
-| 4.5 | Item.java の shelfLifeDays → qualityRetentionDays リネームリファクタリング（レビュー M-2） | 0.5h | - | [ ] |
-| 4.6 | ナビゲーションに在庫管理・発注管理リンク追加（レビュー M-7） | 1h | - | [ ] |
+| 4.1 | IT3 残: 商品カタログに画像プレースホルダー追加（UI/UX-H-1） | 1h | - | [x] |
+| 4.2 | IT3 残: 商品詳細の 2 カラムレイアウト化（UI/UX-H-5） | 1.5h | - | [x] |
+| 4.3 | IT3 残: ダッシュボードに業務サマリカード追加（UI/UX-M-7）。受注 API + 在庫アラート API 接続 | 2h | - | [x] |
+| 4.4 | GlobalExceptionHandler + SecurityConfig の認可ルール統合テスト追加（レビュー H-6） | 2h | - | [x] |
+| 4.5 | Item.java の shelfLifeDays → qualityRetentionDays リネームリファクタリング（レビュー M-2） | 0.5h | - | [x] |
+| 4.6 | ナビゲーションに在庫管理・発注管理リンク追加（レビュー M-7） | 1h | - | [x] |
 
 **小計**: 8h（理想時間）
 
@@ -139,10 +139,10 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 5.1 | 統合テスト（StockRepository CRUD + InventoryTransition API + PurchaseOrder API） | 2h | - | [ ] |
-| 5.2 | 在庫推移計算の結合テスト（受注→引当→在庫減少→発注→入荷→在庫増加のフロー） | 2.5h | - | [ ] |
-| 5.3 | フロントエンドコンポーネントテスト（InventoryTransitionPage、PurchaseOrderPage） | 2h | - | [ ] |
-| 5.4 | E2E テスト（在庫確認→発注→入荷登録のフロー） | 2.5h | - | [ ] |
+| 5.1 | 統合テスト（StockRepository CRUD + InventoryTransition API + PurchaseOrder API） | 2h | - | [x] |
+| 5.2 | 在庫推移計算の結合テスト（受注→引当→在庫減少→発注→入荷→在庫増加のフロー） | 2.5h | - | [x] |
+| 5.3 | フロントエンドコンポーネントテスト（InventoryTransitionPage、PurchaseOrderPage） | 2h | - | [x] |
+| 5.4 | E2E テスト（在庫確認→発注→入荷登録のフロー） | 2.5h | - | [x] |
 
 **小計**: 9h（理想時間）
 
@@ -150,15 +150,15 @@
 
 | カテゴリ | SP | 理想時間 | 状態 |
 |---------|----|----|------|
-| 在庫ドメイン・在庫推移（US-009） | 8 | 19.5h | [ ] |
-| 発注機能（US-010） | 5 | 11h | [ ] |
+| 在庫ドメイン・在庫推移（US-009） | 8 | 19.5h | [x] |
+| 発注機能（US-010） | 5 | 11h | [x] |
 | ~~入荷登録（US-011）~~ | ~~3~~ | - | IT5 移動 |
-| レビュー指摘 + IT3 残タスク（SP 外） | - | 8h | [ ] |
-| テスト（SP 外） | - | 9h | [ ] |
+| レビュー指摘 + IT3 残タスク（SP 外） | - | 8h | [x] |
+| テスト（SP 外） | - | 9h | [x] |
 | **合計** | **13** | **47.5h** | |
 
 **1 SP あたり**: 約 3.7h（テスト含む）
-**進捗率**: 0% (0/13 SP)
+**進捗率**: 100% (13/13 SP)
 
 ---
 
