@@ -95,6 +95,30 @@ class ArrivalControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "PURCHASE_STAFF")
+    void 数量が0の場合は400が返る() throws Exception {
+        String invalidRequest = "{\"quantity\": 0, \"arrivedDate\": \"2026-04-01\"}";
+
+        mockMvc.perform(post("/api/v1/admin/purchase-orders/1/arrivals")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidRequest))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "PURCHASE_STAFF")
+    void 入荷日がnullの場合は400が返る() throws Exception {
+        String invalidRequest = "{\"quantity\": 10}";
+
+        mockMvc.perform(post("/api/v1/admin/purchase-orders/1/arrivals")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidRequest))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @WithMockUser(roles = "CUSTOMER")
     void CUSTOMERは入荷登録にアクセスできない() throws Exception {
         ArrivalRequest request = new ArrivalRequest(10, LocalDate.of(2026, 4, 1));

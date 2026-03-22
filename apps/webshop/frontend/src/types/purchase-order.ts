@@ -6,6 +6,7 @@ export interface PurchaseOrder {
   desiredDeliveryDate: string
   status: string
   orderedAt: string
+  arrivedQuantity: number
 }
 
 export interface PurchaseOrderRequest {

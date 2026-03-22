@@ -7,6 +7,7 @@ import com.frerememoire.webshop.domain.order.OrderStatus;
 import com.frerememoire.webshop.domain.order.port.OrderRepository;
 import com.frerememoire.webshop.domain.product.Product;
 import com.frerememoire.webshop.domain.product.port.ProductRepository;
+import com.frerememoire.webshop.domain.shared.EntityNotFoundException;
 import com.frerememoire.webshop.domain.stock.Stock;
 import com.frerememoire.webshop.domain.stock.port.StockRepository;
 
@@ -45,10 +46,7 @@ public class BundlingQueryService {
 
         for (Order order : orders) {
             Product product = productRepository.findById(order.getProductId())
-                    .orElse(null);
-            if (product == null) {
-                continue;
-            }
+                    .orElseThrow(() -> new EntityNotFoundException("商品", order.getProductId()));
 
             Map<Long, Integer> requiredItems = product.getRequiredItems();
             List<RequiredItem> requiredItemList = new ArrayList<>();

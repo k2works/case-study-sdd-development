@@ -7,6 +7,7 @@ import com.frerememoire.webshop.domain.order.OrderStatus;
 import com.frerememoire.webshop.domain.order.port.OrderRepository;
 import com.frerememoire.webshop.domain.product.Product;
 import com.frerememoire.webshop.domain.product.port.ProductRepository;
+import com.frerememoire.webshop.domain.shared.EntityNotFoundException;
 import com.frerememoire.webshop.domain.stock.Stock;
 import com.frerememoire.webshop.domain.stock.port.StockRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -117,6 +119,23 @@ class BundlingQueryServiceTest {
         assertThat(summary.requiredQuantity()).isEqualTo(10);
         assertThat(summary.availableStock()).isEqualTo(3);
         assertThat(summary.shortage()).isEqualTo(7);
+    }
+
+    @Test
+    void 商品が存在しない注文ではEntityNotFoundExceptionが投げられる() {
+        LocalDate shippingDate = LocalDate.of(2026, 6, 1);
+
+        Order order = new Order(1L, 10L, 999L, 50L,
+                com.frerememoire.webshop.domain.order.DeliveryDate.reconstruct(shippingDate),
+                new com.frerememoire.webshop.domain.order.Message(null),
+                OrderStatus.ACCEPTED, LocalDateTime.now(), LocalDateTime.now());
+
+        when(orderRepository.findByDeliveryDateAndStatus(shippingDate, OrderStatus.ACCEPTED))
+                .thenReturn(List.of(order));
+        when(productRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.getTargets(shippingDate))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test

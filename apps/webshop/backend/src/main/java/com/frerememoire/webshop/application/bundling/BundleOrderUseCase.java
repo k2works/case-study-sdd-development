@@ -11,6 +11,9 @@ import com.frerememoire.webshop.domain.stock.Stock;
 import com.frerememoire.webshop.domain.stock.StockConsumptionService;
 import com.frerememoire.webshop.domain.stock.port.StockRepository;
 
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +34,7 @@ public class BundleOrderUseCase {
         this.stockConsumptionService = stockConsumptionService;
     }
 
+    @Transactional
     public Order execute(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("注文", orderId));
@@ -49,11 +53,14 @@ public class BundleOrderUseCase {
             int requiredQty = entry.getValue();
 
             List<Stock> availableStocks = stockRepository.findAvailableByItemIdOrderByArrivedDate(itemId);
+            Map<Stock, Integer> quantityBefore = new HashMap<>();
+            availableStocks.forEach(s -> quantityBefore.put(s, s.getQuantity()));
+
             stockConsumptionService.consumeFifo(availableStocks, requiredQty);
 
-            for (Stock stock : availableStocks) {
-                stockRepository.save(stock);
-            }
+            availableStocks.stream()
+                    .filter(s -> s.getQuantity() != quantityBefore.get(s))
+                    .forEach(stockRepository::save);
         }
 
         order.prepare();

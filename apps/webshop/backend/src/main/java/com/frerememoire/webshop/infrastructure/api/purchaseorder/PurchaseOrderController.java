@@ -42,7 +42,8 @@ public class PurchaseOrderController {
     @GetMapping("/{id}")
     public ResponseEntity<PurchaseOrderResponse> findById(@PathVariable Long id) {
         PurchaseOrder po = queryService.findById(id);
-        return ResponseEntity.ok(PurchaseOrderResponse.fromDomain(po));
+        int arrivedQuantity = queryService.getArrivedQuantity(id);
+        return ResponseEntity.ok(PurchaseOrderResponse.fromDomain(po, arrivedQuantity));
     }
 
     @GetMapping

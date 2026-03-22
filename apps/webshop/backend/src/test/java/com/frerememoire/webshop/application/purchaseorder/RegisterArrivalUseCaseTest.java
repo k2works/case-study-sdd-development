@@ -139,6 +139,24 @@ class RegisterArrivalUseCaseTest {
     }
 
     @Test
+    void RECEIVED状態の発注には入荷登録できない() {
+        PurchaseOrder po = new PurchaseOrder(1L, 10L, "花卸問屋A", 20,
+                LocalDate.of(2026, 5, 10), PurchaseOrderStatus.RECEIVED,
+                LocalDateTime.now(), LocalDateTime.now());
+
+        Arrival existingArrival = new Arrival(1L, 1L, 10L, 20, LocalDateTime.now());
+
+        when(purchaseOrderRepository.findById(1L)).thenReturn(Optional.of(po));
+        when(arrivalRepository.findByPurchaseOrderId(1L)).thenReturn(List.of(existingArrival));
+
+        RegisterArrivalCommand command = new RegisterArrivalCommand(1L, 1, LocalDate.of(2026, 4, 1));
+
+        assertThatThrownBy(() -> useCase.execute(command))
+                .isInstanceOf(BusinessRuleViolationException.class)
+                .hasMessageContaining("残数量");
+    }
+
+    @Test
     void 入荷数量が残数量を超過すると例外() {
         PurchaseOrder po = new PurchaseOrder(1L, 10L, "花卸問屋A", 20,
                 LocalDate.of(2026, 5, 10), PurchaseOrderStatus.ORDERED,

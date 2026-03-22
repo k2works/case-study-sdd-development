@@ -99,8 +99,9 @@ public class UseCaseConfig {
 
     @Bean
     public PurchaseOrderQueryService purchaseOrderQueryService(
-            PurchaseOrderRepository purchaseOrderRepository) {
-        return new PurchaseOrderQueryService(purchaseOrderRepository);
+            PurchaseOrderRepository purchaseOrderRepository,
+            ArrivalRepository arrivalRepository) {
+        return new PurchaseOrderQueryService(purchaseOrderRepository, arrivalRepository);
     }
 
     @Bean

@@ -66,6 +66,17 @@ export function BundlingTargetsPage() {
 
       {data && data.targets.length > 0 && (
         <>
+          {data.materialSummary.some((m) => m.shortage > 0) && (
+            <div className="bg-amber-50 border border-amber-300 text-amber-800 rounded-lg px-4 py-3 mb-6" role="alert">
+              <span className="font-semibold">花材が不足しています。</span>
+              {' '}仕入スタッフに連絡してください。不足花材:{' '}
+              {data.materialSummary
+                .filter((m) => m.shortage > 0)
+                .map((m) => `${m.itemName}（不足: ${m.shortage}）`)
+                .join('、')}
+            </div>
+          )}
+
           <div className="bg-white shadow rounded-lg overflow-hidden mb-8">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">

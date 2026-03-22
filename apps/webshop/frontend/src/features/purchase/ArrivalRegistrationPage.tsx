@@ -37,19 +37,10 @@ export function ArrivalRegistrationPage() {
 
   const itemName = items.find((i) => i.id === purchaseOrder?.itemId)?.name ?? ''
 
-  const { data: allOrders = [] } = useQuery<PurchaseOrder[]>({
-    queryKey: ['purchase-orders'],
-    queryFn: async () => {
-      const res = await purchaseOrderApi.getAll()
-      return res.data
-    },
-    enabled: false,
-  })
-
-  // 残数量は発注数量 - 既存入荷合計
-  // 簡易的にフロントでは発注数量をそのまま残数量として使い、
-  // バックエンドでバリデーションする
-  const remainingQuantity = purchaseOrder?.quantity ?? 0
+  const remainingQuantity = purchaseOrder
+    ? purchaseOrder.quantity - (purchaseOrder.arrivedQuantity ?? 0)
+    : 0
+  const isFullyReceived = purchaseOrder?.status === 'RECEIVED'
 
   const registerMutation = useMutation({
     mutationFn: () =>
@@ -134,6 +125,13 @@ export function ArrivalRegistrationPage() {
         </div>
       </div>
 
+      {isFullyReceived && (
+        <div className="bg-blue-50 border border-blue-200 text-blue-700 rounded-lg px-4 py-3 mb-6">
+          すべて入荷済みです。この発注に対する追加の入荷登録はできません。
+        </div>
+      )}
+
+      {!isFullyReceived && (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">入荷情報</h3>
         {error && (
@@ -189,6 +187,7 @@ export function ArrivalRegistrationPage() {
           </div>
         </form>
       </div>
+      )}
 
       {confirmDialog && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="confirm-arrival-title">

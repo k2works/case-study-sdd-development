@@ -11,6 +11,8 @@ import com.frerememoire.webshop.domain.shared.EntityNotFoundException;
 import com.frerememoire.webshop.domain.stock.Stock;
 import com.frerememoire.webshop.domain.stock.port.StockRepository;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 
 public class RegisterArrivalUseCase {
@@ -30,6 +32,7 @@ public class RegisterArrivalUseCase {
         this.stockRepository = stockRepository;
     }
 
+    @Transactional
     public Arrival execute(RegisterArrivalCommand command) {
         PurchaseOrder po = purchaseOrderRepository.findById(command.purchaseOrderId())
                 .orElseThrow(() -> new EntityNotFoundException("発注", command.purchaseOrderId()));
