@@ -7,11 +7,11 @@
 | **イテレーション** | 4 |
 | **期間** | 2026-05-04 〜 2026-05-15（2 週間） |
 | **ゴール** | 在庫推移表示と発注・入荷を完成させ、仕入スタッフが在庫を可視化し適切なタイミングで発注できる状態にする。MVP リリース準備。 |
-| **目標 SP** | 16 |
+| **目標 SP** | 13 |
 
 > **注記**: 全実装タスクは TDD（Red-Green-Refactor）で進め、ユニットテストの工数を各タスクの見積もりに含む。
 >
-> **リスク**: 16SP は直近 3 イテレーションの平均ベロシティ（11.7SP）を超過。US-011（入荷登録 3SP）は IT5 に移動可能。
+> **変更（レビュー反映）**: US-011（入荷登録 3SP）を IT5 に移動し、16SP → 13SP に調整。直近 3 イテレーションの平均ベロシティ（11.7SP）に近づけた。
 
 ---
 
@@ -21,8 +21,7 @@
 
 1. **在庫推移表示**: 仕入スタッフが単品ごとの日別在庫予定数（前日在庫・入荷予定・受注引当・廃棄予定・在庫予定）を確認でき、在庫不足をアラートで検知できる
 2. **単品発注**: 仕入スタッフが在庫推移に基づいて不足する単品を発注でき、発注が在庫推移に入荷予定として反映される
-3. **入荷登録**: 仕入スタッフが発注に対する入荷実績を登録し、在庫が更新される
-4. **MVP リリース準備**: Phase 1 の全機能が統合テストをパスし、リリース可能な状態
+3. ~~**入荷登録**~~: IT5 に移動（レビュー H-7）
 
 ### 成功基準
 
@@ -45,8 +44,8 @@
 |----|-------------------|----|--------|
 | US-009 | 在庫推移を表示する | 8 | 必須 |
 | US-010 | 単品を発注する | 5 | 必須 |
-| US-011 | 入荷を登録する | 3 | 必須（IT5 移動可） |
-| **合計** | | **16** | |
+| ~~US-011~~ | ~~入荷を登録する~~ | ~~3~~ | ~~IT5 に移動（レビュー H-7）~~ |
+| **合計** | | **13** | |
 
 ### ストーリー詳細
 
@@ -96,8 +95,8 @@
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
 | 1.1 | Stock エンティティ（StockId, itemId, quantity, arrivedDate, expiryDate, StockStatus）の TDD 実装。品質維持日数に基づく expiryDate 計算、consume/isExpired のテスト | 3h | - | [ ] |
-| 1.2 | InventoryTransitionService ドメインサービスの TDD 実装。日別在庫予定数の計算ロジック（前日在庫 + 入荷予定 - 受注引当 - 廃棄予定 = 在庫予定）。エッジケース: 在庫 0、廃棄日=当日、複数ロット | 4h | - | [ ] |
-| 1.3 | StockRepository / InventoryQueryService ポートインターフェース定義 | 1h | - | [ ] |
+| 1.2 | InventoryTransitionService ドメインサービスの TDD 実装。**Clock 注入**で日付テスタビリティを確保（レビュー H-2）。日別在庫予定数の計算ロジック（前日在庫 + 入荷予定 - 受注引当 - 廃棄予定 = 在庫予定）。エッジケース: 在庫 0、廃棄日=当日、複数ロット、マイナス在庫、品質維持日数 0/1 日 | 4.5h | - | [ ] |
+| 1.3 | StockRepository + **InventoryQueryPort**（受注引当・入荷予定の取得を抽象化、レビュー H-4）ポートインターフェース定義 | 1.5h | - | [ ] |
 | 1.4 | Flyway V6__create_purchase_orders_and_stocks.sql マイグレーション（purchase_orders, arrivals, stocks テーブル作成） | 1.5h | - | [ ] |
 | 1.5 | JPA エンティティ・リポジトリインフラ層実装（StockEntity, PurchaseOrderEntity, ArrivalEntity） | 3h | - | [ ] |
 | 1.6 | 在庫推移 API 実装（GET /api/v1/admin/inventory/transition?itemId=&from=&to=） | 2h | - | [ ] |
@@ -109,7 +108,7 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 2.1 | PurchaseOrder エンティティ（PurchaseOrderId, itemId, supplierId, quantity, desiredDeliveryDate, PurchaseOrderStatus）の TDD 実装。購入単位の倍数バリデーション、ステータス遷移テスト | 2.5h | - | [ ] |
+| 2.1 | PurchaseOrder エンティティ（PurchaseOrderId, itemId, **supplierName**: String, quantity, desiredDeliveryDate, PurchaseOrderStatus）の TDD 実装。購入単位の倍数バリデーション（購入単位未満→切り上げ提案）、ステータス遷移テスト（レビュー H-3: supplier_name 文字列で統一） | 2.5h | - | [ ] |
 | 2.2 | PlacePurchaseOrderUseCase（発注作成）の TDD 実装 | 2h | - | [ ] |
 | 2.3 | 発注 API 実装（POST /api/v1/admin/purchase-orders, GET /api/v1/admin/purchase-orders） | 2h | - | [ ] |
 | 2.4 | 発注画面（S-301: PurchaseOrderPage）フロントエンド実装。新規発注フォーム（単品選択→仕入先・購入単位・リードタイム自動表示）、発注一覧、二重送信防止 | 3.5h | - | [ ] |
@@ -117,16 +116,11 @@
 
 **小計**: 11h（理想時間）
 
-#### 3. 入荷登録の実装（US-011: 3 SP）
+#### ~~3. 入荷登録の実装（US-011: 3 SP）~~ → IT5 に移動（レビュー H-7）
 
-| # | タスク | 見積もり | 担当 | 状態 |
-|---|--------|---------|------|------|
-| 3.1 | Arrival エンティティ・入荷登録ロジックの TDD 実装。入荷時の Stock 自動作成、PurchaseOrderStatus の遷移（ORDERED → PARTIAL / RECEIVED） | 2h | - | [ ] |
-| 3.2 | RegisterArrivalUseCase（入荷登録）の TDD 実装 | 1.5h | - | [ ] |
-| 3.3 | 入荷 API 実装（POST /api/v1/admin/purchase-orders/{id}/arrivals） | 1.5h | - | [ ] |
-| 3.4 | 入荷登録画面（S-302: ArrivalRegistrationPage）フロントエンド実装 | 2h | - | [ ] |
-
-**小計**: 7h（理想時間）
+> US-011 は IT5 の冒頭で実装する。発注集約の PurchaseOrder と Arrival の関連、
+> RegisterArrivalUseCase での集約間調整（発注ステータス更新 + Stock 作成）は
+> IT5 計画で詳細化する。
 
 #### 4. IT3 残タスク + MVP リリース準備（SP 外）
 
@@ -134,10 +128,12 @@
 |---|--------|---------|------|------|
 | 4.1 | IT3 残: 商品カタログに画像プレースホルダー追加（UI/UX-H-1） | 1h | - | [ ] |
 | 4.2 | IT3 残: 商品詳細の 2 カラムレイアウト化（UI/UX-H-5） | 1.5h | - | [ ] |
-| 4.3 | IT3 残: ダッシュボードに業務サマリカード追加（UI/UX-M-7）。受注 API 接続 | 2h | - | [ ] |
-| 4.4 | MVP 回帰テスト（IT1〜IT4 の全機能を通しで確認） | 2h | - | [ ] |
+| 4.3 | IT3 残: ダッシュボードに業務サマリカード追加（UI/UX-M-7）。受注 API + 在庫アラート API 接続 | 2h | - | [ ] |
+| 4.4 | GlobalExceptionHandler + SecurityConfig の認可ルール統合テスト追加（レビュー H-6） | 2h | - | [ ] |
+| 4.5 | Item.java の shelfLifeDays → qualityRetentionDays リネームリファクタリング（レビュー M-2） | 0.5h | - | [ ] |
+| 4.6 | ナビゲーションに在庫管理・発注管理リンク追加（レビュー M-7） | 1h | - | [ ] |
 
-**小計**: 6.5h（理想時間）
+**小計**: 8h（理想時間）
 
 #### 5. テスト（品質保証・SP 外）
 
@@ -154,15 +150,15 @@
 
 | カテゴリ | SP | 理想時間 | 状態 |
 |---------|----|----|------|
-| 在庫ドメイン・在庫推移（US-009） | 8 | 18.5h | [ ] |
+| 在庫ドメイン・在庫推移（US-009） | 8 | 19.5h | [ ] |
 | 発注機能（US-010） | 5 | 11h | [ ] |
-| 入荷登録（US-011） | 3 | 7h | [ ] |
-| IT3 残タスク + MVP 準備（SP 外） | - | 6.5h | [ ] |
+| ~~入荷登録（US-011）~~ | ~~3~~ | - | IT5 移動 |
+| レビュー指摘 + IT3 残タスク（SP 外） | - | 8h | [ ] |
 | テスト（SP 外） | - | 9h | [ ] |
-| **合計** | **16** | **52h** | |
+| **合計** | **13** | **47.5h** | |
 
-**1 SP あたり**: 約 3.3h（テスト含む）
-**進捗率**: 0% (0/16 SP)
+**1 SP あたり**: 約 3.7h（テスト含む）
+**進捗率**: 0% (0/13 SP)
 
 ---
 
@@ -200,21 +196,20 @@ gantt
     section US-010 発注
     PurchaseOrder TDD + UseCase          :a1, 2026-05-11, 1d
     発注 API + 発注画面                   :a2, after a1, 1d
-    section US-011 入荷
-    入荷ロジック + API + 画面             :b1, 2026-05-13, 1d
-    section MVP 準備
-    ダッシュボード + 統合テスト            :c1, 2026-05-14, 1d
+    section レビュー指摘 + テスト
+    ナビ + リネーム + 認可テスト           :c1, 2026-05-13, 1d
+    ダッシュボード + 統合テスト            :c2, after c1, 1d
     section 品質保証
-    E2E テスト + 回帰テスト + バグ修正    :t1, 2026-05-15, 1d
+    E2E テスト + フロントエンドテスト      :t1, 2026-05-15, 1d
 ```
 
 | 日 | タスク |
 |----|--------|
 | Day 6 | PurchaseOrder TDD + UseCase（2.1, 2.2）|
 | Day 7 | 発注 API + 発注画面 + API クライアント（2.3, 2.4, 2.5） |
-| Day 8 | 入荷ロジック + API + 入荷画面（3.1, 3.2, 3.3, 3.4） |
-| Day 9 | ダッシュボード業務サマリ接続（4.3）+ 統合テスト（5.1, 5.2） |
-| Day 10 | E2E テスト + 回帰テスト + フロントエンドテスト + バグ修正（4.4, 5.3, 5.4） |
+| Day 8 | ナビゲーション追加 + Item リネーム + SecurityConfig 認可テスト（4.4, 4.5, 4.6） |
+| Day 9 | ダッシュボード業務サマリ + IT3 残タスク + 統合テスト（4.1, 4.2, 4.3, 5.1, 5.2） |
+| Day 10 | E2E テスト + フロントエンドテスト + バグ修正（5.3, 5.4） |
 
 ---
 
@@ -251,7 +246,7 @@ package "発注集約" #lightsalmon {
   class PurchaseOrder <<Entity>> <<Aggregate Root>> {
     - purchaseOrderId: PurchaseOrderId
     - itemId: ItemId
-    - supplierId: String
+    - supplierName: String
     - quantity: Quantity
     - desiredDeliveryDate: LocalDate
     - status: PurchaseOrderStatus
@@ -278,7 +273,15 @@ package "発注集約" #lightsalmon {
 
 package "ドメインサービス" #lightyellow {
   class InventoryTransitionService <<Domain Service>> {
+    - clock: Clock
+    - inventoryQueryPort: InventoryQueryPort
     + calculateTransition(itemId, dateRange): List<DailyInventory>
+  }
+
+  interface InventoryQueryPort <<Port>> {
+    + findExpectedArrivals(itemId, date): Integer
+    + findOrderAllocations(itemId, date): Integer
+    + findExpectedExpirations(itemId, date): Integer
   }
 
   class DailyInventory <<Value Object>> {
@@ -430,7 +433,9 @@ apps/webshop/
 │   │   │   ├── StockStatus.java
 │   │   │   ├── DailyInventory.java
 │   │   │   ├── InventoryTransitionService.java
-│   │   │   └── port/StockRepository.java
+│   │   │   └── port/
+│   │   │       ├── StockRepository.java
+│   │   │       └── InventoryQueryPort.java
 │   │   └── purchase/
 │   │       ├── PurchaseOrder.java
 │   │       ├── PurchaseOrderStatus.java
@@ -516,6 +521,7 @@ apps/webshop/
 | 日付 | 更新内容 | 更新者 |
 |------|---------|--------|
 | 2026-03-22 | 初版作成 | - |
+| 2026-03-22 | レビュー指摘反映。H-7: US-011 を IT5 に移動（16→13SP）、H-2: Clock 注入を InventoryTransitionService に追加、H-3: supplierName 文字列で統一、H-4: InventoryQueryPort を追加、H-6: 認可テストタスク追加、M-2: Item リネームタスク追加、M-7: ナビゲーション追加タスク追加 | - |
 
 ---
 
