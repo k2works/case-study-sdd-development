@@ -79,9 +79,27 @@ class PurchaseOrderTest {
     }
 
     @Test
-    void RECEIVEDからの遷移は不可() {
+    void RECEIVEDからreceivePartialは不可() {
         PurchaseOrder po = PurchaseOrder.create(1L, "花卸問屋A", 10, LocalDate.of(2026, 5, 10), 10);
         po.receiveAll();
+
+        assertThatThrownBy(po::receivePartial)
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void RECEIVEDからreceiveAllは不可() {
+        PurchaseOrder po = PurchaseOrder.create(1L, "花卸問屋A", 10, LocalDate.of(2026, 5, 10), 10);
+        po.receiveAll();
+
+        assertThatThrownBy(po::receiveAll)
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void PARTIALからreceivePartialは不可() {
+        PurchaseOrder po = PurchaseOrder.create(1L, "花卸問屋A", 10, LocalDate.of(2026, 5, 10), 10);
+        po.receivePartial();
 
         assertThatThrownBy(po::receivePartial)
                 .isInstanceOf(IllegalStateException.class);

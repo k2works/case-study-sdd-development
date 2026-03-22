@@ -1,6 +1,7 @@
 package com.frerememoire.webshop.application.purchaseorder;
 
 import com.frerememoire.webshop.domain.purchaseorder.PurchaseOrder;
+import com.frerememoire.webshop.domain.purchaseorder.PurchaseOrderStatus;
 import com.frerememoire.webshop.domain.purchaseorder.port.PurchaseOrderRepository;
 import com.frerememoire.webshop.domain.shared.EntityNotFoundException;
 
@@ -18,7 +19,7 @@ public class PurchaseOrderQueryService {
         return purchaseOrderRepository.findAll();
     }
 
-    public List<PurchaseOrder> findByStatus(String status) {
+    public List<PurchaseOrder> findByStatus(PurchaseOrderStatus status) {
         return purchaseOrderRepository.findByStatus(status);
     }
 

@@ -3,6 +3,7 @@ package com.frerememoire.webshop.infrastructure.api.purchaseorder;
 import com.frerememoire.webshop.application.purchaseorder.PlacePurchaseOrderUseCase;
 import com.frerememoire.webshop.application.purchaseorder.PurchaseOrderQueryService;
 import com.frerememoire.webshop.domain.purchaseorder.PurchaseOrder;
+import com.frerememoire.webshop.domain.purchaseorder.PurchaseOrderStatus;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,8 @@ public class PurchaseOrderController {
             @RequestParam(required = false) String status) {
         List<PurchaseOrder> orders;
         if (status != null && !status.isEmpty()) {
-            orders = queryService.findByStatus(status);
+            PurchaseOrderStatus poStatus = PurchaseOrderStatus.valueOf(status.toUpperCase());
+            orders = queryService.findByStatus(poStatus);
         } else {
             orders = queryService.findAll();
         }

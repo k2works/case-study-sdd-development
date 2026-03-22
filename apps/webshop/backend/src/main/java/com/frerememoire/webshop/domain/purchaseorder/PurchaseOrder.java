@@ -1,5 +1,6 @@
 package com.frerememoire.webshop.domain.purchaseorder;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -31,6 +32,11 @@ public class PurchaseOrder {
 
     public static PurchaseOrder create(Long itemId, String supplierName, int quantity,
                                         LocalDate desiredDeliveryDate, int purchaseUnit) {
+        return create(itemId, supplierName, quantity, desiredDeliveryDate, purchaseUnit, Clock.systemDefaultZone());
+    }
+
+    public static PurchaseOrder create(Long itemId, String supplierName, int quantity,
+                                        LocalDate desiredDeliveryDate, int purchaseUnit, Clock clock) {
         if (itemId == null) {
             throw new IllegalArgumentException("単品IDは必須です");
         }
@@ -53,7 +59,7 @@ public class PurchaseOrder {
                             purchaseUnit, quantity, roundUpToUnit(quantity, purchaseUnit)));
         }
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(clock);
         return new PurchaseOrder(null, itemId, supplierName, quantity,
                 desiredDeliveryDate, PurchaseOrderStatus.ORDERED, now, now);
     }

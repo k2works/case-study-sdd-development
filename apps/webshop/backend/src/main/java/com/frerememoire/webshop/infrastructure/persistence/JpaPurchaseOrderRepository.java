@@ -37,9 +37,8 @@ public class JpaPurchaseOrderRepository implements PurchaseOrderRepository {
     }
 
     @Override
-    public List<PurchaseOrder> findByStatus(String status) {
-        PurchaseOrderStatus poStatus = PurchaseOrderStatus.valueOf(status);
-        return springDataRepository.findByStatus(poStatus).stream()
+    public List<PurchaseOrder> findByStatus(PurchaseOrderStatus status) {
+        return springDataRepository.findByStatus(status).stream()
                 .map(PurchaseOrderEntity::toDomain)
                 .toList();
     }

@@ -50,10 +50,10 @@ export function PurchaseOrderPage() {
   })
 
   const createMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (actualQuantity: number) =>
       purchaseOrderApi.create({
         itemId: selectedItemId!,
-        quantity,
+        quantity: actualQuantity,
         desiredDeliveryDate,
       }),
     onSuccess: () => {
@@ -75,14 +75,16 @@ export function PurchaseOrderPage() {
       setError('全ての項目を入力してください')
       return
     }
+    let finalQuantity = quantity
     if (selectedItem && quantity % selectedItem.purchaseUnit !== 0) {
       const rounded = Math.ceil(quantity / selectedItem.purchaseUnit) * selectedItem.purchaseUnit
       if (!window.confirm(`${quantity} → ${rounded} 本に切り上げますか？`)) {
         return
       }
+      finalQuantity = rounded
       setQuantity(rounded)
     }
-    createMutation.mutate()
+    createMutation.mutate(finalQuantity)
   }
 
   const getItemName = (itemId: number) => {

@@ -138,7 +138,7 @@ entity "items" as items {
   quality_retention_days : INTEGER <<NOT NULL>>
   purchase_unit : INTEGER <<NOT NULL>>
   lead_time_days : INTEGER <<NOT NULL>>
-  supplier_id : BIGINT <<FK, NOT NULL>>
+  supplier_name : VARCHAR(200) <<NOT NULL>>
   is_active : BOOLEAN <<DEFAULT true>>
   created_at : TIMESTAMP <<NOT NULL>>
   updated_at : TIMESTAMP <<NOT NULL>>
@@ -172,7 +172,7 @@ entity "purchase_orders" as purchase_orders {
   *id : BIGSERIAL <<PK>>
   --
   item_id : BIGINT <<FK, NOT NULL>>
-  supplier_id : BIGINT <<FK, NOT NULL>>
+  supplier_name : VARCHAR(200) <<NOT NULL>>
   quantity : INTEGER <<NOT NULL>>
   desired_delivery_date : DATE <<NOT NULL>>
   status : VARCHAR(20) <<NOT NULL>>
@@ -296,7 +296,7 @@ purchase_orders ||--o{ arrivals
 | quality_retention_days | INTEGER | NO | - | 品質維持日数（1〜30） |
 | purchase_unit | INTEGER | NO | - | 購入単位 |
 | lead_time_days | INTEGER | NO | - | リードタイム（1〜14 日） |
-| supplier_id | BIGINT | NO | - | 仕入先 ID（FK: suppliers.id） |
+| supplier_name | VARCHAR(200) | NO | - | 仕入先名（仕入先マスタは MVP スコープ外のため文字列管理） |
 | is_active | BOOLEAN | NO | true | 有効フラグ |
 | created_at | TIMESTAMP | NO | CURRENT_TIMESTAMP | 作成日時 |
 | updated_at | TIMESTAMP | NO | CURRENT_TIMESTAMP | 更新日時 |
@@ -344,7 +344,7 @@ purchase_orders ||--o{ arrivals
 |:---|:---|:---|:---|:---|
 | id | BIGSERIAL | NO | 自動採番 | 主キー |
 | item_id | BIGINT | NO | - | 単品 ID（FK: items.id） |
-| supplier_id | BIGINT | NO | - | 仕入先 ID（FK: suppliers.id） |
+| supplier_name | VARCHAR(200) | NO | - | 仕入先名（仕入先マスタは MVP スコープ外のため文字列管理） |
 | quantity | INTEGER | NO | - | 発注数量 |
 | desired_delivery_date | DATE | NO | - | 希望納品日 |
 | status | VARCHAR(20) | NO | - | ステータス（ordered/partial/received） |

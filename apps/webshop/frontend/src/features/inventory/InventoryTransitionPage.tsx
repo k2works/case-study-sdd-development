@@ -71,6 +71,10 @@ export function InventoryTransitionPage() {
         <h2 className="text-2xl font-semibold text-gray-900">在庫推移</h2>
       </div>
 
+      <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-4 text-sm text-amber-800">
+        入荷予定・受注引当は現在未反映です。在庫予定は現在庫と廃棄予定のみで計算されています。
+      </div>
+
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>

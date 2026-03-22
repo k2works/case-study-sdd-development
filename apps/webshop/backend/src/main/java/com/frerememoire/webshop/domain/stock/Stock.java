@@ -1,5 +1,6 @@
 package com.frerememoire.webshop.domain.stock;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -41,6 +42,11 @@ public class Stock {
 
     public static Stock create(Long itemId, int quantity, LocalDate arrivedDate,
                                 int qualityRetentionDays) {
+        return create(itemId, quantity, arrivedDate, qualityRetentionDays, Clock.systemDefaultZone());
+    }
+
+    public static Stock create(Long itemId, int quantity, LocalDate arrivedDate,
+                                int qualityRetentionDays, Clock clock) {
         if (arrivedDate == null) {
             throw new IllegalArgumentException("入荷日は必須です");
         }
@@ -49,7 +55,7 @@ public class Stock {
         }
         LocalDate expiryDate = arrivedDate.plusDays(qualityRetentionDays);
         return new Stock(null, itemId, quantity, arrivedDate, expiryDate,
-                StockStatus.AVAILABLE, LocalDateTime.now());
+                StockStatus.AVAILABLE, LocalDateTime.now(clock));
     }
 
     public void consume(int qty) {

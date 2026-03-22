@@ -107,7 +107,7 @@ package "単品集約" #lightgreen {
     - qualityRetentionDays: QualityRetentionDays
     - purchaseUnit: PurchaseUnit
     - leadTimeDays: LeadTime
-    - supplierId: SupplierId
+    - supplierName: String
   }
 
   class QualityRetentionDays <<Value Object>> {
@@ -151,7 +151,7 @@ package "発注集約" #lightsalmon {
   class PurchaseOrder <<Entity>> <<Aggregate Root>> {
     - purchaseOrderId: PurchaseOrderId
     - itemId: ItemId
-    - supplierId: SupplierId
+    - supplierName: String
     - quantity: Quantity
     - desiredDeliveryDate: LocalDate
     - status: PurchaseOrderStatus
