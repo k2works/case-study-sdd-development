@@ -21,7 +21,7 @@ public class ItemEntity {
     @Column(nullable = false, length = 200)
     private String name;
 
-    @Column(name = "shelf_life_days", nullable = false)
+    @Column(name = "quality_retention_days", nullable = false)
     private int qualityRetentionDays;
 
     @Column(name = "purchase_unit", nullable = false)
