@@ -65,6 +65,8 @@
 | [IT4 実装 UI/UX レビュー](./review/it4_impl_uiux_review_20260322.md) | IT4 実装後の UI/UX レビュー |
 | [IT5 計画レビュー](./review/iteration_plan-5_review_20260322.md) | IT5 イテレーション計画のマルチパースペクティブレビュー |
 | [IT5 UI/UX レビュー](./review/iteration_plan-5_uiux_review_20260322.md) | S-302 入荷登録・S-401 結束対象一覧の UI/UX レビュー |
+| [IT5 開発レビュー](./review/it5_developing_review_20260322.md) | IT5 入荷登録・結束対象確認・結束完了実装のマルチパースペクティブレビュー |
+| [IT5 実装 UI/UX レビュー](./review/it5_impl_uiux_review_20260322.md) | IT5 実装後の UI/UX レビュー |
 
 ### 開発 (`development/`)
 
