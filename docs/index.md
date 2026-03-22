@@ -77,6 +77,7 @@
 | [IT3 ふりかえり](./development/iteration_retrospective-3.md) | 作成済み |
 | [IT3 完了報告書](./development/iteration_report-3.md) | 作成済み |
 | [IT4 イテレーション計画](./development/iteration_plan-4.md) | 完了（13 SP / 47.5h） |
+| [IT4 ふりかえり](./development/iteration_retrospective-4.md) | 作成済み |
 
 ### 運用 (`operation/`)
 
