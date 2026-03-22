@@ -43,7 +43,7 @@ public class ItemController {
     @PostMapping
     public ResponseEntity<ItemResponse> create(@Valid @RequestBody ItemRequest request) {
         Item item = itemUseCase.create(
-                request.name(), request.shelfLifeDays(), request.purchaseUnit(),
+                request.name(), request.qualityRetentionDays(), request.purchaseUnit(),
                 request.leadTimeDays(), request.supplierName());
         return ResponseEntity.status(HttpStatus.CREATED).body(ItemResponse.fromDomain(item));
     }
@@ -52,7 +52,7 @@ public class ItemController {
     public ResponseEntity<ItemResponse> update(@PathVariable Long id,
                                                 @Valid @RequestBody ItemRequest request) {
         Item item = itemUseCase.update(id,
-                request.name(), request.shelfLifeDays(), request.purchaseUnit(),
+                request.name(), request.qualityRetentionDays(), request.purchaseUnit(),
                 request.leadTimeDays(), request.supplierName());
         return ResponseEntity.ok(ItemResponse.fromDomain(item));
     }

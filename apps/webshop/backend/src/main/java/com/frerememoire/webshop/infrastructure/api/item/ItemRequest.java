@@ -10,7 +10,7 @@ public record ItemRequest(
         String name,
 
         @Min(value = 1, message = "品質保持日数は1以上である必要があります")
-        int shelfLifeDays,
+        int qualityRetentionDays,
 
         @Min(value = 1, message = "発注単位は1以上である必要があります")
         int purchaseUnit,

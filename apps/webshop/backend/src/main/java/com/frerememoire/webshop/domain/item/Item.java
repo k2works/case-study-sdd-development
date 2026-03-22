@@ -9,25 +9,25 @@ public class Item {
 
     private Long id;
     private String name;
-    private int shelfLifeDays;
+    private int qualityRetentionDays;
     private int purchaseUnit;
     private int leadTimeDays;
     private String supplierName;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Item(Long id, String name, int shelfLifeDays, int purchaseUnit,
+    public Item(Long id, String name, int qualityRetentionDays, int purchaseUnit,
                 int leadTimeDays, String supplierName,
                 LocalDateTime createdAt, LocalDateTime updatedAt) {
         validateName(name);
-        validatePositive(shelfLifeDays, "品質保持日数");
+        validatePositive(qualityRetentionDays, "品質保持日数");
         validatePositive(purchaseUnit, "発注単位");
         validatePositive(leadTimeDays, "リードタイム");
         validateSupplierName(supplierName);
 
         this.id = id;
         this.name = name;
-        this.shelfLifeDays = shelfLifeDays;
+        this.qualityRetentionDays = qualityRetentionDays;
         this.purchaseUnit = purchaseUnit;
         this.leadTimeDays = leadTimeDays;
         this.supplierName = supplierName;
@@ -35,23 +35,23 @@ public class Item {
         this.updatedAt = updatedAt;
     }
 
-    public static Item create(String name, int shelfLifeDays, int purchaseUnit,
+    public static Item create(String name, int qualityRetentionDays, int purchaseUnit,
                                int leadTimeDays, String supplierName) {
         LocalDateTime now = LocalDateTime.now();
-        return new Item(null, name, shelfLifeDays, purchaseUnit,
+        return new Item(null, name, qualityRetentionDays, purchaseUnit,
                 leadTimeDays, supplierName, now, now);
     }
 
-    public void update(String name, int shelfLifeDays, int purchaseUnit,
+    public void update(String name, int qualityRetentionDays, int purchaseUnit,
                        int leadTimeDays, String supplierName) {
         validateName(name);
-        validatePositive(shelfLifeDays, "品質保持日数");
+        validatePositive(qualityRetentionDays, "品質保持日数");
         validatePositive(purchaseUnit, "発注単位");
         validatePositive(leadTimeDays, "リードタイム");
         validateSupplierName(supplierName);
 
         this.name = name;
-        this.shelfLifeDays = shelfLifeDays;
+        this.qualityRetentionDays = qualityRetentionDays;
         this.purchaseUnit = purchaseUnit;
         this.leadTimeDays = leadTimeDays;
         this.supplierName = supplierName;
@@ -96,8 +96,8 @@ public class Item {
         return name;
     }
 
-    public int getShelfLifeDays() {
-        return shelfLifeDays;
+    public int getQualityRetentionDays() {
+        return qualityRetentionDays;
     }
 
     public int getPurchaseUnit() {

@@ -53,7 +53,7 @@ describe('ItemListPage', () => {
         {
           id: 1,
           name: 'バラ',
-          shelfLifeDays: 7,
+          qualityRetentionDays: 7,
           purchaseUnit: 10,
           leadTimeDays: 3,
           supplierName: '花卸問屋A',

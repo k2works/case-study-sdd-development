@@ -54,8 +54,8 @@ const mockProduct = {
 }
 
 const mockItems = [
-  { id: 1, name: 'バラ', shelfLifeDays: 7, purchaseUnit: 10, leadTimeDays: 2, supplierName: '花卸A' },
-  { id: 2, name: 'チューリップ', shelfLifeDays: 5, purchaseUnit: 20, leadTimeDays: 3, supplierName: '花卸B' },
+  { id: 1, name: 'バラ', qualityRetentionDays: 7, purchaseUnit: 10, leadTimeDays: 2, supplierName: '花卸A' },
+  { id: 2, name: 'チューリップ', qualityRetentionDays: 5, purchaseUnit: 20, leadTimeDays: 3, supplierName: '花卸B' },
 ]
 
 function renderProductCompositionPage() {

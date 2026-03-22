@@ -23,17 +23,17 @@ public class ItemUseCase {
                 .orElseThrow(() -> new EntityNotFoundException("単品", id));
     }
 
-    public Item create(String name, int shelfLifeDays, int purchaseUnit,
+    public Item create(String name, int qualityRetentionDays, int purchaseUnit,
                        int leadTimeDays, String supplierName) {
-        Item item = Item.create(name, shelfLifeDays, purchaseUnit,
+        Item item = Item.create(name, qualityRetentionDays, purchaseUnit,
                 leadTimeDays, supplierName);
         return itemRepository.save(item);
     }
 
-    public Item update(Long id, String name, int shelfLifeDays, int purchaseUnit,
+    public Item update(Long id, String name, int qualityRetentionDays, int purchaseUnit,
                        int leadTimeDays, String supplierName) {
         Item item = findById(id);
-        item.update(name, shelfLifeDays, purchaseUnit, leadTimeDays, supplierName);
+        item.update(name, qualityRetentionDays, purchaseUnit, leadTimeDays, supplierName);
         return itemRepository.save(item);
     }
 
