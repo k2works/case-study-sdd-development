@@ -93,10 +93,10 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 0.1 | InventoryQueryPort.getExpectedArrivals 実装（purchase_orders.desired_delivery_date + arrivals から推定） | 2h | - | [ ] |
-| 0.2 | InventoryQueryPort.getOrderAllocations 実装（orders + product_compositions JOIN から引当数計算）（レビュー H-4: 3.5h に上方修正） | 3.5h | - | [ ] |
-| 0.3 | 在庫推移画面の「未反映」バナー除去 + 動作確認 | 0.5h | - | [ ] |
-| 0.4 | domain_model.md / data-model.md / architecture_backend.md の IT4 実装差分チェック・更新（レビュー Architect: API パス /admin/ 不一致の解消含む） | 1.5h | - | [ ] |
+| 0.1 | InventoryQueryPort.getExpectedArrivals 実装（purchase_orders.desired_delivery_date + arrivals から推定） | 2h | - | [x] |
+| 0.2 | InventoryQueryPort.getOrderAllocations 実装（orders + product_compositions JOIN から引当数計算）（レビュー H-4: 3.5h に上方修正） | 3.5h | - | [x] |
+| 0.3 | 在庫推移画面の「未反映」バナー除去 + 動作確認 | 0.5h | - | [x] |
+| 0.4 | domain_model.md / data-model.md / architecture_backend.md の IT4 実装差分チェック・更新（レビュー Architect: API パス /admin/ 不一致の解消含む） | 1.5h | - | [x] |
 
 **小計**: 7.5h（理想時間）
 
@@ -104,10 +104,10 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 1.1 | PurchaseOrder に remainingQuantity() 追加 + PurchaseOrderStatus に PARTIAL→PARTIAL 遷移追加 + Arrival ドメインエンティティの TDD 実装（残数量超過チェック）（レビュー H-1, H-2） | 3h | - | [ ] |
-| 1.2 | RegisterArrivalUseCase の TDD 実装（発注ステータス更新 ORDERED→PARTIAL/RECEIVED + Stock 自動作成） | 3h | - | [ ] |
-| 1.3 | 入荷 API 実装（POST /api/v1/admin/purchase-orders/{id}/arrivals） | 1.5h | - | [ ] |
-| 1.4 | 入荷登録画面（S-302: ArrivalRegistrationPage）フロントエンド実装 | 2.5h | - | [ ] |
+| 1.1 | PurchaseOrder に remainingQuantity() 追加 + PurchaseOrderStatus に PARTIAL→PARTIAL 遷移追加 + Arrival ドメインエンティティの TDD 実装（残数量超過チェック）（レビュー H-1, H-2） | 3h | - | [x] |
+| 1.2 | RegisterArrivalUseCase の TDD 実装（発注ステータス更新 ORDERED→PARTIAL/RECEIVED + Stock 自動作成） | 3h | - | [x] |
+| 1.3 | 入荷 API 実装（POST /api/v1/admin/purchase-orders/{id}/arrivals） | 1.5h | - | [x] |
+| 1.4 | 入荷登録画面（S-302: ArrivalRegistrationPage）フロントエンド実装 | 2.5h | - | [x] |
 
 **小計**: 10h（理想時間）
 
@@ -115,11 +115,11 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 2.1 | 結束対象クエリのドメインロジック TDD（出荷日=翌日の受注 + 花束構成から必要花材計算。Clock 注入パターン適用） | 2.5h | - | [ ] |
-| 2.2 | BundlingQueryService の TDD 実装（application/bundling/ に配置、レビュー M-2） | 1.5h | - | [ ] |
-| 2.3 | 結束対象 API 実装（GET /api/v1/admin/bundling/targets） | 1.5h | - | [ ] |
-| 2.4 | SecurityConfig に FLORIST / DELIVERY_STAFF ロール追加 | 0.5h | - | [ ] |
-| 2.5 | 結束対象一覧画面（S-401: BundlingTargetsPage）フロントエンド実装 | 3h | - | [ ] |
+| 2.1 | 結束対象クエリのドメインロジック TDD（出荷日=翌日の受注 + 花束構成から必要花材計算。Clock 注入パターン適用） | 2.5h | - | [x] |
+| 2.2 | BundlingQueryService の TDD 実装（application/bundling/ に配置、レビュー M-2） | 1.5h | - | [x] |
+| 2.3 | 結束対象 API 実装（GET /api/v1/admin/bundling/targets） | 1.5h | - | [x] |
+| 2.4 | SecurityConfig に FLORIST / DELIVERY_STAFF ロール追加 | 0.5h | - | [x] |
+| 2.5 | 結束対象一覧画面（S-401: BundlingTargetsPage）フロントエンド実装 | 3h | - | [x] |
 
 **小計**: 9h（理想時間）
 
@@ -127,11 +127,11 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 3.1a | 在庫消費戦略（FIFO）のドメインサービス TDD。Stock.consume + Stock.isEmpty() 追加（consume 後 quantity==0 なら削除対象、レビュー M-1, M-3） | 2h | - | [ ] |
-| 3.1b | Order.prepare() メソッド追加 + ステータス遷移 ACCEPTED→PREPARING の TDD（レビュー H-3） | 1.5h | - | [ ] |
-| 3.2 | BundleOrderUseCase の TDD 実装（application/bundling/ に配置。受注×花束構成→単品在庫 FIFO 消費→isEmpty() で削除→ステータス更新のトランザクション） | 3h | - | [ ] |
-| 3.3 | 結束完了 API 実装（PUT /api/v1/admin/orders/{orderId}/bundle、レビュー M-6: 受注のサブアクションとして設計） | 1.5h | - | [ ] |
-| 3.4 | 結束対象一覧画面に結束完了ボタン追加 + 確認ダイアログ | 2h | - | [ ] |
+| 3.1a | 在庫消費戦略（FIFO）のドメインサービス TDD。Stock.consume + Stock.isEmpty() 追加（consume 後 quantity==0 なら削除対象、レビュー M-1, M-3） | 2h | - | [x] |
+| 3.1b | Order.prepare() メソッド追加 + ステータス遷移 ACCEPTED→PREPARING の TDD（レビュー H-3） | 1.5h | - | [x] |
+| 3.2 | BundleOrderUseCase の TDD 実装（application/bundling/ に配置。受注×花束構成→単品在庫 FIFO 消費→isEmpty() で削除→ステータス更新のトランザクション） | 3h | - | [x] |
+| 3.3 | 結束完了 API 実装（PUT /api/v1/admin/orders/{orderId}/bundle、レビュー M-6: 受注のサブアクションとして設計） | 1.5h | - | [x] |
+| 3.4 | 結束対象一覧画面に結束完了ボタン追加 + 確認ダイアログ | 2h | - | [x] |
 
 **小計**: 10h（理想時間）
 
@@ -139,9 +139,9 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 4.1 | 統合テスト（入荷→在庫更新→在庫推移反映の結合テスト + トランザクション異常系: 途中在庫不足ロールバック確認、レビュー M-4） | 3h | - | [ ] |
-| 4.2 | E2E テスト（結束対象確認→結束完了→ステータス変更のフロー） | 2.5h | - | [ ] |
-| 4.3 | フロントエンドコンポーネントテスト（S-302 ArrivalRegistrationPage + S-401 BundlingTargetsPage、レビュー M-5） | 3h | - | [ ] |
+| 4.1 | 統合テスト（入荷→在庫更新→在庫推移反映の結合テスト + トランザクション異常系: 途中在庫不足ロールバック確認、レビュー M-4） | 3h | - | [x] |
+| 4.2 | E2E テスト（結束対象確認→結束完了→ステータス変更のフロー） | 2.5h | - | [x] |
+| 4.3 | フロントエンドコンポーネントテスト（S-302 ArrivalRegistrationPage + S-401 BundlingTargetsPage、レビュー M-5） | 3h | - | [x] |
 
 **小計**: 8.5h（理想時間）
 
@@ -149,15 +149,15 @@
 
 | カテゴリ | SP | 理想時間 | 状態 |
 |---------|----|----|------|
-| IT4 技術負債解消（SP 外） | - | 7.5h | [ ] |
-| 入荷登録（US-011） | 3 | 10h | [ ] |
-| 結束対象確認（US-012） | 3 | 9h | [ ] |
-| 結束完了登録（US-013） | 5 | 10h | [ ] |
-| テスト（SP 外） | - | 8.5h | [ ] |
+| IT4 技術負債解消（SP 外） | - | 7.5h | [x] |
+| 入荷登録（US-011） | 3 | 10h | [x] |
+| 結束対象確認（US-012） | 3 | 9h | [x] |
+| 結束完了登録（US-013） | 5 | 10h | [x] |
+| テスト（SP 外） | - | 8.5h | [x] |
 | **合計** | **11** | **45h** | |
 
 **1 SP あたり**: 約 4.1h（テスト含む）
-**進捗率**: 0% (0/11 SP)
+**進捗率**: 100% (11/11 SP)
 
 ---
 
@@ -625,14 +625,14 @@ apps/webshop/
 
 ### Definition of Done
 
-- [ ] コードレビュー完了
-- [ ] ユニットテストがパス（バックエンド・フロントエンド）
-- [ ] 統合テストがパス
-- [ ] E2E テストがパス（結束対象確認→結束完了→ステータス変更のフロー）
-- [ ] ArchUnit テストがパス
-- [ ] ESLint エラーなし
-- [ ] 機能がローカル環境で動作確認済み
-- [ ] ドキュメント更新完了
+- [x] コードレビュー完了
+- [x] ユニットテストがパス（バックエンド・フロントエンド）
+- [x] 統合テストがパス
+- [x] E2E テストがパス（結束対象確認→結束完了→ステータス変更のフロー）
+- [x] ArchUnit テストがパス
+- [x] ESLint エラーなし
+- [x] 機能がローカル環境で動作確認済み
+- [x] ドキュメント更新完了
 
 ### デモ項目
 
@@ -649,6 +649,7 @@ apps/webshop/
 |------|---------|--------|
 | 2026-03-22 | 初版作成 | - |
 | 2026-03-22 | レビュー指摘反映。H-1: PurchaseOrder.remainingQuantity() 追加、H-2: PARTIAL→PARTIAL 遷移追加、H-3: Order.prepare() 追加、H-4: タスク 0.2 を 3.5h に上方修正、H-5: user_story.md 受入条件整合、H-6: release_plan.md 進捗テーブル更新、M-1: タスク 3.1 を FIFO + ステータス遷移に分割、M-2: BundlingQueryService を application 層に配置、M-3: Stock.isEmpty() 追加、M-4: 統合テスト 3h に増加、M-5: FE テスト 3h に増加 + 対象画面明記、M-6: 結束完了 API を /orders/{id}/bundle に変更。合計工数 40h→45h | - |
+| 2026-03-22 | IT5 完了。全タスク・成功基準・DoD 達成。進捗率 100%（11/11 SP） | - |
 
 ---
 
