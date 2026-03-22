@@ -10,11 +10,14 @@ public class JpaInventoryQueryPort implements InventoryQueryPort {
 
     private final SpringDataStockRepository stockRepository;
     private final SpringDataOrderRepository orderRepository;
+    private final SpringDataPurchaseOrderRepository purchaseOrderRepository;
 
     public JpaInventoryQueryPort(SpringDataStockRepository stockRepository,
-                                  SpringDataOrderRepository orderRepository) {
+                                  SpringDataOrderRepository orderRepository,
+                                  SpringDataPurchaseOrderRepository purchaseOrderRepository) {
         this.stockRepository = stockRepository;
         this.orderRepository = orderRepository;
+        this.purchaseOrderRepository = purchaseOrderRepository;
     }
 
     @Override
@@ -24,15 +27,12 @@ public class JpaInventoryQueryPort implements InventoryQueryPort {
 
     @Override
     public int getExpectedArrivals(Long itemId, LocalDate date) {
-        // IT5 で入荷機能実装後に接続。現在は 0 を返す
-        return 0;
+        return purchaseOrderRepository.sumExpectedArrivalsByItemIdAndDate(itemId, date);
     }
 
     @Override
     public int getOrderAllocations(Long itemId, LocalDate date) {
-        // 受注の届け日に基づく引当数を返す
-        // 商品構成から単品数量を算出する必要があるため、簡易実装
-        return 0;
+        return orderRepository.sumOrderAllocationsByItemIdAndDate(itemId, date);
     }
 
     @Override
