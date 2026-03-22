@@ -28,3 +28,4 @@ tmp
 .agents
 .claude/agent-memory
 lib/
+!src/lib/
