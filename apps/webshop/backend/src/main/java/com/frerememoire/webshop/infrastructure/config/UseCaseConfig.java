@@ -82,8 +82,11 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public DashboardQueryService dashboardQueryService(OrderRepository orderRepository) {
-        return new DashboardQueryService(orderRepository);
+    public DashboardQueryService dashboardQueryService(OrderRepository orderRepository,
+                                                        ItemRepository itemRepository,
+                                                        InventoryQueryPort inventoryQueryPort,
+                                                        Clock clock) {
+        return new DashboardQueryService(orderRepository, itemRepository, inventoryQueryPort, clock);
     }
 
     @Bean

@@ -20,6 +20,8 @@ public class DashboardAdminController {
     public ResponseEntity<DashboardSummaryResponse> getSummary() {
         var summary = dashboardQueryService.getSummary();
         return ResponseEntity.ok(new DashboardSummaryResponse(
-                summary.totalOrders(), summary.orderedCount()));
+                summary.totalOrders(), summary.orderedCount(),
+                summary.lowStockItems(), summary.outOfStockItems(),
+                summary.bundlingCount(), summary.shippingCount()));
     }
 }

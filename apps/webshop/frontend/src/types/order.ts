@@ -36,4 +36,8 @@ export interface OrderFormData {
 export interface DashboardSummary {
   totalOrders: number
   orderedCount: number
+  lowStockItems: number
+  outOfStockItems: number
+  bundlingCount: number
+  shippingCount: number
 }

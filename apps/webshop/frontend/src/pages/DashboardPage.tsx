@@ -48,24 +48,69 @@ export function DashboardPage() {
           )}
           {summary && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* カード1: 本日の受注 */}
               <Link
                 to="/admin/orders"
                 className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-emerald-200 transition-all no-underline"
               >
-                <div className="text-sm text-gray-500 mb-1">総受注数</div>
-                <div className="text-2xl font-bold text-gray-900">{summary.totalOrders}件</div>
-                <div className="text-sm font-medium text-emerald-600 mt-2">受注管理へ →</div>
+                <div className="text-sm font-medium text-gray-700 mb-3">本日の受注</div>
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500">総受注数</span>
+                    <span className="text-lg font-bold text-gray-900">{summary.totalOrders}件</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500">未受付</span>
+                    <span className="text-lg font-bold text-amber-600">{summary.orderedCount}件</span>
+                  </div>
+                </div>
+                <div className="text-sm font-medium text-emerald-600 mt-3">受注管理へ →</div>
               </Link>
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <div className="text-sm text-gray-500 mb-1">未受付の受注</div>
-                <div className="text-2xl font-bold text-amber-600">{summary.orderedCount}件</div>
-              </div>
+
+              {/* カード2: 在庫アラート */}
               <Link
                 to="/admin/inventory"
                 className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-emerald-200 transition-all no-underline"
               >
-                <div className="text-sm text-gray-500 mb-1">在庫管理</div>
-                <div className="text-sm font-medium text-emerald-600">在庫推移を確認 →</div>
+                <div className="text-sm font-medium text-gray-700 mb-3">在庫アラート</div>
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500">不足注意</span>
+                    <span className={`text-lg font-bold ${summary.lowStockItems > 0 ? 'text-amber-600' : 'text-gray-900'}`}>
+                      {summary.lowStockItems}品目
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500">在庫不足</span>
+                    <span className={`text-lg font-bold ${summary.outOfStockItems > 0 ? 'text-red-600' : 'text-gray-900'}`}>
+                      {summary.outOfStockItems}品目
+                    </span>
+                  </div>
+                </div>
+                <div className="text-sm font-medium text-emerald-600 mt-3">在庫管理へ →</div>
+              </Link>
+
+              {/* カード3: 本日の出荷 */}
+              <Link
+                to="/admin/bundling"
+                className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-emerald-200 transition-all no-underline"
+              >
+                <div className="text-sm font-medium text-gray-700 mb-3">本日の出荷</div>
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500">結束待ち</span>
+                    <span className={`text-lg font-bold ${summary.bundlingCount > 0 ? 'text-amber-600' : 'text-gray-900'}`}>
+                      {summary.bundlingCount}件
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500">出荷待ち</span>
+                    <span className={`text-lg font-bold ${summary.shippingCount > 0 ? 'text-blue-600' : 'text-gray-900'}`}>
+                      {summary.shippingCount}件
+                    </span>
+                  </div>
+                </div>
+                <div className="text-sm font-medium text-emerald-600 mt-3">出荷管理へ →</div>
               </Link>
             </div>
           )}
