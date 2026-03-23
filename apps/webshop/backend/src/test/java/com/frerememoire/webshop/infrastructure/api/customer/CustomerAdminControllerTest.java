@@ -104,8 +104,58 @@ class CustomerAdminControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "OWNER")
+    void 得意先詳細で注文履歴が0件の場合は空リストを返す() throws Exception {
+        CustomerDetailResponse detail = new CustomerDetailResponse(
+                1L, "山田太郎", "yamada@example.com", "090-1111-1111",
+                LocalDateTime.of(2026, 1, 1, 0, 0),
+                List.of()
+        );
+        when(getCustomerDetailUseCase.execute(1L)).thenReturn(detail);
+
+        mockMvc.perform(get("/api/v1/admin/customers/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.customer.name").value("山田太郎"))
+                .andExpect(jsonPath("$.orders").isEmpty());
+    }
+
+    @Test
+    @WithMockUser(roles = "OWNER")
+    void 検索結果が0件の場合は空リストを返す() throws Exception {
+        when(customerQueryPort.searchByName("存在しない名前")).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/admin/customers")
+                        .param("name", "存在しない名前"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    // --- IT8: 認可テスト ---
+
+    @Test
     @WithMockUser(roles = "CUSTOMER")
-    void 得意先は管理者エンドポイントにアクセスできない() throws Exception {
+    void 得意先ロールで一覧にアクセスすると403() throws Exception {
+        mockMvc.perform(get("/api/v1/admin/customers"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "CUSTOMER")
+    void 得意先ロールで詳細にアクセスすると403() throws Exception {
+        mockMvc.perform(get("/api/v1/admin/customers/1"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ORDER_STAFF")
+    void 受注スタッフロールで得意先管理にアクセスすると403() throws Exception {
+        mockMvc.perform(get("/api/v1/admin/customers"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "PURCHASE_STAFF")
+    void 仕入スタッフロールで得意先管理にアクセスすると403() throws Exception {
         mockMvc.perform(get("/api/v1/admin/customers"))
                 .andExpect(status().isForbidden());
     }
@@ -113,6 +163,12 @@ class CustomerAdminControllerTest {
     @Test
     void 未認証ユーザーはアクセスできない() throws Exception {
         mockMvc.perform(get("/api/v1/admin/customers"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void 未認証ユーザーは得意先詳細にアクセスできない() throws Exception {
+        mockMvc.perform(get("/api/v1/admin/customers/1"))
                 .andExpect(status().isForbidden());
     }
 }

@@ -61,23 +61,39 @@ public class Order {
     }
 
     public void accept() {
+        accept(Clock.systemDefaultZone());
+    }
+
+    public void accept(Clock clock) {
         this.status = this.status.transitionTo(OrderStatus.ACCEPTED);
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now(clock);
     }
 
     public void prepare() {
+        prepare(Clock.systemDefaultZone());
+    }
+
+    public void prepare(Clock clock) {
         this.status = this.status.transitionTo(OrderStatus.PREPARING);
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now(clock);
     }
 
     public void ship() {
+        ship(Clock.systemDefaultZone());
+    }
+
+    public void ship(Clock clock) {
         this.status = this.status.transitionTo(OrderStatus.SHIPPED);
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now(clock);
     }
 
     public void cancel() {
+        cancel(Clock.systemDefaultZone());
+    }
+
+    public void cancel(Clock clock) {
         this.status = this.status.transitionTo(OrderStatus.CANCELLED);
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now(clock);
     }
 
     public boolean canCancel() {

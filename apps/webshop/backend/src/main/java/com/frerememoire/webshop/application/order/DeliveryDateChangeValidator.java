@@ -7,6 +7,7 @@ import com.frerememoire.webshop.domain.product.port.ProductRepository;
 import com.frerememoire.webshop.domain.shared.EntityNotFoundException;
 import com.frerememoire.webshop.domain.stock.port.InventoryQueryPort;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -21,13 +22,22 @@ public class DeliveryDateChangeValidator {
     private final ProductRepository productRepository;
     private final InventoryQueryPort inventoryQueryPort;
     private final ItemRepository itemRepository;
+    private final Clock clock;
 
     public DeliveryDateChangeValidator(ProductRepository productRepository,
                                         InventoryQueryPort inventoryQueryPort,
                                         ItemRepository itemRepository) {
+        this(productRepository, inventoryQueryPort, itemRepository, Clock.systemDefaultZone());
+    }
+
+    public DeliveryDateChangeValidator(ProductRepository productRepository,
+                                        InventoryQueryPort inventoryQueryPort,
+                                        ItemRepository itemRepository,
+                                        Clock clock) {
         this.productRepository = productRepository;
         this.inventoryQueryPort = inventoryQueryPort;
         this.itemRepository = itemRepository;
+        this.clock = clock;
     }
 
     public DeliveryDateChangeResult validate(Long productId, LocalDate targetDate) {
@@ -76,7 +86,7 @@ public class DeliveryDateChangeValidator {
 
     private List<LocalDate> findAlternativeDates(Map<Long, Integer> requiredItems, LocalDate targetDate) {
         List<LocalDate> alternatives = new ArrayList<>();
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(clock);
 
         for (int offset = 1; offset <= SEARCH_RANGE_DAYS && alternatives.size() < MAX_ALTERNATIVE_DATES; offset++) {
             LocalDate candidate = targetDate.plusDays(offset);

@@ -88,9 +88,43 @@ class DeliveryDestinationControllerTest {
     }
 
     @Test
-    void 未認証の場合は401を返す() throws Exception {
+    void 未認証の場合はアクセスできない() throws Exception {
         mockMvc.perform(get("/api/v1/customers/me/delivery-destinations"))
                 .andExpect(status().isForbidden());
+    }
+
+    // --- IT8: 認可テスト ---
+
+    @Test
+    @WithMockUser(username = "customerA@example.com", roles = "CUSTOMER")
+    void 得意先Aは自分の届け先のみ取得でき得意先Bの届け先は含まれない() throws Exception {
+        Long userIdA = 1L;
+        Long customerIdA = 10L;
+        setupAuthAndCustomer("customerA@example.com", userIdA, customerIdA);
+
+        // 得意先 A の届け先のみ返す（得意先 B の届け先は含まれない）
+        List<DeliveryDestination> destinationsA = List.of(
+            new DeliveryDestination(1L, customerIdA, "得意先Aの届け先", "100-0001",
+                    "東京都千代田区", "090-1234-5678", LocalDateTime.now())
+        );
+        when(getDeliveryDestinationsUseCase.execute(customerIdA)).thenReturn(destinationsA);
+
+        mockMvc.perform(get("/api/v1/customers/me/delivery-destinations"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].recipientName").value("得意先Aの届け先"));
+    }
+
+    @Test
+    @WithMockUser(username = "owner@example.com", roles = "OWNER")
+    void 経営者ロールでも認証ユーザーとしてアクセスできる() throws Exception {
+        Long userId = 5L;
+        Long customerId = 50L;
+        setupAuthAndCustomer("owner@example.com", userId, customerId);
+        when(getDeliveryDestinationsUseCase.execute(customerId)).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/customers/me/delivery-destinations"))
+                .andExpect(status().isOk());
     }
 
     private void setupAuthAndCustomer(String email, Long userId, Long customerId) {

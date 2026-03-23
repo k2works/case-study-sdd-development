@@ -16,7 +16,7 @@ apply plugin: 'jacoco'
 apply plugin: 'checkstyle'
 
 group = 'com.frerememoire'
-version = '2.0.0'
+version = '3.0.0'
 
 java {
     toolchain {

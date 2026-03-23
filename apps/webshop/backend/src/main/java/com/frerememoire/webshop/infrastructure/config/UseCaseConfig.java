@@ -153,8 +153,9 @@ public class UseCaseConfig {
     public DeliveryDateChangeValidator deliveryDateChangeValidator(
             ProductRepository productRepository,
             InventoryQueryPort inventoryQueryPort,
-            ItemRepository itemRepository) {
-        return new DeliveryDateChangeValidator(productRepository, inventoryQueryPort, itemRepository);
+            ItemRepository itemRepository,
+            Clock clock) {
+        return new DeliveryDateChangeValidator(productRepository, inventoryQueryPort, itemRepository, clock);
     }
 
     @Bean
