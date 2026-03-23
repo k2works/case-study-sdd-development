@@ -89,6 +89,7 @@
 | [IT5 ふりかえり](./development/iteration_retrospective-5.md) | 作成済み |
 | [IT5 完了報告書](./development/iteration_report-5.md) | 作成済み |
 | [Release 1.0 MVP 完了報告書](./development/release_report-1_0.md) | 作成済み |
+| [IT6 イテレーション計画](./development/iteration_plan-6.md) | 計画済み |
 
 ### 運用 (`operation/`)
 
