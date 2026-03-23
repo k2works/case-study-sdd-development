@@ -102,7 +102,10 @@
 | [IT7 イテレーション計画](./development/iteration_plan-7.md) | 実装完了（8 SP / 439 テスト） |
 | [IT7 ふりかえり](./development/iteration_retrospective-7.md) | 作成済み |
 | [IT7 完了報告書](./development/iteration_report-7.md) | 作成済み |
-| [IT8 イテレーション計画（バッファ）](./development/iteration_plan-8.md) | 計画済み（品質保証・リリース準備） |
+| [IT8 イテレーション計画（バッファ）](./development/iteration_plan-8.md) | 完了（品質保証・リリース準備） |
+| [IT8 ふりかえり](./development/iteration_retrospective-8.md) | 作成済み |
+| [IT8 完了報告書](./development/iteration_report-8.md) | 作成済み |
+| [Release 3.0 顧客体験 完了報告書](./development/release_report-3_0.md) | 作成済み |
 
 ### 運用 (`operation/`)
 
