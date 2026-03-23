@@ -21,6 +21,7 @@
 | IT5 | [計画](iteration_plan-5.md) | [ふりかえり](iteration_retrospective-5.md) | [報告書](iteration_report-5.md) | 完了 |
 | IT6 | [計画](iteration_plan-6.md) | [ふりかえり](iteration_retrospective-6.md) | [報告書](iteration_report-6.md) | 完了 |
 | IT7 | [計画](iteration_plan-7.md) | [ふりかえり](iteration_retrospective-7.md) | [報告書](iteration_report-7.md) | 実装完了 |
+| IT8（バッファ） | [計画](iteration_plan-8.md) | - | - | 計画済み |
 
 ### 進捗サマリー
 

@@ -102,6 +102,7 @@
 | [IT7 イテレーション計画](./development/iteration_plan-7.md) | 実装完了（8 SP / 439 テスト） |
 | [IT7 ふりかえり](./development/iteration_retrospective-7.md) | 作成済み |
 | [IT7 完了報告書](./development/iteration_report-7.md) | 作成済み |
+| [IT8 イテレーション計画（バッファ）](./development/iteration_plan-8.md) | 計画済み（品質保証・リリース準備） |
 
 ### 運用 (`operation/`)
 
