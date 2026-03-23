@@ -71,6 +71,8 @@
 | [IT6 UI/UX レビュー](./review/it6_uiux_review_20260323.md) | IT6 UI/UX 設計の UI/UX レビュー |
 | [IT6 開発レビュー](./review/it6_developing_review_20260323.md) | IT6 出荷・キャンセル・届け日変更実装のマルチパースペクティブレビュー |
 | [IT6 実装 UI/UX レビュー](./review/it6_impl_uiux_review_20260323.md) | IT6 実装後の UI/UX レビュー |
+| [IT7 開発レビュー](./review/it7_developing_review_20260323.md) | IT7 シードデータ追加のマルチパースペクティブレビュー |
+| [IT7 ダッシュボードレビュー](./review/it7_dashboard_review_20260323.md) | ダッシュボード S-100 の問題点分析・改善提案 |
 
 ### 開発 (`development/`)
 
@@ -97,7 +99,9 @@
 | [IT6 イテレーション計画](./development/iteration_plan-6.md) | 実装完了（16 SP） |
 | [IT6 ふりかえり](./development/iteration_retrospective-6.md) | 作成済み |
 | [IT6 完了報告書](./development/iteration_report-6.md) | 作成済み |
-| [IT7 イテレーション計画](./development/iteration_plan-7.md) | 計画済み（8 SP） |
+| [IT7 イテレーション計画](./development/iteration_plan-7.md) | 実装完了（8 SP / 439 テスト） |
+| [IT7 ふりかえり](./development/iteration_retrospective-7.md) | 作成済み |
+| [IT7 完了報告書](./development/iteration_report-7.md) | 作成済み |
 
 ### 運用 (`operation/`)
 
