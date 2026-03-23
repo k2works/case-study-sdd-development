@@ -122,13 +122,6 @@ public class OrderAdminController {
         return ResponseEntity.ok(RescheduleCheckResponse.fromResult(result));
     }
 
-    @GetMapping("/dashboard/summary")
-    public ResponseEntity<DashboardSummaryResponse> getDashboardSummary() {
-        var summary = orderQueryService.getDashboardSummary();
-        return ResponseEntity.ok(new DashboardSummaryResponse(
-                summary.totalOrders(), summary.orderedCount(), summary.acceptedCount()));
-    }
-
     private OrderResponse toResponseWithDetails(Order order) {
         String productName = productRepository.findById(order.getProductId())
                 .map(Product::getName)

@@ -11,6 +11,7 @@ import com.frerememoire.webshop.application.shipping.ShipOrderUseCase;
 import com.frerememoire.webshop.application.shipping.ShipmentQueryService;
 import com.frerememoire.webshop.application.auth.AuthenticationUseCase;
 import com.frerememoire.webshop.application.auth.RegistrationUseCase;
+import com.frerememoire.webshop.application.dashboard.DashboardQueryService;
 import com.frerememoire.webshop.application.item.ItemUseCase;
 import com.frerememoire.webshop.application.order.OrderQueryService;
 import com.frerememoire.webshop.application.order.PlaceOrderUseCase;
@@ -78,6 +79,11 @@ public class UseCaseConfig {
     public OrderQueryService orderQueryService(OrderRepository orderRepository,
                                                 CustomerRepository customerRepository) {
         return new OrderQueryService(orderRepository, customerRepository);
+    }
+
+    @Bean
+    public DashboardQueryService dashboardQueryService(OrderRepository orderRepository) {
+        return new DashboardQueryService(orderRepository);
     }
 
     @Bean

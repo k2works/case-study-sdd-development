@@ -36,5 +36,4 @@ export interface OrderFormData {
 export interface DashboardSummary {
   totalOrders: number
   orderedCount: number
-  acceptedCount: number
 }
