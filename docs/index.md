@@ -69,6 +69,8 @@
 | [IT5 実装 UI/UX レビュー](./review/it5_impl_uiux_review_20260322.md) | IT5 実装後の UI/UX レビュー |
 | [IT6 計画レビュー](./review/iteration_plan-6_review_20260323.md) | IT6 計画のマルチパースペクティブレビュー |
 | [IT6 UI/UX レビュー](./review/it6_uiux_review_20260323.md) | IT6 UI/UX 設計の UI/UX レビュー |
+| [IT6 開発レビュー](./review/it6_developing_review_20260323.md) | IT6 出荷・キャンセル・届け日変更実装のマルチパースペクティブレビュー |
+| [IT6 実装 UI/UX レビュー](./review/it6_impl_uiux_review_20260323.md) | IT6 実装後の UI/UX レビュー |
 
 ### 開発 (`development/`)
 
@@ -95,6 +97,7 @@
 | [IT6 イテレーション計画](./development/iteration_plan-6.md) | 実装完了（16 SP） |
 | [IT6 ふりかえり](./development/iteration_retrospective-6.md) | 作成済み |
 | [IT6 完了報告書](./development/iteration_report-6.md) | 作成済み |
+| [IT7 イテレーション計画](./development/iteration_plan-7.md) | 計画済み（8 SP） |
 
 ### 運用 (`operation/`)
 
