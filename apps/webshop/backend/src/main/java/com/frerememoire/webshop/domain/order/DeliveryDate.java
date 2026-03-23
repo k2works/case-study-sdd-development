@@ -1,5 +1,6 @@
 package com.frerememoire.webshop.domain.order;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -11,7 +12,11 @@ public class DeliveryDate {
     private final LocalDate value;
 
     public DeliveryDate(LocalDate value) {
-        validate(value);
+        this(value, Clock.systemDefaultZone());
+    }
+
+    public DeliveryDate(LocalDate value, Clock clock) {
+        validate(value, clock);
         this.value = value;
     }
 
@@ -26,11 +31,11 @@ public class DeliveryDate {
         return new DeliveryDate(value, true);
     }
 
-    private void validate(LocalDate value) {
+    private void validate(LocalDate value, Clock clock) {
         if (value == null) {
             throw new IllegalArgumentException("届け日は必須です");
         }
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(clock);
         LocalDate earliest = today.plusDays(MIN_DAYS_AHEAD);
         LocalDate latest = today.plusDays(MAX_DAYS_AHEAD);
 
