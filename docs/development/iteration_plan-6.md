@@ -100,10 +100,10 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 1.1 | Order.ship() メソッド追加 + ステータス遷移 PREPARING→SHIPPED の TDD（OrderStatus.getAllowedTransitions は実装済み） | 1h | - | [ ] |
-| 1.2 | ShipOrderUseCase の TDD 実装（PREPARING ステータスの受注を SHIPPED に遷移） | 2h | - | [ ] |
-| 1.3 | 出荷 API 実装（PUT /api/v1/admin/orders/{id}/ship） | 1.5h | - | [ ] |
-| 1.4 | 出荷対象一覧画面（ShipmentPage）フロントエンド実装（PREPARING ステータスの受注一覧 + 出荷ボタン + 届け先情報表示） | 3h | - | [ ] |
+| 1.1 | Order.ship() メソッド追加 + ステータス遷移 PREPARING→SHIPPED の TDD（OrderStatus.getAllowedTransitions は実装済み） | 1h | - | [x] |
+| 1.2 | ShipOrderUseCase の TDD 実装（PREPARING ステータスの受注を SHIPPED に遷移） | 2h | - | [x] |
+| 1.3 | 出荷 API 実装（PUT /api/v1/admin/orders/{id}/ship） | 1.5h | - | [x] |
+| 1.4 | 出荷対象一覧画面（ShipmentPage）フロントエンド実装（PREPARING ステータスの受注一覧 + 出荷ボタン + 届け先情報表示） | 3h | - | [x] |
 
 **小計**: 7.5h（理想時間）
 
@@ -111,10 +111,10 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 2.1 | Order.cancel() メソッド追加 + ステータス遷移 TDD（ORDERED→CANCELLED, ACCEPTED→CANCELLED は許可。**PREPARING→CANCELLED は不許可に変更確定**（レビュー H-2）。OrderStatus.getAllowedTransitions() から CANCELLED を除去 + 既存テスト影響調査・回帰テスト） | 2h | - | [ ] |
-| 2.2 | CancelOrderUseCase の TDD 実装（受注キャンセル + 在庫引当解除。PREPARING→CANCELLED 不許可のため結束済み在庫復元は不要（レビュー Architect M-2）） | 3h | - | [ ] |
-| 2.3 | キャンセル API 実装（PUT /api/v1/admin/orders/{id}/cancel） | 1.5h | - | [ ] |
-| 2.4 | 受注詳細画面にキャンセルボタン追加 + 確認ダイアログ（ステータスに応じた表示制御） | 2.5h | - | [ ] |
+| 2.1 | Order.cancel() メソッド追加 + ステータス遷移 TDD（ORDERED→CANCELLED, ACCEPTED→CANCELLED は許可。**PREPARING→CANCELLED は不許可に変更確定**（レビュー H-2）。OrderStatus.getAllowedTransitions() から CANCELLED を除去 + 既存テスト影響調査・回帰テスト） | 2h | - | [x] |
+| 2.2 | CancelOrderUseCase の TDD 実装（受注キャンセル + 在庫引当解除。PREPARING→CANCELLED 不許可のため結束済み在庫復元は不要（レビュー Architect M-2）） | 3h | - | [x] |
+| 2.3 | キャンセル API 実装（PUT /api/v1/admin/orders/{id}/cancel） | 1.5h | - | [x] |
+| 2.4 | 受注詳細画面にキャンセルボタン追加 + 確認ダイアログ（ステータスに応じた表示制御） | 2.5h | - | [x] |
 
 **小計**: 9h（理想時間。レビュー反映で 10h → 9h に削減）
 
@@ -122,11 +122,11 @@
 
 | # | タスク | 見積もり | 担当 | 状態 |
 |---|--------|---------|------|------|
-| 3.1 | Order.reschedule(newDeliveryDate) メソッド追加 + 変更可否バリデーション TDD（PREPARING 以降は不可）。**設計判断**: deliveryDate の `final` を除去し status と同様のミュータブルフィールドにする（レビュー H-4）。DeliveryDate の変更時バリデーション戦略を定義（`DeliveryDate.forReschedule()` ファクトリメソッド検討。新規注文と変更時で異なるルールが必要か）（レビュー H-5）。境界値テスト: 当日/翌日/30 日後/31 日後/同一日/過去日（レビュー M-7） | 3h | - | [ ] |
-| 3.2 | DeliveryDateChangeValidator ドメインサービス TDD（在庫推移を確認し、新しい届け日の花材充足チェック） | 4h | - | [ ] |
-| 3.3 | RescheduleOrderUseCase の TDD 実装（在庫チェック→届け日更新。不可の場合は代替日を提案） | 4h | - | [ ] |
-| 3.4 | 届け日変更 API 実装（PUT /api/v1/admin/orders/{id}/reschedule）+ 在庫チェック API（GET /api/v1/admin/orders/{id}/reschedule-check?date=YYYY-MM-DD） | 2h | - | [ ] |
-| 3.5 | 受注詳細画面に届け日変更フォーム追加（日付選択 + 在庫チェック結果表示 + 代替日提案） | 4h | - | [ ] |
+| 3.1 | Order.reschedule(newDeliveryDate) メソッド追加 + 変更可否バリデーション TDD（PREPARING 以降は不可）。**設計判断**: deliveryDate の `final` を除去し status と同様のミュータブルフィールドにする（レビュー H-4）。DeliveryDate の変更時バリデーション戦略を定義（`DeliveryDate.forReschedule()` ファクトリメソッド検討。新規注文と変更時で異なるルールが必要か）（レビュー H-5）。境界値テスト: 当日/翌日/30 日後/31 日後/同一日/過去日（レビュー M-7） | 3h | - | [x] |
+| 3.2 | DeliveryDateChangeValidator ドメインサービス TDD（在庫推移を確認し、新しい届け日の花材充足チェック） | 4h | - | [x] |
+| 3.3 | RescheduleOrderUseCase の TDD 実装（在庫チェック→届け日更新。不可の場合は代替日を提案） | 4h | - | [x] |
+| 3.4 | 届け日変更 API 実装（PUT /api/v1/admin/orders/{id}/reschedule）+ 在庫チェック API（GET /api/v1/admin/orders/{id}/reschedule-check?date=YYYY-MM-DD） | 2h | - | [x] |
+| 3.5 | 受注詳細画面に届け日変更フォーム追加（日付選択 + 在庫チェック結果表示 + 代替日提案） | 4h | - | [x] |
 
 **小計**: 16h（理想時間）
 
@@ -150,9 +150,9 @@
 
 | カテゴリ | SP | 理想時間 | 状態 |
 |---------|----|----|------|
-| 出荷処理（US-014） | 3 | 7.5h | [ ] |
-| 注文キャンセル（US-019） | 5 | 9h | [ ] |
-| 届け日変更（US-008） | 8 | 17h | [ ] |
+| 出荷処理（US-014） | 3 | 7.5h | [x] |
+| 注文キャンセル（US-019） | 5 | 9h | [x] |
+| 届け日変更（US-008） | 8 | 17h | [x] |
 | テスト・リリース準備（SP 外） | - | 18h | [ ] |
 | **合計** | **16** | **51.5h** | |
 
