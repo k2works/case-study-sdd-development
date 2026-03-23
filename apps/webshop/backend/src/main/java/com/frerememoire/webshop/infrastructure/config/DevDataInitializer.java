@@ -99,10 +99,12 @@ public class DevDataInitializer implements ApplicationRunner {
         createStaffUser();
         createPurchaseStaffUser();
         createCustomerUser();
+        createSecondCustomerUser();
         createSeedItems();
         createSeedProducts();
         createSeedStocksAndPurchaseOrders();
         createSeedOrders();
+        createSecondCustomerOrders();
     }
 
     private void createOwnerUser() {
@@ -128,6 +130,19 @@ public class DevDataInitializer implements ApplicationRunner {
                 "customer@example.com", "Password1",
                 "太郎", "山田", "090-1234-5678");
         log.info("得意先ユーザーを作成しました: customer@example.com / Password1");
+    }
+
+    private void createSecondCustomerUser() {
+        var existing = authUserRepository.findByEmail("customer2@example.com");
+        if (existing.isPresent()) {
+            ensureCustomerRecord(existing.get());
+            return;
+        }
+
+        registrationUseCase.register(
+                "customer2@example.com", "Password1",
+                "花子", "鈴木", "080-9876-5432");
+        log.info("得意先ユーザー2を作成しました: customer2@example.com / Password1");
     }
 
     private void createSeedItems() {
@@ -320,6 +335,48 @@ public class DevDataInitializer implements ApplicationRunner {
                         orderRepository.save(order);
                     }
                 });
+    }
+
+    private void createSecondCustomerOrders() {
+        var customerUser = authUserRepository.findByEmail("customer2@example.com");
+        if (customerUser.isEmpty()) {
+            return;
+        }
+
+        // customer2 の注文が既にある場合はスキップ
+        var customer = customerRepository.findByUserId(customerUser.get().getId());
+        if (customer.isPresent() && !orderRepository.findByCustomerId(customer.get().getId()).isEmpty()) {
+            return;
+        }
+
+        var products = productRepository.findAll();
+        if (products.isEmpty()) {
+            return;
+        }
+
+        createSeedOrder(customerUser.get().getId(), products, new SeedOrderSpec(
+                "パステルミックスブーケ",
+                java.time.LocalDate.now().plusDays(4),
+                "鈴木 一郎",
+                "460-0008",
+                "愛知県名古屋市中区栄 3-5-1",
+                "080-1111-2222",
+                "退院祝いです。お元気で。",
+                false
+        ));
+
+        createSeedOrder(customerUser.get().getId(), products, new SeedOrderSpec(
+                "感謝のカーネーションブーケ",
+                java.time.LocalDate.now().plusDays(6),
+                "鈴木 花子",
+                "810-0001",
+                "福岡県福岡市中央区天神 1-8-1",
+                "080-9876-5432",
+                "母の日のプレゼントです。",
+                true
+        ));
+
+        log.info("得意先2の開発用受注データを作成しました（2件）");
     }
 
     private void ensurePrivilegedUser(String email, String firstName, String lastName,
