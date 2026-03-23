@@ -20,8 +20,8 @@
 | IT4 | [計画](iteration_plan-4.md) | [ふりかえり](iteration_retrospective-4.md) | [報告書](iteration_report-4.md) | 完了 |
 | IT5 | [計画](iteration_plan-5.md) | [ふりかえり](iteration_retrospective-5.md) | [報告書](iteration_report-5.md) | 完了 |
 | IT6 | [計画](iteration_plan-6.md) | [ふりかえり](iteration_retrospective-6.md) | [報告書](iteration_report-6.md) | 完了 |
-| IT7 | [計画](iteration_plan-7.md) | [ふりかえり](iteration_retrospective-7.md) | [報告書](iteration_report-7.md) | 実装完了 |
-| IT8（バッファ） | [計画](iteration_plan-8.md) | - | - | 計画済み |
+| IT7 | [計画](iteration_plan-7.md) | [ふりかえり](iteration_retrospective-7.md) | [報告書](iteration_report-7.md) | 完了 |
+| IT8（バッファ） | [計画](iteration_plan-8.md) | [ふりかえり](iteration_retrospective-8.md) | [報告書](iteration_report-8.md) | 完了 |
 
 ### 進捗サマリー
 
@@ -51,3 +51,4 @@
 |---------|--------|------|
 | Release 1.0 MVP | [完了報告書](release_report-1_0.md) | 作成済み |
 | Release 2.0 出荷管理 | [完了報告書](release_report-2_0.md) | 作成済み |
+| Release 3.0 顧客体験 | [完了報告書](release_report-3_0.md) | 作成済み |
