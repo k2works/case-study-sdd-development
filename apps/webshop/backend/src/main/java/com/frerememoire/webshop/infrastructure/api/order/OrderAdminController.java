@@ -13,6 +13,8 @@ import com.frerememoire.webshop.domain.order.Order;
 import com.frerememoire.webshop.domain.order.OrderStatus;
 import com.frerememoire.webshop.domain.product.Product;
 import com.frerememoire.webshop.domain.product.port.ProductRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin/orders")
+@Tag(name = "受注管理", description = "受注一覧・受付・キャンセル・出荷・届け日変更")
 public class OrderAdminController {
 
     private final OrderQueryService orderQueryService;
@@ -55,6 +58,7 @@ public class OrderAdminController {
         this.deliveryDestinationRepository = deliveryDestinationRepository;
     }
 
+    @Operation(summary = "受注一覧", description = "ステータスや日付範囲で絞り込み可能")
     @GetMapping
     public ResponseEntity<List<OrderResponse>> findAll(
             @RequestParam(required = false) OrderStatus status,
@@ -72,18 +76,21 @@ public class OrderAdminController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "受注詳細")
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> findById(@PathVariable Long id) {
         Order order = orderQueryService.findById(id);
         return ResponseEntity.ok(toResponseWithDetails(order));
     }
 
+    @Operation(summary = "受注受付", description = "ORDERED → ACCEPTED にステータス遷移")
     @PutMapping("/{id}/accept")
     public ResponseEntity<OrderResponse> acceptOrder(@PathVariable Long id) {
         Order order = orderQueryService.acceptOrder(id);
         return ResponseEntity.ok(toResponseWithDetails(order));
     }
 
+    @Operation(summary = "一括受付")
     @PutMapping("/bulk-accept")
     public ResponseEntity<List<OrderResponse>> bulkAcceptOrders(
             @Valid @RequestBody BulkAcceptRequest request) {
@@ -94,18 +101,21 @@ public class OrderAdminController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "注文キャンセル", description = "ORDERED/ACCEPTED の受注をキャンセルし在庫引当を解除する")
     @PutMapping("/{id}/cancel")
     public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long id) {
         Order order = cancelOrderUseCase.execute(id);
         return ResponseEntity.ok(toResponseWithDetails(order));
     }
 
+    @Operation(summary = "出荷処理", description = "PREPARING → SHIPPED にステータス遷移")
     @PutMapping("/{id}/ship")
     public ResponseEntity<OrderResponse> shipOrder(@PathVariable Long id) {
         Order order = shipOrderUseCase.execute(id);
         return ResponseEntity.ok(toResponseWithDetails(order));
     }
 
+    @Operation(summary = "届け日変更", description = "在庫チェック後に届け日を変更する")
     @PutMapping("/{id}/reschedule")
     public ResponseEntity<OrderResponse> rescheduleOrder(
             @PathVariable Long id,
@@ -114,6 +124,7 @@ public class OrderAdminController {
         return ResponseEntity.ok(toResponseWithDetails(order));
     }
 
+    @Operation(summary = "届け日変更チェック", description = "指定日の在庫状況を確認し代替日を提案する")
     @GetMapping("/{id}/reschedule-check")
     public ResponseEntity<RescheduleCheckResponse> checkReschedule(
             @PathVariable Long id,
