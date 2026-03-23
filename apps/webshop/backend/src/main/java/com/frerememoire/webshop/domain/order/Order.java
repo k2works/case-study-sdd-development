@@ -63,6 +63,11 @@ public class Order {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void ship() {
+        this.status = this.status.transitionTo(OrderStatus.SHIPPED);
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public Long getId() {
         return id;
     }

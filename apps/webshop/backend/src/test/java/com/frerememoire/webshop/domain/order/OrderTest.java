@@ -99,4 +99,37 @@ class OrderTest {
         assertThatThrownBy(order::prepare)
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    // --- US-014: 出荷処理 ---
+
+    @Test
+    void 準備中の注文を出荷済みに更新できる() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        order.accept();
+        order.prepare();
+
+        order.ship();
+
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.SHIPPED);
+    }
+
+    @Test
+    void 受付済みの注文を直接出荷済みにはできない() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        order.accept();
+
+        assertThatThrownBy(order::ship)
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void 注文済みの注文を直接出荷済みにはできない() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+
+        assertThatThrownBy(order::ship)
+                .isInstanceOf(IllegalStateException.class);
+    }
 }

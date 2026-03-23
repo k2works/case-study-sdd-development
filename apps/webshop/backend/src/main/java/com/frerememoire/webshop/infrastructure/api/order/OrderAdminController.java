@@ -1,6 +1,7 @@
 package com.frerememoire.webshop.infrastructure.api.order;
 
 import com.frerememoire.webshop.application.order.OrderQueryService;
+import com.frerememoire.webshop.application.shipping.ShipOrderUseCase;
 import com.frerememoire.webshop.domain.customer.Customer;
 import com.frerememoire.webshop.domain.customer.DeliveryDestination;
 import com.frerememoire.webshop.domain.customer.port.CustomerRepository;
@@ -28,15 +29,18 @@ import java.util.List;
 public class OrderAdminController {
 
     private final OrderQueryService orderQueryService;
+    private final ShipOrderUseCase shipOrderUseCase;
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
     private final DeliveryDestinationRepository deliveryDestinationRepository;
 
     public OrderAdminController(OrderQueryService orderQueryService,
+                                 ShipOrderUseCase shipOrderUseCase,
                                  ProductRepository productRepository,
                                  CustomerRepository customerRepository,
                                  DeliveryDestinationRepository deliveryDestinationRepository) {
         this.orderQueryService = orderQueryService;
+        this.shipOrderUseCase = shipOrderUseCase;
         this.productRepository = productRepository;
         this.customerRepository = customerRepository;
         this.deliveryDestinationRepository = deliveryDestinationRepository;
@@ -79,6 +83,12 @@ public class OrderAdminController {
                 .map(this::toResponseWithDetails)
                 .toList();
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}/ship")
+    public ResponseEntity<OrderResponse> shipOrder(@PathVariable Long id) {
+        Order order = shipOrderUseCase.execute(id);
+        return ResponseEntity.ok(toResponseWithDetails(order));
     }
 
     @GetMapping("/dashboard/summary")
