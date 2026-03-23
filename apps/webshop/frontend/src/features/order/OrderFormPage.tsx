@@ -39,6 +39,14 @@ export function OrderFormPage() {
     },
   })
 
+  const { data: destinations = [] } = useQuery<DeliveryDestinationResponse[]>({
+    queryKey: ['my-delivery-destinations'],
+    queryFn: () => deliveryDestinationApi.getMyDestinations(),
+  })
+
+  const [inputMode, setInputMode] = useState<'new' | 'select'>('new')
+  const [selectedDestinationId, setSelectedDestinationId] = useState<number | null>(null)
+
   const [form, setForm] = useState<OrderFormData>({
     recipientName: '',
     postalCode: '',
@@ -47,6 +55,31 @@ export function OrderFormPage() {
     deliveryDate: getMinDate(),
     message: '',
   })
+
+  const handleModeChange = (mode: 'new' | 'select') => {
+    setInputMode(mode)
+    if (mode === 'new') {
+      setSelectedDestinationId(null)
+      setForm((prev) => ({
+        ...prev,
+        recipientName: '',
+        postalCode: '',
+        address: '',
+        phone: '',
+      }))
+    }
+  }
+
+  const handleSelectDestination = (dest: DeliveryDestinationResponse) => {
+    setSelectedDestinationId(dest.id)
+    setForm((prev) => ({
+      ...prev,
+      recipientName: dest.recipientName,
+      postalCode: dest.postalCode,
+      address: dest.address,
+      phone: dest.phone ?? '',
+    }))
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -97,6 +130,48 @@ export function OrderFormPage() {
         <p className="text-lg font-semibold text-gray-900">{product.name}</p>
         <p className="text-2xl font-bold text-emerald-600">{formatPrice(product.price)}</p>
       </div>
+
+      {destinations.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 max-w-3xl">
+          <div className="flex gap-6">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="inputMode"
+                checked={inputMode === 'new'}
+                onChange={() => handleModeChange('new')}
+              />
+              新しい届け先を入力
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="inputMode"
+                checked={inputMode === 'select'}
+                onChange={() => handleModeChange('select')}
+              />
+              過去の届け先から選択
+            </label>
+          </div>
+
+          {inputMode === 'select' && (
+            <div className="mt-4 space-y-2">
+              {destinations.map((dest) => (
+                <label key={dest.id} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                  <input
+                    type="radio"
+                    name="destination"
+                    checked={selectedDestinationId === dest.id}
+                    onChange={() => handleSelectDestination(dest)}
+                  />
+                  <span>{dest.recipientName}</span>
+                  <span className="text-gray-500 text-sm">{dest.address}</span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 max-w-3xl">
         <div className="space-y-4">
