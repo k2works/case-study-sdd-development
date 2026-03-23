@@ -1,5 +1,7 @@
 package com.frerememoire.webshop.infrastructure.config;
 
+import com.frerememoire.webshop.application.customer.GetCustomerDetailUseCase;
+import com.frerememoire.webshop.application.customer.GetDeliveryDestinationsUseCase;
 import com.frerememoire.webshop.application.bundling.BundleOrderUseCase;
 import com.frerememoire.webshop.application.bundling.BundlingQueryService;
 import com.frerememoire.webshop.application.order.CancelOrderUseCase;
@@ -164,6 +166,22 @@ public class UseCaseConfig {
             ProductRepository productRepository,
             DeliveryDestinationRepository deliveryDestinationRepository) {
         return new ShipmentQueryService(orderRepository, productRepository, deliveryDestinationRepository);
+    }
+
+    @Bean
+    public GetCustomerDetailUseCase getCustomerDetailUseCase(
+            CustomerRepository customerRepository,
+            OrderQueryService orderQueryService,
+            ProductRepository productRepository,
+            AuthUserRepository authUserRepository) {
+        return new GetCustomerDetailUseCase(
+                customerRepository, orderQueryService, productRepository, authUserRepository);
+    }
+
+    @Bean
+    public GetDeliveryDestinationsUseCase getDeliveryDestinationsUseCase(
+            DeliveryDestinationRepository deliveryDestinationRepository) {
+        return new GetDeliveryDestinationsUseCase(deliveryDestinationRepository);
     }
 
     @Bean
