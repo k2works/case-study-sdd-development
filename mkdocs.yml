@@ -107,6 +107,7 @@ nav:
       - IT5 開発レビュー: review/it5_developing_review_20260322.md
       - IT5 実装 UI/UX レビュー: review/it5_impl_uiux_review_20260322.md
       - IT6 計画レビュー: review/iteration_plan-6_review_20260323.md
+      - IT6 UI/UX レビュー: review/it6_uiux_review_20260323.md
   - 開発:
       - 概要: development/index.md
       - リリース計画: development/release_plan.md

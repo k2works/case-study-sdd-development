@@ -68,6 +68,7 @@
 | [IT5 開発レビュー](./review/it5_developing_review_20260322.md) | IT5 入荷登録・結束対象確認・結束完了実装のマルチパースペクティブレビュー |
 | [IT5 実装 UI/UX レビュー](./review/it5_impl_uiux_review_20260322.md) | IT5 実装後の UI/UX レビュー |
 | [IT6 計画レビュー](./review/iteration_plan-6_review_20260323.md) | IT6 計画のマルチパースペクティブレビュー |
+| [IT6 UI/UX レビュー](./review/it6_uiux_review_20260323.md) | IT6 UI/UX 設計の UI/UX レビュー |
 
 ### 開発 (`development/`)
 
