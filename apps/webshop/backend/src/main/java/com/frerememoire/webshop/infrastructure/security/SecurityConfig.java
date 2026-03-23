@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/admin/inventory/**").hasAnyRole("OWNER", "PURCHASE_STAFF")
                 .requestMatchers("/api/v1/admin/purchase-orders/**").hasAnyRole("OWNER", "PURCHASE_STAFF")
                 .requestMatchers("/api/v1/admin/bundling/**").hasAnyRole("OWNER", "FLORIST", "DELIVERY_STAFF")
+                .requestMatchers("/api/v1/admin/shipments/**").hasAnyRole("OWNER", "DELIVERY_STAFF")
                 .requestMatchers("/api/v1/admin/dashboard/**").hasAnyRole("OWNER", "ORDER_STAFF", "PURCHASE_STAFF")
                 .requestMatchers("/api/v1/admin/**").hasRole("OWNER")
                 .requestMatchers("/api/v1/orders/**").hasRole("CUSTOMER")
