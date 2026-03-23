@@ -1,5 +1,6 @@
 package com.frerememoire.webshop.infrastructure.api.order;
 
+import com.frerememoire.webshop.application.order.CancelOrderUseCase;
 import com.frerememoire.webshop.application.order.OrderQueryService;
 import com.frerememoire.webshop.application.shipping.ShipOrderUseCase;
 import com.frerememoire.webshop.domain.customer.Customer;
@@ -30,17 +31,20 @@ public class OrderAdminController {
 
     private final OrderQueryService orderQueryService;
     private final ShipOrderUseCase shipOrderUseCase;
+    private final CancelOrderUseCase cancelOrderUseCase;
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
     private final DeliveryDestinationRepository deliveryDestinationRepository;
 
     public OrderAdminController(OrderQueryService orderQueryService,
                                  ShipOrderUseCase shipOrderUseCase,
+                                 CancelOrderUseCase cancelOrderUseCase,
                                  ProductRepository productRepository,
                                  CustomerRepository customerRepository,
                                  DeliveryDestinationRepository deliveryDestinationRepository) {
         this.orderQueryService = orderQueryService;
         this.shipOrderUseCase = shipOrderUseCase;
+        this.cancelOrderUseCase = cancelOrderUseCase;
         this.productRepository = productRepository;
         this.customerRepository = customerRepository;
         this.deliveryDestinationRepository = deliveryDestinationRepository;
@@ -83,6 +87,12 @@ public class OrderAdminController {
                 .map(this::toResponseWithDetails)
                 .toList();
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long id) {
+        Order order = cancelOrderUseCase.execute(id);
+        return ResponseEntity.ok(toResponseWithDetails(order));
     }
 
     @PutMapping("/{id}/ship")

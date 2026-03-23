@@ -26,7 +26,7 @@ public enum OrderStatus {
         return switch (this) {
             case ORDERED -> Set.of(ACCEPTED, CANCELLED);
             case ACCEPTED -> Set.of(PREPARING, CANCELLED);
-            case PREPARING -> Set.of(SHIPPED, CANCELLED);
+            case PREPARING -> Set.of(SHIPPED);
             case SHIPPED -> Set.of(DELIVERED);
             case DELIVERED -> Set.of();
             case CANCELLED -> Set.of();

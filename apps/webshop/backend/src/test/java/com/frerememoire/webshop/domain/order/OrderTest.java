@@ -132,4 +132,65 @@ class OrderTest {
         assertThatThrownBy(order::ship)
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    // --- US-019: 注文キャンセル ---
+
+    @Test
+    void 注文済みの注文をキャンセルできる() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+
+        order.cancel();
+
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.CANCELLED);
+    }
+
+    @Test
+    void 受付済みの注文をキャンセルできる() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        order.accept();
+
+        order.cancel();
+
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.CANCELLED);
+    }
+
+    @Test
+    void 準備中の注文はキャンセルできない() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        order.accept();
+        order.prepare();
+
+        assertThatThrownBy(order::cancel)
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void canCancel_注文済みはtrue() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+
+        assertThat(order.canCancel()).isTrue();
+    }
+
+    @Test
+    void canCancel_受付済みはtrue() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        order.accept();
+
+        assertThat(order.canCancel()).isTrue();
+    }
+
+    @Test
+    void canCancel_準備中はfalse() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        order.accept();
+        order.prepare();
+
+        assertThat(order.canCancel()).isFalse();
+    }
 }

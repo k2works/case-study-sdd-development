@@ -78,4 +78,16 @@ class OrderStatusTest {
     void 全6状態が定義されている() {
         assertThat(OrderStatus.values()).hasSize(6);
     }
+
+    // --- US-019: PREPARING→CANCELLED 不許可 ---
+
+    @Test
+    void 出荷準備中からキャンセルに遷移できない() {
+        assertThat(OrderStatus.PREPARING.canTransitionTo(OrderStatus.CANCELLED)).isFalse();
+    }
+
+    @Test
+    void 受付済みからキャンセルに遷移できる() {
+        assertThat(OrderStatus.ACCEPTED.canTransitionTo(OrderStatus.CANCELLED)).isTrue();
+    }
 }

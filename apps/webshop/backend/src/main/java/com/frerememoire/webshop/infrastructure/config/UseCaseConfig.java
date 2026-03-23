@@ -2,6 +2,7 @@ package com.frerememoire.webshop.infrastructure.config;
 
 import com.frerememoire.webshop.application.bundling.BundleOrderUseCase;
 import com.frerememoire.webshop.application.bundling.BundlingQueryService;
+import com.frerememoire.webshop.application.order.CancelOrderUseCase;
 import com.frerememoire.webshop.application.shipping.ShipOrderUseCase;
 import com.frerememoire.webshop.application.shipping.ShipmentQueryService;
 import com.frerememoire.webshop.application.auth.AuthenticationUseCase;
@@ -128,6 +129,11 @@ public class UseCaseConfig {
             StockRepository stockRepository,
             ItemRepository itemRepository) {
         return new BundlingQueryService(orderRepository, productRepository, stockRepository, itemRepository);
+    }
+
+    @Bean
+    public CancelOrderUseCase cancelOrderUseCase(OrderRepository orderRepository) {
+        return new CancelOrderUseCase(orderRepository);
     }
 
     @Bean

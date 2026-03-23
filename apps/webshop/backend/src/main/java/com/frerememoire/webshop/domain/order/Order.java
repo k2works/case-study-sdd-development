@@ -68,6 +68,15 @@ public class Order {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void cancel() {
+        this.status = this.status.transitionTo(OrderStatus.CANCELLED);
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public boolean canCancel() {
+        return this.status.canTransitionTo(OrderStatus.CANCELLED);
+    }
+
     public Long getId() {
         return id;
     }

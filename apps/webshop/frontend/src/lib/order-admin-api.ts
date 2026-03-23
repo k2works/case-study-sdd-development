@@ -8,5 +8,7 @@ export const orderAdminApi = {
   acceptOrder: (id: number) => api.put<OrderResponse>(`/admin/orders/${id}/accept`),
   bulkAcceptOrders: (orderIds: number[]) =>
     api.put<OrderResponse[]>('/admin/orders/bulk-accept', { orderIds }),
+  cancelOrder: (id: number) => api.put<OrderResponse>(`/admin/orders/${id}/cancel`),
+  shipOrder: (id: number) => api.put<OrderResponse>(`/admin/orders/${id}/ship`),
   getDashboardSummary: () => api.get<DashboardSummary>('/admin/dashboard/summary'),
 }

@@ -13,11 +13,15 @@ const STATUS_LABELS: Record<string, string> = {
   CANCELLED: 'キャンセル',
 }
 
+const CANCELLABLE_STATUSES = ['ORDERED', 'ACCEPTED']
+
 export function OrderDetailPage() {
   const { id } = useParams<{ id: string }>()
   const orderId = Number(id)
   const queryClient = useQueryClient()
   const [isAccepting, setIsAccepting] = useState(false)
+  const [showCancelDialog, setShowCancelDialog] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
 
   const { data: order, isLoading } = useQuery<OrderResponse>({
     queryKey: ['admin-orders', orderId],
@@ -37,11 +41,23 @@ export function OrderDetailPage() {
     },
   })
 
+  const cancelMutation = useMutation({
+    mutationFn: () => orderAdminApi.cancelOrder(orderId),
+    onSuccess: () => {
+      setShowCancelDialog(false)
+      setToast('注文をキャンセルしました')
+      setTimeout(() => setToast(null), 3000)
+      queryClient.invalidateQueries({ queryKey: ['admin-orders'] })
+    },
+  })
+
   const handleAccept = () => {
     if (isAccepting) return
     setIsAccepting(true)
     acceptMutation.mutate()
   }
+
+  const canCancel = order ? CANCELLABLE_STATUSES.includes(order.status) : false
 
   if (isLoading) {
     return <p className="text-gray-500 text-center py-12">読み込み中...</p>
@@ -132,7 +148,68 @@ export function OrderDetailPage() {
             </button>
           </div>
         )}
+
+        {/* キャンセルボタン */}
+        {order.status !== 'CANCELLED' && order.status !== 'DELIVERED' && (
+          <div className="pt-4">
+            <button
+              type="button"
+              onClick={() => canCancel && setShowCancelDialog(true)}
+              disabled={!canCancel}
+              title={!canCancel ? '出荷準備中のためキャンセルできません。対応が必要な場合は店長にご相談ください' : undefined}
+              className="bg-red-600 text-white font-medium rounded-lg px-5 py-2.5 hover:bg-red-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              キャンセル
+            </button>
+          </div>
+        )}
+
+        {cancelMutation.isError && (
+          <div className="bg-red-50 text-red-700 rounded-lg p-3 text-sm">
+            キャンセル処理に失敗しました。もう一度お試しください。
+          </div>
+        )}
       </div>
+
+      {/* キャンセル確認ダイアログ */}
+      {showCancelDialog && order && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">キャンセル確認</h3>
+            <p className="text-gray-600 mb-2">
+              注文 #{order.id}（{order.productName}）をキャンセルしますか？
+            </p>
+            <p className="text-gray-600 mb-2">
+              得意先: {order.customerName}
+            </p>
+            <p className="text-amber-700 text-sm mb-6">
+              在庫引当が解除されます。
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowCancelDialog(false)}
+                className="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                戻る
+              </button>
+              <button
+                onClick={() => cancelMutation.mutate()}
+                disabled={cancelMutation.isPending}
+                className="px-5 py-2.5 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50"
+              >
+                {cancelMutation.isPending ? '処理中...' : 'キャンセルを実行'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* トースト通知 */}
+      {toast && (
+        <div className="fixed bottom-4 right-4 bg-emerald-600 text-white px-6 py-3 rounded-lg shadow-lg z-50" role="status">
+          {toast}
+        </div>
+      )}
     </div>
   )
 }
