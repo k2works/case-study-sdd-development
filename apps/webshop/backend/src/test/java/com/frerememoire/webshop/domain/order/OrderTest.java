@@ -193,4 +193,122 @@ class OrderTest {
 
         assertThat(order.canCancel()).isFalse();
     }
+
+    // --- US-008: 届け日変更 ---
+
+    @Test
+    void 注文済みの注文の届け日を変更できる() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        LocalDate newDate = LocalDate.now().plusDays(10);
+
+        order.reschedule(newDate);
+
+        assertThat(order.getDeliveryDateValue()).isEqualTo(newDate);
+    }
+
+    @Test
+    void 受付済みの注文の届け日を変更できる() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        order.accept();
+        LocalDate newDate = LocalDate.now().plusDays(10);
+
+        order.reschedule(newDate);
+
+        assertThat(order.getDeliveryDateValue()).isEqualTo(newDate);
+    }
+
+    @Test
+    void 準備中の注文の届け日は変更できない() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        order.accept();
+        order.prepare();
+
+        assertThatThrownBy(() -> order.reschedule(LocalDate.now().plusDays(10)))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void 出荷済みの注文の届け日は変更できない() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        order.accept();
+        order.prepare();
+        order.ship();
+
+        assertThatThrownBy(() -> order.reschedule(LocalDate.now().plusDays(10)))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void canReschedule_注文済みはtrue() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+
+        assertThat(order.canReschedule()).isTrue();
+    }
+
+    @Test
+    void canReschedule_準備中はfalse() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        order.accept();
+        order.prepare();
+
+        assertThat(order.canReschedule()).isFalse();
+    }
+
+    @Test
+    void 届け日変更_翌日は有効() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+        order.reschedule(tomorrow);
+
+        assertThat(order.getDeliveryDateValue()).isEqualTo(tomorrow);
+    }
+
+    @Test
+    void 届け日変更_30日後は有効() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        LocalDate in30Days = LocalDate.now().plusDays(30);
+
+        order.reschedule(in30Days);
+
+        assertThat(order.getDeliveryDateValue()).isEqualTo(in30Days);
+    }
+
+    @Test
+    void 届け日変更_当日は無効() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        LocalDate today = LocalDate.now();
+
+        assertThatThrownBy(() -> order.reschedule(today))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 届け日変更_31日後は無効() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        LocalDate in31Days = LocalDate.now().plusDays(31);
+
+        assertThatThrownBy(() -> order.reschedule(in31Days))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 届け日変更_過去日は無効() {
+        Order order = Order.create(CUSTOMER_ID, PRODUCT_ID, DELIVERY_DEST_ID,
+                VALID_DATE, null);
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+
+        assertThatThrownBy(() -> order.reschedule(yesterday))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }

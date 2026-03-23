@@ -1,7 +1,9 @@
 package com.frerememoire.webshop.infrastructure.api.order;
 
 import com.frerememoire.webshop.application.order.CancelOrderUseCase;
+import com.frerememoire.webshop.application.order.DeliveryDateChangeResult;
 import com.frerememoire.webshop.application.order.OrderQueryService;
+import com.frerememoire.webshop.application.order.RescheduleOrderUseCase;
 import com.frerememoire.webshop.application.shipping.ShipOrderUseCase;
 import com.frerememoire.webshop.domain.customer.Customer;
 import com.frerememoire.webshop.domain.customer.DeliveryDestination;
@@ -32,6 +34,7 @@ public class OrderAdminController {
     private final OrderQueryService orderQueryService;
     private final ShipOrderUseCase shipOrderUseCase;
     private final CancelOrderUseCase cancelOrderUseCase;
+    private final RescheduleOrderUseCase rescheduleOrderUseCase;
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
     private final DeliveryDestinationRepository deliveryDestinationRepository;
@@ -39,12 +42,14 @@ public class OrderAdminController {
     public OrderAdminController(OrderQueryService orderQueryService,
                                  ShipOrderUseCase shipOrderUseCase,
                                  CancelOrderUseCase cancelOrderUseCase,
+                                 RescheduleOrderUseCase rescheduleOrderUseCase,
                                  ProductRepository productRepository,
                                  CustomerRepository customerRepository,
                                  DeliveryDestinationRepository deliveryDestinationRepository) {
         this.orderQueryService = orderQueryService;
         this.shipOrderUseCase = shipOrderUseCase;
         this.cancelOrderUseCase = cancelOrderUseCase;
+        this.rescheduleOrderUseCase = rescheduleOrderUseCase;
         this.productRepository = productRepository;
         this.customerRepository = customerRepository;
         this.deliveryDestinationRepository = deliveryDestinationRepository;
@@ -99,6 +104,22 @@ public class OrderAdminController {
     public ResponseEntity<OrderResponse> shipOrder(@PathVariable Long id) {
         Order order = shipOrderUseCase.execute(id);
         return ResponseEntity.ok(toResponseWithDetails(order));
+    }
+
+    @PutMapping("/{id}/reschedule")
+    public ResponseEntity<OrderResponse> rescheduleOrder(
+            @PathVariable Long id,
+            @Valid @RequestBody RescheduleRequest request) {
+        Order order = rescheduleOrderUseCase.execute(id, request.newDeliveryDate());
+        return ResponseEntity.ok(toResponseWithDetails(order));
+    }
+
+    @GetMapping("/{id}/reschedule-check")
+    public ResponseEntity<RescheduleCheckResponse> checkReschedule(
+            @PathVariable Long id,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        DeliveryDateChangeResult result = rescheduleOrderUseCase.check(id, date);
+        return ResponseEntity.ok(RescheduleCheckResponse.fromResult(result));
     }
 
     @GetMapping("/dashboard/summary")

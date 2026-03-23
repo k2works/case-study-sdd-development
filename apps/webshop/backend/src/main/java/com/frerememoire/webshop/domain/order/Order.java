@@ -9,7 +9,7 @@ public class Order {
     private final Long customerId;
     private final Long productId;
     private final Long deliveryDestinationId;
-    private final DeliveryDate deliveryDate;
+    private DeliveryDate deliveryDate;
     private final Message message;
     private OrderStatus status;
     private final LocalDateTime orderedAt;
@@ -75,6 +75,19 @@ public class Order {
 
     public boolean canCancel() {
         return this.status.canTransitionTo(OrderStatus.CANCELLED);
+    }
+
+    public void reschedule(LocalDate newDeliveryDate) {
+        if (!canReschedule()) {
+            throw new IllegalStateException(
+                    "ステータスが%sの注文は届け日を変更できません".formatted(this.status.name()));
+        }
+        this.deliveryDate = new DeliveryDate(newDeliveryDate);
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public boolean canReschedule() {
+        return this.status == OrderStatus.ORDERED || this.status == OrderStatus.ACCEPTED;
     }
 
     public Long getId() {

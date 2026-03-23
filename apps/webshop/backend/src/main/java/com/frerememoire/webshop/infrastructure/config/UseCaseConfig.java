@@ -3,6 +3,8 @@ package com.frerememoire.webshop.infrastructure.config;
 import com.frerememoire.webshop.application.bundling.BundleOrderUseCase;
 import com.frerememoire.webshop.application.bundling.BundlingQueryService;
 import com.frerememoire.webshop.application.order.CancelOrderUseCase;
+import com.frerememoire.webshop.application.order.DeliveryDateChangeValidator;
+import com.frerememoire.webshop.application.order.RescheduleOrderUseCase;
 import com.frerememoire.webshop.application.shipping.ShipOrderUseCase;
 import com.frerememoire.webshop.application.shipping.ShipmentQueryService;
 import com.frerememoire.webshop.application.auth.AuthenticationUseCase;
@@ -134,6 +136,21 @@ public class UseCaseConfig {
     @Bean
     public CancelOrderUseCase cancelOrderUseCase(OrderRepository orderRepository) {
         return new CancelOrderUseCase(orderRepository);
+    }
+
+    @Bean
+    public DeliveryDateChangeValidator deliveryDateChangeValidator(
+            ProductRepository productRepository,
+            InventoryQueryPort inventoryQueryPort,
+            ItemRepository itemRepository) {
+        return new DeliveryDateChangeValidator(productRepository, inventoryQueryPort, itemRepository);
+    }
+
+    @Bean
+    public RescheduleOrderUseCase rescheduleOrderUseCase(
+            OrderRepository orderRepository,
+            DeliveryDateChangeValidator deliveryDateChangeValidator) {
+        return new RescheduleOrderUseCase(orderRepository, deliveryDateChangeValidator);
     }
 
     @Bean

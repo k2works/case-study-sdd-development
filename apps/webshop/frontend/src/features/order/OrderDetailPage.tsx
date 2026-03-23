@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams, Link } from 'react-router-dom'
 import { orderAdminApi } from '../../lib/order-admin-api'
+import type { RescheduleCheckResponse } from '../../lib/order-admin-api'
 import type { OrderResponse } from '../../types/order'
 
 const STATUS_LABELS: Record<string, string> = {
@@ -21,6 +22,10 @@ export function OrderDetailPage() {
   const queryClient = useQueryClient()
   const [isAccepting, setIsAccepting] = useState(false)
   const [showCancelDialog, setShowCancelDialog] = useState(false)
+  const [showRescheduleForm, setShowRescheduleForm] = useState(false)
+  const [newDeliveryDate, setNewDeliveryDate] = useState('')
+  const [rescheduleCheck, setRescheduleCheck] = useState<RescheduleCheckResponse | null>(null)
+  const [isCheckingDate, setIsCheckingDate] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
 
   const { data: order, isLoading } = useQuery<OrderResponse>({
@@ -51,13 +56,45 @@ export function OrderDetailPage() {
     },
   })
 
+  const rescheduleMutation = useMutation({
+    mutationFn: () => orderAdminApi.rescheduleOrder(orderId, newDeliveryDate),
+    onSuccess: () => {
+      setShowRescheduleForm(false)
+      setNewDeliveryDate('')
+      setRescheduleCheck(null)
+      setToast('届け日を変更しました')
+      setTimeout(() => setToast(null), 3000)
+      queryClient.invalidateQueries({ queryKey: ['admin-orders'] })
+    },
+  })
+
   const handleAccept = () => {
     if (isAccepting) return
     setIsAccepting(true)
     acceptMutation.mutate()
   }
 
+  const handleDateChange = useCallback(async (date: string) => {
+    setNewDeliveryDate(date)
+    setRescheduleCheck(null)
+    if (!date) return
+    setIsCheckingDate(true)
+    try {
+      const res = await orderAdminApi.checkReschedule(orderId, date)
+      setRescheduleCheck(res.data)
+    } catch {
+      // エラー時はチェック結果をクリア
+    } finally {
+      setIsCheckingDate(false)
+    }
+  }, [orderId])
+
+  const handleAlternativeDateClick = (date: string) => {
+    handleDateChange(date)
+  }
+
   const canCancel = order ? CANCELLABLE_STATUSES.includes(order.status) : false
+  const canReschedule = order ? CANCELLABLE_STATUSES.includes(order.status) : false
 
   if (isLoading) {
     return <p className="text-gray-500 text-center py-12">読み込み中...</p>
@@ -167,6 +204,108 @@ export function OrderDetailPage() {
         {cancelMutation.isError && (
           <div className="bg-red-50 text-red-700 rounded-lg p-3 text-sm">
             キャンセル処理に失敗しました。もう一度お試しください。
+          </div>
+        )}
+
+        {/* 届け日変更ボタン */}
+        {order.status !== 'CANCELLED' && order.status !== 'DELIVERED' && order.status !== 'SHIPPED' && (
+          <div className="pt-4">
+            <button
+              type="button"
+              onClick={() => canReschedule && setShowRescheduleForm(!showRescheduleForm)}
+              disabled={!canReschedule}
+              title={!canReschedule ? '出荷準備中のため届け日を変更できません' : undefined}
+              className="bg-blue-600 text-white font-medium rounded-lg px-5 py-2.5 hover:bg-blue-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              届け日変更
+            </button>
+          </div>
+        )}
+
+        {/* 届け日変更フォーム（アコーディオン展開） */}
+        {showRescheduleForm && order && (
+          <div className="pt-4 border-t border-gray-200 mt-4">
+            <h3 className="text-sm font-bold text-gray-900 mb-3">届け日変更</h3>
+            <p className="text-sm text-gray-500 mb-3">
+              現在の届け日: <span className="font-medium text-gray-900">{order.deliveryDate}</span>
+            </p>
+            <div className="flex items-center gap-3 mb-3">
+              <label htmlFor="new-delivery-date" className="text-sm text-gray-700">
+                新しい届け日:
+              </label>
+              <input
+                id="new-delivery-date"
+                type="date"
+                value={newDeliveryDate}
+                onChange={(e) => handleDateChange(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              />
+            </div>
+
+            {/* ローディング状態 */}
+            {isCheckingDate && (
+              <p className="text-sm text-gray-500 mb-3">在庫を確認中...</p>
+            )}
+
+            {/* 在庫チェック結果 */}
+            {rescheduleCheck && rescheduleCheck.available && (
+              <div className="mb-3">
+                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800">
+                  変更可能です（在庫充足）
+                </span>
+              </div>
+            )}
+
+            {rescheduleCheck && !rescheduleCheck.available && (
+              <div className="mb-3">
+                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 mb-2">
+                  変更できません
+                </span>
+                <p className="text-sm text-red-600 mt-1">{rescheduleCheck.reason}</p>
+
+                {/* 代替日チップ */}
+                {rescheduleCheck.alternativeDates.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-sm text-gray-600 mb-2">代替日の候補:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {rescheduleCheck.alternativeDates.map((altDate) => (
+                        <button
+                          key={altDate}
+                          type="button"
+                          onClick={() => handleAlternativeDateClick(altDate)}
+                          className="inline-flex px-3 py-1 text-sm font-medium rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors cursor-pointer border border-blue-200"
+                        >
+                          {altDate}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {rescheduleCheck.alternativeDates.length === 0 && (
+                  <p className="text-sm text-gray-500 mt-2">
+                    直近で変更可能な日付が見つかりませんでした。
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* 変更実行ボタン */}
+            {rescheduleCheck && rescheduleCheck.available && (
+              <button
+                type="button"
+                onClick={() => rescheduleMutation.mutate()}
+                disabled={rescheduleMutation.isPending}
+                className="bg-emerald-600 text-white font-medium rounded-lg px-5 py-2.5 hover:bg-emerald-700 transition-colors text-sm disabled:opacity-50"
+              >
+                {rescheduleMutation.isPending ? '変更中...' : '変更する'}
+              </button>
+            )}
+
+            {rescheduleMutation.isError && (
+              <div className="bg-red-50 text-red-700 rounded-lg p-3 text-sm mt-3">
+                届け日の変更に失敗しました。もう一度お試しください。
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -13,6 +13,8 @@ vi.mock('../../lib/order-admin-api', () => ({
     findById: vi.fn(),
     acceptOrder: vi.fn(),
     cancelOrder: vi.fn(),
+    checkReschedule: vi.fn(),
+    rescheduleOrder: vi.fn(),
   },
 }))
 
@@ -159,5 +161,52 @@ describe('OrderDetailPage - キャンセル機能', () => {
       const cancelButton = screen.getByRole('button', { name: 'キャンセル' })
       expect(cancelButton).toBeDisabled()
     })
+  })
+})
+
+describe('OrderDetailPage - 届け日変更機能', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('ORDERED状態で届け日変更ボタンが表示される', async () => {
+    vi.mocked(orderAdminApi.findById).mockResolvedValue({
+      data: createMockOrder({ status: 'ORDERED' }),
+    } as never)
+
+    renderPage()
+
+    await waitFor(() => {
+      expect(screen.getByText('届け日変更')).toBeInTheDocument()
+    })
+  })
+
+  it('PREPARING状態で届け日変更ボタンがdisabledである', async () => {
+    vi.mocked(orderAdminApi.findById).mockResolvedValue({
+      data: createMockOrder({ status: 'PREPARING' }),
+    } as never)
+
+    renderPage()
+
+    await waitFor(() => {
+      const btn = screen.getByRole('button', { name: '届け日変更' })
+      expect(btn).toBeDisabled()
+    })
+  })
+
+  it('届け日変更ボタンで変更フォームが展開される', async () => {
+    vi.mocked(orderAdminApi.findById).mockResolvedValue({
+      data: createMockOrder({ status: 'ORDERED', deliveryDate: '2026-06-01' }),
+    } as never)
+
+    renderPage()
+
+    await waitFor(() => {
+      expect(screen.getByText('届け日変更')).toBeInTheDocument()
+    })
+
+    await userEvent.click(screen.getByText('届け日変更'))
+
+    expect(screen.getByText(/現在の届け日/)).toBeInTheDocument()
   })
 })
