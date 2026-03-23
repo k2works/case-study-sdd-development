@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/api/v1/catalog/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api-docs/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/api/v1/admin/orders/**").hasAnyRole("OWNER", "ORDER_STAFF")
                 .requestMatchers("/api/v1/admin/inventory/**").hasAnyRole("OWNER", "PURCHASE_STAFF")

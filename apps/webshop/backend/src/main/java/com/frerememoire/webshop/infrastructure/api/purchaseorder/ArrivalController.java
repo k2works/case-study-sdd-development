@@ -3,6 +3,8 @@ package com.frerememoire.webshop.infrastructure.api.purchaseorder;
 import com.frerememoire.webshop.application.purchaseorder.RegisterArrivalCommand;
 import com.frerememoire.webshop.application.purchaseorder.RegisterArrivalUseCase;
 import com.frerememoire.webshop.domain.purchaseorder.Arrival;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/admin/purchase-orders/{purchaseOrderId}/arrivals")
+@Tag(name = "発注管理")
 public class ArrivalController {
 
     private final RegisterArrivalUseCase registerArrivalUseCase;
@@ -22,6 +25,7 @@ public class ArrivalController {
         this.registerArrivalUseCase = registerArrivalUseCase;
     }
 
+    @Operation(summary = "入荷登録", description = "発注に対する入荷を登録し在庫を追加する")
     @PostMapping
     public ResponseEntity<ArrivalResponse> register(
             @PathVariable Long purchaseOrderId,

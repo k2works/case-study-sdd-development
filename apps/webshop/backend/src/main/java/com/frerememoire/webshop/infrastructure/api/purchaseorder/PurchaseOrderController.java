@@ -4,6 +4,8 @@ import com.frerememoire.webshop.application.purchaseorder.PlacePurchaseOrderUseC
 import com.frerememoire.webshop.application.purchaseorder.PurchaseOrderQueryService;
 import com.frerememoire.webshop.domain.purchaseorder.PurchaseOrder;
 import com.frerememoire.webshop.domain.purchaseorder.PurchaseOrderStatus;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin/purchase-orders")
+@Tag(name = "発注管理", description = "単品の発注と入荷登録")
 public class PurchaseOrderController {
 
     private final PlacePurchaseOrderUseCase placeUseCase;
@@ -30,6 +33,7 @@ public class PurchaseOrderController {
         this.queryService = queryService;
     }
 
+    @Operation(summary = "発注作成")
     @PostMapping
     public ResponseEntity<PurchaseOrderResponse> create(
             @Valid @RequestBody PurchaseOrderRequest request) {
@@ -39,6 +43,7 @@ public class PurchaseOrderController {
                 .body(PurchaseOrderResponse.fromDomain(po));
     }
 
+    @Operation(summary = "発注詳細取得")
     @GetMapping("/{id}")
     public ResponseEntity<PurchaseOrderResponse> findById(@PathVariable Long id) {
         PurchaseOrder po = queryService.findById(id);
@@ -46,6 +51,7 @@ public class PurchaseOrderController {
         return ResponseEntity.ok(PurchaseOrderResponse.fromDomain(po, arrivedQuantity));
     }
 
+    @Operation(summary = "発注一覧", description = "ステータスで絞り込み可能")
     @GetMapping
     public ResponseEntity<List<PurchaseOrderResponse>> findAll(
             @RequestParam(required = false) String status) {
