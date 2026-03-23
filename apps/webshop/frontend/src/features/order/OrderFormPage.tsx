@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { catalogApi } from '../../lib/product-api'
+import { deliveryDestinationApi } from '../../lib/delivery-destination-api'
+import type { DeliveryDestinationResponse } from '../../lib/delivery-destination-api'
 import type { Product } from '../../types/product'
 import type { OrderFormData } from '../../types/order'
 
