@@ -110,6 +110,8 @@ nav:
       - IT6 UI/UX レビュー: review/it6_uiux_review_20260323.md
       - IT6 開発レビュー: review/it6_developing_review_20260323.md
       - IT6 実装 UI/UX レビュー: review/it6_impl_uiux_review_20260323.md
+      - IT7 開発レビュー: review/it7_developing_review_20260323.md
+      - IT7 ダッシュボードレビュー: review/it7_dashboard_review_20260323.md
   - 開発:
       - 概要: development/index.md
       - リリース計画: development/release_plan.md
@@ -134,6 +136,9 @@ nav:
       - イテレーション 6 ふりかえり: development/iteration_retrospective-6.md
       - イテレーション 6 完了報告書: development/iteration_report-6.md
       - イテレーション 7 計画: development/iteration_plan-7.md
+      - イテレーション 7 ふりかえり: development/iteration_retrospective-7.md
+      - イテレーション 7 完了報告書: development/iteration_report-7.md
+      - イテレーション 8 計画（バッファ）: development/iteration_plan-8.md
   - 運用:
       - 概要: operation/index.md
       - アプリケーション開発環境セットアップ: operation/app-development-setup.md
