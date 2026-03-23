@@ -1,5 +1,6 @@
 package com.frerememoire.webshop.domain.order;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -9,7 +10,7 @@ public class Order {
     private final Long customerId;
     private final Long productId;
     private final Long deliveryDestinationId;
-    private final DeliveryDate deliveryDate;
+    private DeliveryDate deliveryDate;
     private final Message message;
     private OrderStatus status;
     private final LocalDateTime orderedAt;
@@ -46,9 +47,15 @@ public class Order {
 
     public static Order create(Long customerId, Long productId, Long deliveryDestinationId,
                                 LocalDate deliveryDateValue, String messageValue) {
-        LocalDateTime now = LocalDateTime.now();
+        return create(customerId, productId, deliveryDestinationId,
+                deliveryDateValue, messageValue, Clock.systemDefaultZone());
+    }
+
+    public static Order create(Long customerId, Long productId, Long deliveryDestinationId,
+                                LocalDate deliveryDateValue, String messageValue, Clock clock) {
+        LocalDateTime now = LocalDateTime.now(clock);
         return new Order(null, customerId, productId, deliveryDestinationId,
-                new DeliveryDate(deliveryDateValue),
+                new DeliveryDate(deliveryDateValue, clock),
                 new Message(messageValue),
                 OrderStatus.ORDERED, now, now);
     }
@@ -61,6 +68,37 @@ public class Order {
     public void prepare() {
         this.status = this.status.transitionTo(OrderStatus.PREPARING);
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void ship() {
+        this.status = this.status.transitionTo(OrderStatus.SHIPPED);
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void cancel() {
+        this.status = this.status.transitionTo(OrderStatus.CANCELLED);
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public boolean canCancel() {
+        return this.status.canTransitionTo(OrderStatus.CANCELLED);
+    }
+
+    public void reschedule(LocalDate newDeliveryDate) {
+        reschedule(newDeliveryDate, Clock.systemDefaultZone());
+    }
+
+    public void reschedule(LocalDate newDeliveryDate, Clock clock) {
+        if (!canReschedule()) {
+            throw new IllegalStateException(
+                    "ステータスが%sの注文は届け日を変更できません".formatted(this.status.name()));
+        }
+        this.deliveryDate = new DeliveryDate(newDeliveryDate, clock);
+        this.updatedAt = LocalDateTime.now(clock);
+    }
+
+    public boolean canReschedule() {
+        return this.status == OrderStatus.ORDERED || this.status == OrderStatus.ACCEPTED;
     }
 
     public Long getId() {

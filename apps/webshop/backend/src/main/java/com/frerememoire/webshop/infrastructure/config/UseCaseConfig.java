@@ -2,6 +2,11 @@ package com.frerememoire.webshop.infrastructure.config;
 
 import com.frerememoire.webshop.application.bundling.BundleOrderUseCase;
 import com.frerememoire.webshop.application.bundling.BundlingQueryService;
+import com.frerememoire.webshop.application.order.CancelOrderUseCase;
+import com.frerememoire.webshop.application.order.DeliveryDateChangeValidator;
+import com.frerememoire.webshop.application.order.RescheduleOrderUseCase;
+import com.frerememoire.webshop.application.shipping.ShipOrderUseCase;
+import com.frerememoire.webshop.application.shipping.ShipmentQueryService;
 import com.frerememoire.webshop.application.auth.AuthenticationUseCase;
 import com.frerememoire.webshop.application.auth.RegistrationUseCase;
 import com.frerememoire.webshop.application.item.ItemUseCase;
@@ -126,6 +131,39 @@ public class UseCaseConfig {
             StockRepository stockRepository,
             ItemRepository itemRepository) {
         return new BundlingQueryService(orderRepository, productRepository, stockRepository, itemRepository);
+    }
+
+    @Bean
+    public CancelOrderUseCase cancelOrderUseCase(OrderRepository orderRepository) {
+        return new CancelOrderUseCase(orderRepository);
+    }
+
+    @Bean
+    public DeliveryDateChangeValidator deliveryDateChangeValidator(
+            ProductRepository productRepository,
+            InventoryQueryPort inventoryQueryPort,
+            ItemRepository itemRepository) {
+        return new DeliveryDateChangeValidator(productRepository, inventoryQueryPort, itemRepository);
+    }
+
+    @Bean
+    public RescheduleOrderUseCase rescheduleOrderUseCase(
+            OrderRepository orderRepository,
+            DeliveryDateChangeValidator deliveryDateChangeValidator) {
+        return new RescheduleOrderUseCase(orderRepository, deliveryDateChangeValidator);
+    }
+
+    @Bean
+    public ShipOrderUseCase shipOrderUseCase(OrderRepository orderRepository) {
+        return new ShipOrderUseCase(orderRepository);
+    }
+
+    @Bean
+    public ShipmentQueryService shipmentQueryService(
+            OrderRepository orderRepository,
+            ProductRepository productRepository,
+            DeliveryDestinationRepository deliveryDestinationRepository) {
+        return new ShipmentQueryService(orderRepository, productRepository, deliveryDestinationRepository);
     }
 
     @Bean

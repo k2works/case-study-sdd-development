@@ -67,6 +67,8 @@
 | [IT5 UI/UX レビュー](./review/iteration_plan-5_uiux_review_20260322.md) | S-302 入荷登録・S-401 結束対象一覧の UI/UX レビュー |
 | [IT5 開発レビュー](./review/it5_developing_review_20260322.md) | IT5 入荷登録・結束対象確認・結束完了実装のマルチパースペクティブレビュー |
 | [IT5 実装 UI/UX レビュー](./review/it5_impl_uiux_review_20260322.md) | IT5 実装後の UI/UX レビュー |
+| [IT6 計画レビュー](./review/iteration_plan-6_review_20260323.md) | IT6 計画のマルチパースペクティブレビュー |
+| [IT6 UI/UX レビュー](./review/it6_uiux_review_20260323.md) | IT6 UI/UX 設計の UI/UX レビュー |
 
 ### 開発 (`development/`)
 
@@ -89,6 +91,9 @@
 | [IT5 ふりかえり](./development/iteration_retrospective-5.md) | 作成済み |
 | [IT5 完了報告書](./development/iteration_report-5.md) | 作成済み |
 | [Release 1.0 MVP 完了報告書](./development/release_report-1_0.md) | 作成済み |
+| [IT6 イテレーション計画](./development/iteration_plan-6.md) | 実装完了（16 SP） |
+| [IT6 ふりかえり](./development/iteration_retrospective-6.md) | 作成済み |
+| [IT6 完了報告書](./development/iteration_report-6.md) | 作成済み |
 
 ### 運用 (`operation/`)
 
