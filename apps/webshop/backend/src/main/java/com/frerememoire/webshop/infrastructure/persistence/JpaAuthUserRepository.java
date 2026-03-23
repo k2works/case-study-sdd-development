@@ -22,6 +22,12 @@ public class JpaAuthUserRepository implements AuthUserRepository {
     }
 
     @Override
+    public Optional<AuthUser> findById(Long id) {
+        return springDataRepository.findById(id)
+                .map(UserEntity::toDomain);
+    }
+
+    @Override
     public AuthUser save(AuthUser user) {
         UserEntity entity = UserEntity.fromDomain(user);
         UserEntity saved = springDataRepository.save(entity);

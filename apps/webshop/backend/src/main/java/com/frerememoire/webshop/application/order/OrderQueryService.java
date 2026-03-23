@@ -4,7 +4,6 @@ import com.frerememoire.webshop.domain.order.Order;
 import com.frerememoire.webshop.domain.order.OrderStatus;
 import com.frerememoire.webshop.domain.order.port.OrderRepository;
 import com.frerememoire.webshop.domain.shared.EntityNotFoundException;
-import com.frerememoire.webshop.application.order.dto.DashboardSummary;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -56,14 +55,5 @@ public class OrderQueryService {
         return orderIds.stream()
                 .map(this::acceptOrder)
                 .toList();
-    }
-
-    public DashboardSummary getDashboardSummary() {
-        List<Order> allOrders = orderRepository.findAll();
-        long orderedCount = allOrders.stream()
-                .filter(o -> o.getStatus() == OrderStatus.ORDERED).count();
-        long acceptedCount = allOrders.stream()
-                .filter(o -> o.getStatus() == OrderStatus.ACCEPTED).count();
-        return new DashboardSummary(allOrders.size(), orderedCount, acceptedCount);
     }
 }

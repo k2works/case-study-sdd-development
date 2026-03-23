@@ -1,5 +1,7 @@
 package com.frerememoire.webshop.infrastructure.config;
 
+import com.frerememoire.webshop.application.customer.GetCustomerDetailUseCase;
+import com.frerememoire.webshop.application.customer.GetDeliveryDestinationsUseCase;
 import com.frerememoire.webshop.application.bundling.BundleOrderUseCase;
 import com.frerememoire.webshop.application.bundling.BundlingQueryService;
 import com.frerememoire.webshop.application.order.CancelOrderUseCase;
@@ -9,6 +11,7 @@ import com.frerememoire.webshop.application.shipping.ShipOrderUseCase;
 import com.frerememoire.webshop.application.shipping.ShipmentQueryService;
 import com.frerememoire.webshop.application.auth.AuthenticationUseCase;
 import com.frerememoire.webshop.application.auth.RegistrationUseCase;
+import com.frerememoire.webshop.application.dashboard.DashboardQueryService;
 import com.frerememoire.webshop.application.item.ItemUseCase;
 import com.frerememoire.webshop.application.order.OrderQueryService;
 import com.frerememoire.webshop.application.order.PlaceOrderUseCase;
@@ -76,6 +79,14 @@ public class UseCaseConfig {
     public OrderQueryService orderQueryService(OrderRepository orderRepository,
                                                 CustomerRepository customerRepository) {
         return new OrderQueryService(orderRepository, customerRepository);
+    }
+
+    @Bean
+    public DashboardQueryService dashboardQueryService(OrderRepository orderRepository,
+                                                        ItemRepository itemRepository,
+                                                        InventoryQueryPort inventoryQueryPort,
+                                                        Clock clock) {
+        return new DashboardQueryService(orderRepository, itemRepository, inventoryQueryPort, clock);
     }
 
     @Bean
@@ -164,6 +175,22 @@ public class UseCaseConfig {
             ProductRepository productRepository,
             DeliveryDestinationRepository deliveryDestinationRepository) {
         return new ShipmentQueryService(orderRepository, productRepository, deliveryDestinationRepository);
+    }
+
+    @Bean
+    public GetCustomerDetailUseCase getCustomerDetailUseCase(
+            CustomerRepository customerRepository,
+            OrderQueryService orderQueryService,
+            ProductRepository productRepository,
+            AuthUserRepository authUserRepository) {
+        return new GetCustomerDetailUseCase(
+                customerRepository, orderQueryService, productRepository, authUserRepository);
+    }
+
+    @Bean
+    public GetDeliveryDestinationsUseCase getDeliveryDestinationsUseCase(
+            DeliveryDestinationRepository deliveryDestinationRepository) {
+        return new GetDeliveryDestinationsUseCase(deliveryDestinationRepository);
     }
 
     @Bean

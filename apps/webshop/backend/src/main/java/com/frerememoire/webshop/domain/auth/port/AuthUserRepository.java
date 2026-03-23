@@ -8,6 +8,8 @@ public interface AuthUserRepository {
 
     Optional<AuthUser> findByEmail(String email);
 
+    Optional<AuthUser> findById(Long id);
+
     AuthUser save(AuthUser user);
 
     boolean existsByEmail(String email);

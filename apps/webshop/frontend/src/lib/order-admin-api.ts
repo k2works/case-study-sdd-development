@@ -1,5 +1,5 @@
 import api from './api'
-import type { OrderResponse, DashboardSummary } from '../types/order'
+import type { OrderResponse } from '../types/order'
 
 export interface RescheduleCheckResponse {
   available: boolean
@@ -21,5 +21,4 @@ export const orderAdminApi = {
     api.put<OrderResponse>(`/admin/orders/${id}/reschedule`, { newDeliveryDate }),
   checkReschedule: (id: number, date: string) =>
     api.get<RescheduleCheckResponse>(`/admin/orders/${id}/reschedule-check`, { params: { date } }),
-  getDashboardSummary: () => api.get<DashboardSummary>('/admin/dashboard/summary'),
 }
