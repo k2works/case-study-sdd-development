@@ -100,6 +100,9 @@ Then  一方のみが成功し、他方は在庫不足エラーとなること
 | pytest-django | Django テスト統合 |
 | pytest-cov | カバレッジ計測 |
 | factory_boy | テストデータファクトリ |
+| Ruff | リンター + フォーマッター（flake8, black, isort 統合） |
+| mypy | 静的型チェック |
+| tox | タスクランナー（テスト・Lint・型チェック一括実行） |
 | Playwright | E2E テスト |
 | axe-core | アクセシビリティテスト |
 | bandit | セキュリティ静的解析 |
@@ -138,7 +141,7 @@ start
 :コードを push;
 
 |GitHub Actions|
-:Lint（flake8, black, isort）;
+:Lint（ruff check + ruff format + mypy）;
 
 fork
   :ユニットテスト（pytest -m unit）;
@@ -173,7 +176,7 @@ stop
 
 | タイミング | 実行テスト | 失敗時 |
 | :--- | :--- | :--- |
-| pre-commit（ローカル） | Lint + ユニットテスト | コミット阻止 |
+| ローカル（`uv run tox`） | Lint + 型チェック + ユニットテスト | 手動実行（push 前に推奨） |
 | push（CI） | 全テスト（ユニット→統合→E2E） | PR マージ阻止 |
 | デプロイ前 | E2E テスト（ステージング） | デプロイ阻止 |
 

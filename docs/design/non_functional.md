@@ -82,7 +82,7 @@
 | 指標 | 目標 | 実現方法 |
 | :--- | :--- | :--- |
 | コードカバレッジ | 70% 以上 | pytest-cov + CI ゲート |
-| 静的解析 | 警告 0 件 | flake8 + black + isort |
+| 静的解析 | 警告 0 件 | Ruff（lint + format）+ mypy |
 | ドキュメント | API ドキュメント自動生成 | DRF Spectacular |
 | マイグレーション | 自動 | Django Migrations |
 | 依存関係更新 | 月 1 回 | Dependabot |

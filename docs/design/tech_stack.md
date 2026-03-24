@@ -15,9 +15,9 @@
 | テスト | pytest-django | 4.x | Django テスト統合 | - |
 | テスト | pytest-cov | 5.x | カバレッジ計測 | - |
 | テストデータ | factory_boy | 3.3+ | テストデータファクトリ | - |
-| Lint | flake8 | 7.x | スタイルチェック | - |
-| フォーマッタ | black | 24.x | コードフォーマット | - |
-| インポート整理 | isort | 5.x | import 文の整理 | - |
+| Lint + フォーマッタ | Ruff | 0.8+ | リンター + フォーマッター（flake8, black, isort を統合） | - |
+| 型チェック | mypy | 1.13+ | 静的型チェック | - |
+| タスクランナー | tox | 4.x | テスト・Lint・型チェックの一括実行 | - |
 | セキュリティ | bandit | 1.7+ | 静的セキュリティ解析 | - |
 | セキュリティ | pip-audit | 2.x | 依存関係脆弱性チェック | - |
 | WSGI サーバー | gunicorn | 22.x | 本番用アプリケーションサーバー | - |
@@ -60,10 +60,9 @@
 
 | カテゴリ | 技術 | バージョン | 用途 |
 | :--- | :--- | :--- | :--- |
-| パッケージ管理 | pip + pip-tools | - | Python パッケージ管理 |
-| 仮想環境 | venv | (Python 組込) | Python 仮想環境 |
+| パッケージ管理 | uv | 0.5+ | 高速パッケージマネージャ（pip + venv + pip-tools を統合） |
+| プロジェクト定義 | pyproject.toml | - | プロジェクト設定・依存関係・ツール設定を一元管理 |
 | ローカル DB | Docker Compose | - | PostgreSQL ローカル実行 |
-| pre-commit | pre-commit | 3.x | Git フック管理（Lint） |
 | エディタ | - | - | チーム任意（VS Code 推奨） |
 
 ## バージョンアップグレード計画
