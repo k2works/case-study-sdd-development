@@ -2,3 +2,191 @@
 
 エンティティ、値オブジェクトのビジネスルールを DB 非依存でテストする。
 """
+
+from datetime import date
+
+import pytest
+
+from apps.products.domain.entities import Item, Supplier
+from apps.products.domain.value_objects import (
+    ItemName,
+    LeadTimeDays,
+    PurchaseUnit,
+    QualityRetentionDays,
+)
+
+
+class TestItemName:
+    """ItemName 値オブジェクトのテスト。"""
+
+    def test_正常な名前で生成できる(self):
+        name = ItemName("バラ（赤）")
+        assert name.value == "バラ（赤）"
+
+    def test_1文字で生成できる(self):
+        name = ItemName("花")
+        assert name.value == "花"
+
+    def test_100文字で生成できる(self):
+        name = ItemName("あ" * 100)
+        assert name.value == "あ" * 100
+
+    def test_空文字で生成するとエラー(self):
+        with pytest.raises(ValueError):
+            ItemName("")
+
+    def test_Noneで生成するとエラー(self):
+        with pytest.raises((ValueError, TypeError)):
+            ItemName(None)
+
+    def test_101文字で生成するとエラー(self):
+        with pytest.raises(ValueError):
+            ItemName("あ" * 101)
+
+    def test_等価性(self):
+        assert ItemName("バラ") == ItemName("バラ")
+
+    def test_非等価性(self):
+        assert ItemName("バラ") != ItemName("チューリップ")
+
+    def test_strで文字列表現を取得できる(self):
+        assert str(ItemName("バラ")) == "バラ"
+
+
+class TestQualityRetentionDays:
+    """品質維持日数の値オブジェクトテスト。"""
+
+    def test_正常な日数で生成できる(self):
+        days = QualityRetentionDays(7)
+        assert days.value == 7
+
+    def test_1日で生成できる(self):
+        days = QualityRetentionDays(1)
+        assert days.value == 1
+
+    def test_0日で生成するとエラー(self):
+        with pytest.raises(ValueError):
+            QualityRetentionDays(0)
+
+    def test_負数で生成するとエラー(self):
+        with pytest.raises(ValueError):
+            QualityRetentionDays(-1)
+
+    def test_品質維持期限を計算できる(self):
+        days = QualityRetentionDays(7)
+        arrived = date(2026, 4, 1)
+        # 入荷日 + 品質維持日数 - 1
+        assert days.calculate_expiry(arrived) == date(2026, 4, 7)
+
+    def test_品質維持期限間近を判定できる(self):
+        days = QualityRetentionDays(7)
+        arrived = date(2026, 4, 1)
+        # 期限日 = 4/7、残り 2 日以内 = 4/5(残2日), 4/6(残1日), 4/7(残0日)
+        assert days.is_near_expiry(arrived, date(2026, 4, 5)) is True
+        assert days.is_near_expiry(arrived, date(2026, 4, 4)) is False
+
+
+class TestPurchaseUnit:
+    """購入単位の値オブジェクトテスト。"""
+
+    def test_正常な単位で生成できる(self):
+        unit = PurchaseUnit(10)
+        assert unit.value == 10
+
+    def test_1本で生成できる(self):
+        unit = PurchaseUnit(1)
+        assert unit.value == 1
+
+    def test_0で生成するとエラー(self):
+        with pytest.raises(ValueError):
+            PurchaseUnit(0)
+
+    def test_負数で生成するとエラー(self):
+        with pytest.raises(ValueError):
+            PurchaseUnit(-5)
+
+
+class TestLeadTimeDays:
+    """リードタイムの値オブジェクトテスト。"""
+
+    def test_正常な日数で生成できる(self):
+        lead = LeadTimeDays(3)
+        assert lead.value == 3
+
+    def test_0日で生成できる(self):
+        lead = LeadTimeDays(0)
+        assert lead.value == 0
+
+    def test_負数で生成するとエラー(self):
+        with pytest.raises(ValueError):
+            LeadTimeDays(-1)
+
+    def test_最短届け日を計算できる(self):
+        lead = LeadTimeDays(3)
+        order_date = date(2026, 4, 1)
+        # 注文日 + リードタイム = 最短届け日
+        assert lead.earliest_delivery_date(order_date) == date(2026, 4, 4)
+
+
+class TestSupplier:
+    """Supplier エンティティのテスト。"""
+
+    def test_仕入先を生成できる(self):
+        supplier = Supplier(id=1, name="花卉市場A", contact_info="03-1234-5678")
+        assert supplier.id == 1
+        assert supplier.name == "花卉市場A"
+        assert supplier.contact_info == "03-1234-5678"
+
+    def test_連絡先なしで生成できる(self):
+        supplier = Supplier(id=2, name="花卉市場B")
+        assert supplier.contact_info == ""
+
+    def test_名前が空で生成するとエラー(self):
+        with pytest.raises(ValueError):
+            Supplier(id=1, name="")
+
+    def test_名前が101文字で生成するとエラー(self):
+        with pytest.raises(ValueError):
+            Supplier(id=1, name="あ" * 101)
+
+
+class TestItem:
+    """Item エンティティのテスト。"""
+
+    def test_単品を生成できる(self):
+        item = Item(
+            id=1,
+            name=ItemName("バラ（赤）"),
+            quality_retention_days=QualityRetentionDays(7),
+            purchase_unit=PurchaseUnit(10),
+            lead_time_days=LeadTimeDays(3),
+            supplier_id=1,
+        )
+        assert item.id == 1
+        assert item.name == ItemName("バラ（赤）")
+        assert item.supplier_id == 1
+        assert item.is_active is True
+
+    def test_品質維持期限を計算できる(self):
+        item = Item(
+            id=1,
+            name=ItemName("バラ（赤）"),
+            quality_retention_days=QualityRetentionDays(7),
+            purchase_unit=PurchaseUnit(10),
+            lead_time_days=LeadTimeDays(3),
+            supplier_id=1,
+        )
+        arrived = date(2026, 4, 1)
+        assert item.calculate_expiry_date(arrived) == date(2026, 4, 7)
+
+    def test_無効化できる(self):
+        item = Item(
+            id=1,
+            name=ItemName("バラ（赤）"),
+            quality_retention_days=QualityRetentionDays(7),
+            purchase_unit=PurchaseUnit(10),
+            lead_time_days=LeadTimeDays(3),
+            supplier_id=1,
+        )
+        item.deactivate()
+        assert item.is_active is False
