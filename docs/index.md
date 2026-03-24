@@ -57,7 +57,9 @@
 | [IT3 計画](./development/iteration_plan-3.md) | 完了 |
 | [IT3 ふりかえり](./development/retrospective-3.md) | 完了 |
 | [IT3 完了報告書](./development/iteration_report-3.md) | 完了 |
-| [IT4 計画](./development/iteration_plan-4.md) | 進行中 |
+| [IT4 計画](./development/iteration_plan-4.md) | 完了 |
+| [IT4 ふりかえり](./development/retrospective-4.md) | 完了 |
+| [IT4 完了報告書](./development/iteration_report-4.md) | 完了 |
 
 ### 運用 (`operation/`)
 
@@ -88,6 +90,7 @@
 | [IT2 コードレビュー](./review/it2_code_review_20260324.md) | 2026-03-24 |
 | [IT3 S08 コードレビュー](./review/S08_stock_forecast_review_20260324.md) | 2026-03-24 |
 | [IT3 S08 UI/UX レビュー](./review/S08_stock_forecast_uiux_review_20260324.md) | 2026-03-24 |
+| [IT4 コードレビュー](./review/it4_code_review_20260324.md) | 2026-03-24 |
 
 ### リファレンス (`reference/`)
 
