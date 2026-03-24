@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "mkdocs",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "docker", "compose", "up", "mkdocs", "plantuml"],
+      "port": 8000,
+      "autoPort": false
+    },
+    {
+      "name": "sonarqube",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "docker", "compose", "-f", "ops/docker/sonarqube-local/docker-compose.yml", "up"],
+      "port": 9000,
+      "autoPort": false
+    }
+  ]
+}
