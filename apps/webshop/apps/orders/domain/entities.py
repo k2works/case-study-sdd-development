@@ -1,8 +1,13 @@
-"""受注ドメインのエンティティ。"""
+"""受注ドメインのエンティティ定義。
+
+DeliveryAddress, OrderLine, Order の各エンティティを定義する。
+Order が集約ルートとして注文のライフサイクルを管理する。
+"""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date
 from decimal import Decimal
 
 from apps.orders.domain.value_objects import (

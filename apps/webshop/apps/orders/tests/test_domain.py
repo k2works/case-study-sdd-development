@@ -76,6 +76,20 @@ class TestDeliveryDate:
         dd = DeliveryDate.reconstruct(past)
         assert dd.value == past
 
+    def test_reconstructと通常生成の等価性(self):
+        d = date.today() + timedelta(days=5)
+        assert DeliveryDate(d) == DeliveryDate.reconstruct(d)
+
+    def test_翌日で生成できる(self):
+        tomorrow = date.today() + timedelta(days=1)
+        dd = DeliveryDate(tomorrow)
+        assert dd.value == tomorrow
+
+    def test_変更期限は届け日の3日前(self):
+        d = date.today() + timedelta(days=10)
+        dd = DeliveryDate(d)
+        assert dd.change_deadline() == d - timedelta(days=3)
+
 
 # --- Message ---
 
