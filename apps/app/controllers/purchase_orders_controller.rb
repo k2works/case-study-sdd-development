@@ -4,7 +4,9 @@ class PurchaseOrdersController < ApplicationController
 
   def index
     @purchase_orders = PurchaseOrder.includes(:item, :supplier).order(created_at: :desc)
-    @purchase_orders = @purchase_orders.where(status: params[:status]) if params[:status].present?
+    if params[:status].present? && PurchaseOrder.statuses.key?(params[:status])
+      @purchase_orders = @purchase_orders.where(status: params[:status])
+    end
   end
 
   def show
@@ -25,7 +27,7 @@ class PurchaseOrdersController < ApplicationController
     service = PurchaseOrderService.new
     @purchase_order = service.create_order(item: item, quantity: quantity, desired_delivery_date: desired_date)
     redirect_to purchase_orders_path, notice: "発注を登録しました"
-  rescue PurchaseOrderService::InvalidQuantityError, PurchaseOrderService::InvalidDateError => e
+  rescue PurchaseOrderService::InvalidQuantityError, PurchaseOrderService::InvalidDateError, ArgumentError, ActiveRecord::RecordNotFound => e
     @purchase_order = PurchaseOrder.new(purchase_order_params)
     flash.now[:alert] = e.message
     render :new, status: :unprocessable_entity

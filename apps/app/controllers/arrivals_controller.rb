@@ -14,7 +14,7 @@ class ArrivalsController < ApplicationController
 
     service.receive_arrival(purchase_order: @purchase_order, quantity: quantity, arrived_at: arrived_at)
     redirect_to purchase_order_path(@purchase_order), notice: "入荷を記録しました"
-  rescue PurchaseOrderService::InvalidStatusError => e
+  rescue PurchaseOrderService::InvalidStatusError, ArgumentError => e
     @arrival = Arrival.new(arrival_params)
     flash.now[:alert] = e.message
     render :new, status: :unprocessable_entity
