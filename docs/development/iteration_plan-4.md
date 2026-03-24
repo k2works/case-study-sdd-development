@@ -22,12 +22,12 @@
 
 ### 成功基準
 
-- [ ] 単品を選択して発注数量と希望納品日を入力し、発注を確定できる
-- [ ] 発注数量が購入単位の整数倍でない場合にエラーが表示される
-- [ ] 発注一覧から対象の発注を選択し、入荷を記録できる
-- [ ] 入荷を記録すると在庫が増加し、発注が「入荷済み」に更新される
-- [ ] テストカバレッジ 85% 以上
-- [ ] RuboCop / Brakeman OK
+- [x] 単品を選択して発注数量と希望納品日を入力し、発注を確定できる
+- [x] 発注数量が購入単位の整数倍でない場合にエラーが表示される
+- [x] 発注一覧から対象の発注を選択し、入荷を記録できる
+- [x] 入荷を記録すると在庫が増加し、発注が「入荷済み」に更新される
+- [x] テストカバレッジ 85% 以上（95.03%）
+- [x] RuboCop / Brakeman OK
 
 ---
 
@@ -287,13 +287,13 @@ PurchaseOrder ..> StockForecastService : 入荷予定
 
 ### Definition of Done
 
-- [ ] 全テストがパス（Model Spec + Request Spec + Service Spec）
-- [ ] テストカバレッジ 85% 以上
-- [ ] RuboCop 0 offenses
-- [ ] Brakeman 0 warnings
-- [ ] SonarQube Quality Gate OK
-- [ ] コードレビュー完了（developing-review）
-- [ ] 発注画面・入荷画面がブラウザで動作確認済み
+- [x] 全テストがパス（Model Spec + Request Spec + Service Spec）— 165 examples, 0 failures
+- [x] テストカバレッジ 85% 以上 — 95.03%
+- [x] RuboCop 0 offenses
+- [x] Brakeman 0 warnings
+- [x] SonarQube Quality Gate OK
+- [x] コードレビュー完了（developing-review）— it4_code_review_20260324.md
+- [x] 発注画面・入荷画面がブラウザで動作確認済み
 
 ### デモ項目
 
