@@ -77,9 +77,9 @@ IT3 で PurchaseOrder の基本モデルは作成済み。IT4 ではステータ
 
 | # | タスク | 見積もり | 状態 |
 |---|--------|---------|------|
-| 1.1 | PurchaseOrder にステータス管理を追加（TDD: ordered/delivered/cancelled） | 2h | [ ] |
-| 1.2 | PurchaseOrderService（発注ロジック: 購入単位バリデーション、リードタイム計算）— TDD | 3h | [ ] |
-| 1.3 | 発注確定時に入荷予定（StockForecast）に反映される統合テスト | 2h | [ ] |
+| 1.1 | PurchaseOrder にステータス管理を追加（TDD: ordered/delivered/cancelled） | 2h | [x] |
+| 1.2 | PurchaseOrderService（発注ロジック: 購入単位バリデーション、リードタイム計算）— TDD | 3h | [x] |
+| 1.3 | 発注確定時に入荷予定（StockForecast）に反映される統合テスト | 2h | [x] |
 
 **小計**: 7h
 
@@ -87,10 +87,10 @@ IT3 で PurchaseOrder の基本モデルは作成済み。IT4 ではステータ
 
 | # | タスク | 見積もり | 状態 |
 |---|--------|---------|------|
-| 2.1 | PurchaseOrdersController + Request Spec（index/new/create/show） | 3h | [ ] |
-| 2.2 | 発注一覧画面（ステータス別フィルタ） | 2h | [ ] |
-| 2.3 | 発注新規画面（単品選択 → 仕入先・購入単位・リードタイム自動表示） | 2h | [ ] |
-| 2.4 | ナビゲーションに「発注管理」リンク追加 | 0.5h | [ ] |
+| 2.1 | PurchaseOrdersController + Request Spec（index/new/create/show） | 3h | [x] |
+| 2.2 | 発注一覧画面（ステータス別フィルタ） | 2h | [x] |
+| 2.3 | 発注新規画面（単品選択 → 仕入先・購入単位・リードタイム自動表示） | 2h | [x] |
+| 2.4 | ナビゲーションに「発注管理」リンク追加 | 0.5h | [x] |
 
 **小計**: 7.5h
 
@@ -100,10 +100,10 @@ IT3 で Arrival の基本モデルは作成済み。IT4 では入荷受入ロジ
 
 | # | タスク | 見積もり | 状態 |
 |---|--------|---------|------|
-| 3.1 | Arrival モデルに受入ロジック追加（TDD: 在庫増加 + 発注ステータス更新） | 2h | [ ] |
-| 3.2 | ArrivalsController + Request Spec（new/create） | 2h | [ ] |
-| 3.3 | 入荷受入画面（発注選択 → 入荷数量入力） | 2h | [ ] |
-| 3.4 | StockForecastService との連携確認テスト | 1h | [ ] |
+| 3.1 | Arrival モデルに受入ロジック追加（TDD: 在庫増加 + 発注ステータス更新） | 2h | [x] |
+| 3.2 | ArrivalsController + Request Spec（new/create） | 2h | [x] |
+| 3.3 | 入荷受入画面（発注選択 → 入荷数量入力） | 2h | [x] |
+| 3.4 | StockForecastService との連携確認テスト | 1h | [x] |
 
 **小計**: 7h
 
@@ -111,12 +111,13 @@ IT3 で Arrival の基本モデルは作成済み。IT4 では入荷受入ロジ
 
 | カテゴリ | SP | 理想時間 | 状態 |
 |---------|----|----|------|
-| PurchaseOrder 拡張 + Service | 3 | 7h | [ ] |
-| 発注画面 | 2 | 7.5h | [ ] |
-| 入荷受入 | 3 | 7h | [ ] |
+| PurchaseOrder 拡張 + Service | 3 | 7h | [x] |
+| 発注画面 | 2 | 7.5h | [x] |
+| 入荷受入 | 3 | 7h | [x] |
 | **合計** | **8** | **21.5h** | |
 
 **1 SP あたり**: 約 2.7h
+**進捗率**: 100% (8/8 SP)
 **進捗率**: 0% (0/8 SP)
 
 ---
