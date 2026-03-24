@@ -2,6 +2,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 
 /**
@@ -84,7 +85,8 @@ export function wrapWithJava(command) {
     console.warn('Please install Java or ensure Nix is on the PATH.');
     return command;
   }
-  const flakeDir = path.resolve(new URL('.', import.meta.url).pathname, '../..');
+  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+  const flakeDir = path.resolve(scriptDir, '../..');
   const escaped = command.replace(/'/g, "'\\''");
   return `${nix} develop ${flakeDir}#webshop --command bash -c '${escaped}'`;
 }

@@ -1,6 +1,7 @@
 'use strict';
 
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 import { cleanDockerEnv } from './shared.js';
 
@@ -14,7 +15,8 @@ const PREFIX = 'DEV';
 const appName = () => process.env[`${PREFIX}_HEROKU_APP`] || 'sdd-case-study-take2';
 
 /** webshop ディレクトリ */
-const webshopDir = () => path.resolve(new URL('.', import.meta.url).pathname, '../../apps/webshop');
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+const webshopDir = () => path.resolve(scriptDir, '../../apps/webshop');
 
 // ============================================
 // ヘルパー関数
