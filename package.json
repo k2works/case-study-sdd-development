@@ -15,7 +15,13 @@
     "claude:yolo": "claude --dangerously-skip-permissions",
     "copilot:yolo": "copilot --allow-all-tools",
     "codex:yolo": "codex --yolo",
-    "gemini:yolo": "gemini --yolo"
+    "gemini:yolo": "gemini --yolo",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "apps/**/*.rb": [
+      "bash -c 'cd apps && bundle exec rubocop --force-exclusion'"
+    ]
   },
   "repository": {
     "type": "git",
@@ -37,5 +43,8 @@
     "@k2works/claude-code-booster": "^2.7.1",
     "dotenv": "^17.2.3",
     "gulp": "^5.0.0"
+  },
+  "devDependencies": {
+    "lint-staged": "^16.4.0"
   }
 }
