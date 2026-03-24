@@ -6,7 +6,7 @@ DRF ViewSet のリクエスト/レスポンスをテストする。
 import pytest
 from django.test import Client
 
-from apps.products.models import Item, Supplier
+from apps.products.models import Item, Product, Supplier
 
 
 @pytest.mark.django_db
@@ -76,4 +76,48 @@ class TestItemAPI:
 
     def test_存在しない単品で404(self):
         response = self.client.get("/api/items/9999/")
+        assert response.status_code == 404
+
+
+@pytest.mark.django_db
+class TestProductAPI:
+    """商品 API のテスト。"""
+
+    def setup_method(self):
+        self.client = Client()
+        self.product = Product.objects.create(
+            name="バースデーブーケ",
+            description="お誕生日用の花束",
+            price="5000.00",
+        )
+        Product.objects.create(
+            name="廃止ブーケ",
+            description="",
+            price="3000.00",
+            is_active=False,
+        )
+
+    def test_有効な商品一覧のみ取得できる(self):
+        response = self.client.get("/api/products/")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["name"] == "バースデーブーケ"
+
+    def test_商品詳細を取得できる(self):
+        response = self.client.get(f"/api/products/{self.product.pk}/")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["name"] == "バースデーブーケ"
+        assert data["description"] == "お誕生日用の花束"
+        assert data["price"] == "5000.00"
+
+    def test_商品0件で空配列を返す(self):
+        Product.objects.all().delete()
+        response = self.client.get("/api/products/")
+        assert response.status_code == 200
+        assert response.json() == []
+
+    def test_存在しない商品で404(self):
+        response = self.client.get("/api/products/9999/")
         assert response.status_code == 404

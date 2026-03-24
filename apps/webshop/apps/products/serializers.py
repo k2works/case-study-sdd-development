@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from apps.products.models import Item, Supplier
+from apps.products.models import Item, Product, Supplier
 
 
 class SupplierSerializer(serializers.ModelSerializer):
@@ -23,5 +23,18 @@ class ItemSerializer(serializers.ModelSerializer):
             "purchase_unit",
             "lead_time_days",
             "supplier",
+            "is_active",
+        ]
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = [
+            "id",
+            "name",
+            "description",
+            "price",
+            "image_url",
             "is_active",
         ]

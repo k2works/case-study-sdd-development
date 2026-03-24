@@ -4,13 +4,16 @@
 """
 
 from datetime import date
+from decimal import Decimal
 
 import pytest
 
-from apps.products.domain.entities import Item, Supplier
+from apps.products.domain.entities import Item, Product, Supplier
 from apps.products.domain.value_objects import (
     ItemName,
     LeadTimeDays,
+    Price,
+    ProductName,
     PurchaseUnit,
     QualityRetentionDays,
 )
@@ -190,3 +193,76 @@ class TestItem:
         )
         item.deactivate()
         assert item.is_active is False
+
+
+class TestProductName:
+    """ProductName 値オブジェクトのテスト。"""
+
+    def test_正常な名前で生成できる(self):
+        name = ProductName("バースデーブーケ")
+        assert name.value == "バースデーブーケ"
+
+    def test_1文字で生成できる(self):
+        assert ProductName("花").value == "花"
+
+    def test_100文字で生成できる(self):
+        assert ProductName("あ" * 100).value == "あ" * 100
+
+    def test_空文字で生成するとエラー(self):
+        with pytest.raises(ValueError):
+            ProductName("")
+
+    def test_101文字で生成するとエラー(self):
+        with pytest.raises(ValueError):
+            ProductName("あ" * 101)
+
+    def test_等価性(self):
+        assert ProductName("ブーケ") == ProductName("ブーケ")
+
+
+class TestPrice:
+    """Price 値オブジェクトのテスト。"""
+
+    def test_正常な価格で生成できる(self):
+        price = Price(Decimal("5000"))
+        assert price.value == Decimal("5000")
+
+    def test_0円で生成できる(self):
+        assert Price(Decimal("0")).value == Decimal("0")
+
+    def test_負数で生成するとエラー(self):
+        with pytest.raises(ValueError):
+            Price(Decimal("-1"))
+
+    def test_等価性(self):
+        assert Price(Decimal("3000")) == Price(Decimal("3000"))
+
+    def test_strで文字列表現を取得できる(self):
+        assert str(Price(Decimal("5000"))) == "5000"
+
+
+class TestProduct:
+    """Product エンティティのテスト。"""
+
+    def test_商品を生成できる(self):
+        product = Product(
+            id=1,
+            name=ProductName("バースデーブーケ"),
+            description="お誕生日用の花束",
+            price=Price(Decimal("5000")),
+        )
+        assert product.id == 1
+        assert product.name == ProductName("バースデーブーケ")
+        assert product.price == Price(Decimal("5000"))
+        assert product.is_active is True
+        assert product.image_url == ""
+
+    def test_無効化できる(self):
+        product = Product(
+            id=1,
+            name=ProductName("バースデーブーケ"),
+            description="",
+            price=Price(Decimal("5000")),
+        )
+        product.deactivate()
+        assert product.is_active is False

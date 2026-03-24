@@ -11,6 +11,8 @@ from datetime import date
 from apps.products.domain.value_objects import (
     ItemName,
     LeadTimeDays,
+    Price,
+    ProductName,
     PurchaseUnit,
     QualityRetentionDays,
 )
@@ -51,4 +53,20 @@ class Item:
 
     def deactivate(self) -> None:
         """単品を無効化する。"""
+        self.is_active = False
+
+
+@dataclass
+class Product:
+    """商品（花束）エンティティ。集約ルート。"""
+
+    id: int
+    name: ProductName
+    description: str
+    price: Price
+    image_url: str = ""
+    is_active: bool = field(default=True)
+
+    def deactivate(self) -> None:
+        """商品を無効化する。"""
         self.is_active = False

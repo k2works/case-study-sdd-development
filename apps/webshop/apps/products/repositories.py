@@ -5,15 +5,24 @@ domain/interfaces.py で定義された ABC を Django ORM で実装する。
 
 from __future__ import annotations
 
-from apps.products.domain.entities import Item, Supplier
-from apps.products.domain.interfaces import ItemRepository, SupplierRepository
+from decimal import Decimal
+
+from apps.products.domain.entities import Item, Product, Supplier
+from apps.products.domain.interfaces import (
+    ItemRepository,
+    ProductRepository,
+    SupplierRepository,
+)
 from apps.products.domain.value_objects import (
     ItemName,
     LeadTimeDays,
+    Price,
+    ProductName,
     PurchaseUnit,
     QualityRetentionDays,
 )
 from apps.products.models import Item as ItemModel
+from apps.products.models import Product as ProductModel
 from apps.products.models import Supplier as SupplierModel
 
 
@@ -91,5 +100,49 @@ class DjangoItemRepository(ItemRepository):
             purchase_unit=PurchaseUnit(obj.purchase_unit),
             lead_time_days=LeadTimeDays(obj.lead_time_days),
             supplier_id=obj.supplier_id,
+            is_active=obj.is_active,
+        )
+
+
+class DjangoProductRepository(ProductRepository):
+    """商品 Repository の Django ORM 実装。"""
+
+    def find_by_id(self, product_id: int) -> Product | None:
+        try:
+            obj = ProductModel.objects.get(pk=product_id)
+            return self._to_entity(obj)
+        except ProductModel.DoesNotExist:
+            return None
+
+    def find_active(self) -> list[Product]:
+        objs = ProductModel.objects.filter(is_active=True).order_by("name")
+        return [self._to_entity(obj) for obj in objs]
+
+    def save(self, product: Product) -> Product:
+        if product.id and product.id > 0:
+            obj = ProductModel.objects.get(pk=product.id)
+            obj.name = str(product.name)
+            obj.description = product.description
+            obj.price = product.price.value
+            obj.image_url = product.image_url
+            obj.is_active = product.is_active
+            obj.save()
+        else:
+            obj = ProductModel.objects.create(
+                name=str(product.name),
+                description=product.description,
+                price=product.price.value,
+                image_url=product.image_url,
+                is_active=product.is_active,
+            )
+        return self._to_entity(obj)
+
+    def _to_entity(self, obj: ProductModel) -> Product:
+        return Product(
+            id=obj.pk,
+            name=ProductName(obj.name),
+            description=obj.description,
+            price=Price(Decimal(str(obj.price))),
+            image_url=obj.image_url,
             is_active=obj.is_active,
         )

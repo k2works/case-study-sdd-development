@@ -3,16 +3,24 @@
 Django ORM を使用した CRUD 操作をテストする。
 """
 
+from decimal import Decimal
+
 import pytest
 
-from apps.products.domain.entities import Item, Supplier
+from apps.products.domain.entities import Item, Product, Supplier
 from apps.products.domain.value_objects import (
     ItemName,
     LeadTimeDays,
+    Price,
+    ProductName,
     PurchaseUnit,
     QualityRetentionDays,
 )
-from apps.products.repositories import DjangoItemRepository, DjangoSupplierRepository
+from apps.products.repositories import (
+    DjangoItemRepository,
+    DjangoProductRepository,
+    DjangoSupplierRepository,
+)
 
 
 @pytest.mark.django_db
@@ -104,3 +112,52 @@ class TestDjangoItemRepository:
 
     def test_存在しないIDで取得するとNone(self):
         assert self.item_repo.find_by_id(9999) is None
+
+
+@pytest.mark.django_db
+class TestDjangoProductRepository:
+    """商品 Repository の統合テスト。"""
+
+    def setup_method(self):
+        self.repo = DjangoProductRepository()
+
+    def test_商品を保存して取得できる(self):
+        product = Product(
+            id=0,
+            name=ProductName("バースデーブーケ"),
+            description="お誕生日用の花束",
+            price=Price(Decimal("5000")),
+            image_url="https://example.com/img.jpg",
+        )
+        saved = self.repo.save(product)
+
+        assert saved.id > 0
+        found = self.repo.find_by_id(saved.id)
+        assert found is not None
+        assert found.name == ProductName("バースデーブーケ")
+        assert found.price == Price(Decimal("5000"))
+        assert found.image_url == "https://example.com/img.jpg"
+
+    def test_有効な商品一覧を取得できる(self):
+        p1 = Product(
+            id=0,
+            name=ProductName("バースデーブーケ"),
+            description="",
+            price=Price(Decimal("5000")),
+        )
+        p2 = Product(
+            id=0,
+            name=ProductName("廃止ブーケ"),
+            description="",
+            price=Price(Decimal("3000")),
+            is_active=False,
+        )
+        self.repo.save(p1)
+        self.repo.save(p2)
+
+        active = self.repo.find_active()
+        assert len(active) == 1
+        assert active[0].name == ProductName("バースデーブーケ")
+
+    def test_存在しないIDで取得するとNone(self):
+        assert self.repo.find_by_id(9999) is None

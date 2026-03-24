@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from apps.products.domain.entities import Item, Supplier
+from apps.products.domain.entities import Item, Product, Supplier
 
 
 class ItemRepository(ABC):
@@ -38,3 +38,19 @@ class SupplierRepository(ABC):
     @abstractmethod
     def save(self, supplier: Supplier) -> Supplier:
         """仕入先を保存する。"""
+
+
+class ProductRepository(ABC):
+    """商品リポジトリインターフェース。"""
+
+    @abstractmethod
+    def find_by_id(self, product_id: int) -> Product | None:
+        """ID で商品を取得する。"""
+
+    @abstractmethod
+    def find_active(self) -> list[Product]:
+        """有効な商品一覧を取得する。"""
+
+    @abstractmethod
+    def save(self, product: Product) -> Product:
+        """商品を保存する。"""

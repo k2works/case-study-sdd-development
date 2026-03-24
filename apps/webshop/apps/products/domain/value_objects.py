@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, timedelta
+from decimal import Decimal
 
 
 @dataclass(frozen=True)
@@ -75,3 +76,36 @@ class LeadTimeDays:
     def earliest_delivery_date(self, order_date: date) -> date:
         """注文日から最短届け日を算出する。"""
         return order_date + timedelta(days=self.value)
+
+
+@dataclass(frozen=True)
+class ProductName:
+    """商品名。1〜100 文字。"""
+
+    value: str
+
+    def __post_init__(self) -> None:
+        if not self.value or not isinstance(self.value, str):
+            msg = "商品名は必須です"
+            raise ValueError(msg)
+        if len(self.value) > 100:
+            msg = "商品名は100文字以内です"
+            raise ValueError(msg)
+
+    def __str__(self) -> str:
+        return self.value
+
+
+@dataclass(frozen=True)
+class Price:
+    """価格（税込）。0 以上。"""
+
+    value: Decimal
+
+    def __post_init__(self) -> None:
+        if self.value < 0:
+            msg = "価格は0以上です"
+            raise ValueError(msg)
+
+    def __str__(self) -> str:
+        return str(self.value)

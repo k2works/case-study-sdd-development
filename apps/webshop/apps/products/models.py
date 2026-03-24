@@ -47,3 +47,23 @@ class Item(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class Product(models.Model):
+    """商品（花束）モデル。"""
+
+    name = models.CharField("商品名", max_length=100)
+    description = models.TextField("説明", blank=True, default="")
+    price = models.DecimalField("価格", max_digits=10, decimal_places=2)
+    image_url = models.URLField("画像URL", max_length=500, blank=True, default="")
+    is_active = models.BooleanField("有効", default=True)
+    created_at = models.DateTimeField("作成日時", auto_now_add=True)
+    updated_at = models.DateTimeField("更新日時", auto_now=True)
+
+    class Meta:
+        db_table = "products_product"
+        verbose_name = "商品"
+        verbose_name_plural = "商品"
+
+    def __str__(self) -> str:
+        return self.name
