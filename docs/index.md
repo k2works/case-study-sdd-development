@@ -35,9 +35,9 @@
 | [データモデル設計](./design/data-model.md) | 作成済み |
 | [ドメインモデル設計](./design/domain-model.md) | 作成済み |
 | [UI 設計](./design/ui-design.md) | 作成済み |
-| [テスト戦略](./design/test_strategy.md) | 未着手 |
-| [非機能要件](./design/non_functional.md) | 未着手 |
-| [運用要件](./design/operation.md) | 未着手 |
+| [テスト戦略](./design/test_strategy.md) | 作成済み |
+| [非機能要件](./design/non_functional.md) | 作成済み |
+| [運用要件](./design/operation.md) | 作成済み |
 | [技術スタック選定](./design/tech_stack.md) | 未着手 |
 
 ### 開発 (`development/`)
