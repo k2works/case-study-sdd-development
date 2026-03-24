@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
   devise_for :users
 
-  resources :products, except: [ :show, :destroy ]
+  resources :products, except: [ :show, :destroy ] do
+    resources :compositions, only: [ :index, :create, :destroy ]
+  end
   resources :items, except: [ :show, :destroy ]
 
   get "up" => "rails/health#show", as: :rails_health_check

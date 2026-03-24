@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_24_070003) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_24_070004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "compositions", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.bigint "item_id", null: false
+    t.integer "quantity", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["item_id"], name: "index_compositions_on_item_id"
+    t.index ["product_id", "item_id"], name: "index_compositions_on_product_id_and_item_id", unique: true
+    t.index ["product_id"], name: "index_compositions_on_product_id"
+  end
 
   create_table "items", force: :cascade do |t|
     t.string "name", null: false
@@ -56,5 +67,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_24_070003) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "compositions", "items"
+  add_foreign_key "compositions", "products"
   add_foreign_key "items", "suppliers"
 end
