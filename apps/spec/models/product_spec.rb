@@ -15,6 +15,11 @@ RSpec.describe Product, type: :model do
     it { is_expected.to validate_numericality_of(:price).is_greater_than(0) }
   end
 
+  describe "関連" do
+    it { is_expected.to have_many(:compositions).dependent(:destroy) }
+    it { is_expected.to have_many(:items).through(:compositions) }
+  end
+
   describe "デフォルト値" do
     it "active のデフォルト値が true である" do
       product = Product.new(name: "テスト", price: 1000)

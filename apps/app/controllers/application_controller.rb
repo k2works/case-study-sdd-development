@@ -1,4 +1,11 @@
 class ApplicationController < ActionController::Base
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
+
+  private
+
+  def require_staff!
+    unless current_user&.staff?
+      redirect_to root_path, alert: "権限がありません"
+    end
+  end
 end

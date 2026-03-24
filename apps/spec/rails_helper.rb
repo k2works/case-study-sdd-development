@@ -1,7 +1,7 @@
 # SimpleCov must be started before any application code is loaded
 require 'simplecov'
 SimpleCov.start 'rails' do
-  minimum_coverage 40  # IT1 完了時に 80% に引き上げ
+  minimum_coverage 80
 end
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
