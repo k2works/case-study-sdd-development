@@ -1,0 +1,57 @@
+<div class="py-3">
+  <h1 class="h3 mb-4">発注詳細</h1>
+
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <strong>発注 #<%= @purchase_order.id %></strong>
+      <% case @purchase_order.status %>
+      <% when "ordered" %>
+        <span class="badge bg-primary">発注済み</span>
+      <% when "arrived" %>
+        <span class="badge bg-success">入荷済み</span>
+      <% when "cancelled" %>
+        <span class="badge bg-secondary">キャンセル</span>
+      <% end %>
+    </div>
+    <div class="card-body">
+      <table class="table table-borderless mb-0">
+        <tbody>
+          <tr>
+            <th class="w-25">単品</th>
+            <td><%= @purchase_order.item.name %></td>
+          </tr>
+          <tr>
+            <th>仕入先</th>
+            <td><%= @purchase_order.supplier.name %></td>
+          </tr>
+          <tr>
+            <th>発注数量</th>
+            <td><%= @purchase_order.quantity %></td>
+          </tr>
+          <tr>
+            <th>希望納品日</th>
+            <td><%= @purchase_order.desired_delivery_date %></td>
+          </tr>
+          <tr>
+            <th>発注日時</th>
+            <td><%= @purchase_order.ordered_at.strftime("%Y-%m-%d %H:%M") %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <% if @purchase_order.ordered? %>
+      <div class="card-footer">
+        <%= link_to "入荷を記録する", new_purchase_order_arrival_path(@purchase_order), class: "btn btn-success" %>
+      </div>
+    <% end %>
+    <% if @purchase_order.arrival %>
+      <div class="card-footer">
+        <strong>入荷情報:</strong>
+        数量 <%= @purchase_order.arrival.quantity %> /
+        入荷日 <%= @purchase_order.arrival.arrived_at.strftime("%Y-%m-%d") %>
+      </div>
+    <% end %>
+  </div>
+
+  <%= link_to "発注一覧に戻る", purchase_orders_path, class: "btn btn-outline-secondary" %>
+</div>
