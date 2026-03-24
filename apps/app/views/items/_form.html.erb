@@ -1,0 +1,41 @@
+<%= form_with(model: item) do |form| %>
+  <% if item.errors.any? %>
+    <div class="alert alert-danger">
+      <ul>
+        <% item.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :name, "単品名", class: "form-label" %>
+    <%= form.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :quality_retention_days, "品質維持日数", class: "form-label" %>
+    <%= form.number_field :quality_retention_days, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :purchase_unit, "購入単位", class: "form-label" %>
+    <%= form.number_field :purchase_unit, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :lead_time_days, "リードタイム（日）", class: "form-label" %>
+    <%= form.number_field :lead_time_days, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :supplier_id, "仕入先", class: "form-label" %>
+    <%= form.collection_select :supplier_id, Supplier.all, :id, :name, { prompt: "選択してください" }, class: "form-select" %>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= form.submit class: "btn btn-primary" %>
+    <%= link_to "キャンセル", items_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>
