@@ -41,10 +41,10 @@ RSpec.describe StockForecastService, type: :service do
         expect(result[4][:expired]).to eq(30)
       end
 
-      it "有効在庫 = 良品在庫 + 入荷予定 - 引当済み - 廃棄対象 を計算する" do
+      it "有効在庫 = 良品在庫 + 入荷予定 - 引当済み を計算する（expired は表示用）" do
         result = service.forecast(item, base_date, base_date + 6.days)
-        expect(result[0][:effective_stock]).to eq(30)
-        expect(result[4][:effective_stock]).to eq(-30) # 廃棄分がマイナス
+        expect(result[0][:effective_stock]).to eq(30) # 良品30 + 入荷0 - 引当0
+        expect(result[4][:effective_stock]).to eq(0)  # 良品0 + 入荷0 - 引当0（expired は計算に含めない）
       end
     end
 

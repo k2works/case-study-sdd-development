@@ -13,7 +13,9 @@ class StockForecastService
       incoming = calculate_incoming(pending_orders, date)
       allocated = allocated_by_date[date] || 0
       expired = calculate_expired(stocks, date)
-      effective_stock = available_stock + incoming - allocated - expired
+      # 有効在庫 = 良品在庫 + 入荷予定 - 引当済み
+      # expired は表示用（available_stock から既に除外されているため計算に含めない）
+      effective_stock = available_stock + incoming - allocated
 
       {
         date: date,
@@ -40,6 +42,9 @@ class StockForecastService
     stocks.select { |s| s.expiry_date < date }.sum(&:quantity)
   end
 
+  # 引当計算: 受注の届け日（delivery_date）の前日を出荷日とし、
+  # 出荷日に必要な単品数量を引当として計上する。
+  # 引当数量 = 商品構成の必要数量（Composition#quantity）
   def calculate_allocations(item, start_date, end_date)
     compositions = Composition.where(item_id: item.id)
     return {} if compositions.empty?
@@ -47,6 +52,7 @@ class StockForecastService
     product_ids = compositions.pluck(:product_id)
     quantities_by_product = compositions.index_by(&:product_id)
 
+    # 出荷日が期間内の受注を取得（出荷日 = 届け日 - 1 日のため、届け日を +1 日オフセット）
     orders = Order.where(product_id: product_ids, status: "ordered")
       .where(delivery_date: (start_date + 1.day)..(end_date + 1.day))
 
