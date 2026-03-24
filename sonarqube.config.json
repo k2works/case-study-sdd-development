@@ -1,0 +1,11 @@
+{
+  "projects": [
+    {
+      "name": "webshop",
+      "label": "フレール・メモワール WEB ショップ",
+      "projectKey": "frere-memoire-webshop",
+      "scanType": "sonar-scanner",
+      "srcDir": "apps"
+    }
+  ]
+}
