@@ -51,6 +51,8 @@
 | [IT1 コードレビュー](./review/it1_code_review_20260324.md) | 2026-03-24 |
 | [IT2 コードレビュー](./review/it2_code_review_20260324.md) | 2026-03-24 |
 | [IT2 UI/UX レビュー](./review/it2_uiux_review_20260324.md) | 2026-03-24 |
+| [IT3 開発前コードレビュー](./review/it3_pre_code_review_20260324.md) | 2026-03-24 |
+| [IT3 開発前 UI/UX レビュー](./review/it3_pre_uiux_review_20260324.md) | 2026-03-24 |
 
 ### 開発 (`development/`)
 
@@ -63,6 +65,9 @@
 | [イテレーション 2 計画](./development/iteration_plan-2.md) | 完了 |
 | [イテレーション 2 ふりかえり](./development/retrospective-2.md) | 完了 |
 | [イテレーション 2 完了報告書](./development/iteration_report-2.md) | 完了 |
+| [イテレーション 3 計画](./development/iteration_plan-3.md) | 完了 |
+| [イテレーション 3 ふりかえり](./development/retrospective-3.md) | 完了 |
+| [イテレーション 3 完了報告書](./development/iteration_report-3.md) | 完了 |
 
 ### 運用 (`operation/`)
 
@@ -73,6 +78,10 @@
 ### ADR (`adr/`)
 
 技術的意思決定を記録した Architecture Decision Records です。
+
+| ドキュメント | 状態 |
+| :--- | :--- |
+| [ADR-001: OrderStatus 命名・設計乖離](./adr/001-order-status-naming.md) | 承認済み |
 
 ### リファレンス (`reference/`)
 

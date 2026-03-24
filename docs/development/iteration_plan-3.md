@@ -23,12 +23,12 @@
 
 ### 成功基準
 
-- [ ] 在庫推移画面がブラウザで表示される（単品選択→日別推移テーブル）
-- [ ] 注文キャンセルが動作する（期限内キャンセル + 期限超過エラー）
-- [ ] Application 層（OrderService, InventoryService）が導入されている
-- [ ] `uv run tox` で全テストがパス
-- [ ] テストカバレッジ 80% 以上（ドメイン層）
-- [ ] SonarQube Quality Gate OK
+- [x] 在庫推移画面がブラウザで表示される（単品選択→日別推移テーブル）
+- [x] 注文キャンセルが動作する（期限内キャンセル + 期限超過エラー）
+- [x] Application 層（OrderService, InventoryService）が導入されている
+- [x] `uv run tox` で全テストがパス
+- [x] テストカバレッジ 80% 以上（ドメイン層）
+- [x] SonarQube Quality Gate OK
 
 ---
 
@@ -101,9 +101,9 @@
 
 | # | タスク | 見積もり | 状態 |
 | :--- | :--- | :--- | :--- |
-| 0.1 | Application 層: OrderService の導入（View からビジネスロジックを移動） | 3h | [ ] |
-| 0.2 | ファクトリメソッド: 全エンティティに `reconstruct()` パターンを標準化 | 1.5h | [ ] |
-| 0.3 | 設計ドキュメントとの差分を ADR に記録 | 1h | [ ] |
+| 0.1 | Application 層: OrderService の導入（View からビジネスロジックを移動） | 3h | [x] |
+| 0.2 | ファクトリメソッド: 全エンティティに `reconstruct()` パターンを標準化 | 1.5h | [x] |
+| 0.3 | 設計ドキュメントとの差分を ADR に記録 | 1h | [x] |
 
 **小計**: 5.5h
 
@@ -111,9 +111,9 @@
 
 | # | タスク | 見積もり | 状態 |
 | :--- | :--- | :--- | :--- |
-| 1.1 | ドメイン層: StockLot エンティティ + 値オブジェクト（ExpiryDate, StockLotStatus）のテスト・実装 | 3h | [ ] |
-| 1.2 | ドメイン層: StockForecastService（日別在庫推移計算）のテスト・実装 | 4h | [ ] |
-| 1.3 | ドメイン層: StockLotRepository インターフェース定義 | 0.5h | [ ] |
+| 1.1 | ドメイン層: StockLot エンティティ + 値オブジェクト（ExpiryDate, StockLotStatus）のテスト・実装 | 3h | [x] |
+| 1.2 | ドメイン層: StockForecastService（日別在庫推移計算）のテスト・実装 | 4h | [x] |
+| 1.3 | ドメイン層: StockLotRepository インターフェース定義 | 0.5h | [x] |
 
 **小計**: 7.5h
 
@@ -121,9 +121,9 @@
 
 | # | タスク | 見積もり | 状態 |
 | :--- | :--- | :--- | :--- |
-| 2.1 | インフラ層: Django ORM Model（inventory_stocklot）+ マイグレーション | 2h | [ ] |
-| 2.2 | インフラ層: DjangoStockLotRepository 実装 + 統合テスト | 2h | [ ] |
-| 2.3 | インフラ層: Django Admin 設定（StockLot 管理） | 1h | [ ] |
+| 2.1 | インフラ層: Django ORM Model（inventory_stocklot）+ マイグレーション | 2h | [x] |
+| 2.2 | インフラ層: DjangoStockLotRepository 実装 + 統合テスト | 2h | [x] |
+| 2.3 | インフラ層: Django Admin 設定（StockLot 管理） | 1h | [x] |
 
 **小計**: 5h
 
@@ -131,10 +131,10 @@
 
 | # | タスク | 見積もり | 状態 |
 | :--- | :--- | :--- | :--- |
-| 3.1 | Application 層: InventoryService（在庫推移取得ロジック） | 2h | [ ] |
-| 3.2 | Django Template: 在庫推移画面（stock_forecast.html — 単品選択 + 日別テーブル） | 3h | [ ] |
-| 3.3 | Django View: 在庫推移 View + URL ルーティング（/staff/inventory/forecast/） | 1.5h | [ ] |
-| 3.4 | テスト: 在庫推移画面のテンプレートレンダリングテスト + API テスト | 2h | [ ] |
+| 3.1 | Application 層: InventoryService（在庫推移取得ロジック） | 2h | [x] |
+| 3.2 | Django Template: 在庫推移画面（stock_forecast.html — 単品選択 + 日別テーブル） | 3h | [x] |
+| 3.3 | Django View: 在庫推移 View + URL ルーティング（/staff/inventory/forecast/） | 1.5h | [x] |
+| 3.4 | テスト: 在庫推移画面のテンプレートレンダリングテスト + API テスト | 2h | [x] |
 
 **小計**: 8.5h
 
@@ -142,11 +142,11 @@
 
 | # | タスク | 見積もり | 状態 |
 | :--- | :--- | :--- | :--- |
-| 4.1 | ドメイン層: Order.cancel() + can_cancel() のテスト・実装（期限チェック含む） | 2h | [ ] |
-| 4.2 | Application 層: OrderService.cancel_order() のテスト・実装 | 1.5h | [ ] |
-| 4.3 | Django Template: キャンセル確認画面 + キャンセル完了画面 | 2h | [ ] |
-| 4.4 | Django View: キャンセル View + URL ルーティング | 1h | [ ] |
-| 4.5 | テスト: キャンセルフローの統合テスト（期限内・期限超過） | 1.5h | [ ] |
+| 4.1 | ドメイン層: Order.cancel() + can_cancel() のテスト・実装（期限チェック含む） | 2h | [x] |
+| 4.2 | Application 層: OrderService.cancel_order() のテスト・実装 | 1.5h | [x] |
+| 4.3 | Django Template: キャンセル確認画面 + キャンセル完了画面 | 2h | [x] |
+| 4.4 | Django View: キャンセル View + URL ルーティング | 1h | [x] |
+| 4.5 | テスト: キャンセルフローの統合テスト（期限内・期限超過） | 1.5h | [x] |
 
 **小計**: 8h
 
@@ -154,14 +154,14 @@
 
 | カテゴリ | SP | 理想時間 | 状態 |
 | :--- | :--- | :--- | :--- |
-| IT2 ふりかえり対応 | - | 5.5h | [ ] |
-| US-007: 在庫推移（ドメイン） | 8 | 7.5h | [ ] |
-| US-007: 在庫推移（インフラ） | - | 5h | [ ] |
-| US-007: 在庫推移（プレゼン） | - | 8.5h | [ ] |
-| US-014: キャンセル | 3 | 8h | [ ] |
+| IT2 ふりかえり対応 | - | 5.5h | [x] |
+| US-007: 在庫推移（ドメイン） | 8 | 7.5h | [x] |
+| US-007: 在庫推移（インフラ） | - | 5h | [x] |
+| US-007: 在庫推移（プレゼン） | - | 8.5h | [x] |
+| US-014: キャンセル | 3 | 8h | [x] |
 | **合計** | **11** | **34.5h** | |
 
-**進捗率**: 0% (0/11 SP)
+**進捗率**: 100% (11/11 SP)
 
 ---
 
@@ -373,10 +373,10 @@ apps/webshop/apps/
 
 | Try 項目 | 対応タスク | 状態 |
 | :--- | :--- | :--- |
-| Application 層（OrderService）の導入 | 0.1: View → Service のリファクタリング | [ ] |
-| ファクトリメソッドパターンの標準化 | 0.2: 全エンティティに `reconstruct()` 追加 | [ ] |
-| 実装後のユーザーフローウォークスルー | IT3 の画面実装後にフロー確認を実施 | [ ] |
-| 設計ドキュメントとの差分を ADR に記録 | 0.3: ADR 作成 | [ ] |
+| Application 層（OrderService）の導入 | 0.1: View → Service のリファクタリング | [x] |
+| ファクトリメソッドパターンの標準化 | 0.2: 全エンティティに `reconstruct()` 追加 | [x] |
+| 実装後のユーザーフローウォークスルー | IT3 の画面実装後にフロー確認を実施 | [x] |
+| 設計ドキュメントとの差分を ADR に記録 | 0.3: ADR 作成 | [x] |
 
 ---
 
@@ -395,14 +395,14 @@ apps/webshop/apps/
 
 ### Definition of Done
 
-- [ ] `uv run tox` で全テスト（test + lint + type）がパス
-- [ ] 在庫推移画面がブラウザで動作確認済み
-- [ ] 注文キャンセルが統合テストでパス（期限内 + 期限超過）
-- [ ] Application 層が導入されている（OrderService, InventoryService）
-- [ ] Ruff エラーなし
-- [ ] テストカバレッジ 80% 以上（ドメイン層）
-- [ ] SonarQube Quality Gate OK
-- [ ] ドキュメント更新完了
+- [x] `uv run tox` で全テスト（test + lint + type）がパス
+- [x] 在庫推移画面がブラウザで動作確認済み
+- [x] 注文キャンセルが統合テストでパス（期限内 + 期限超過）
+- [x] Application 層が導入されている（OrderService, InventoryService）
+- [x] Ruff エラーなし
+- [x] テストカバレッジ 80% 以上（ドメイン層）
+- [x] SonarQube Quality Gate OK
+- [x] ドキュメント更新完了
 
 ### デモ項目
 
