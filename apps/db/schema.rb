@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_24_101637) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_24_101810) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -82,6 +82,20 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_24_101637) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "purchase_orders", force: :cascade do |t|
+    t.bigint "item_id", null: false
+    t.bigint "supplier_id", null: false
+    t.integer "quantity", null: false
+    t.date "desired_delivery_date", null: false
+    t.string "status", default: "ordered", null: false
+    t.datetime "ordered_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["item_id"], name: "index_purchase_orders_on_item_id"
+    t.index ["status"], name: "index_purchase_orders_on_status"
+    t.index ["supplier_id"], name: "index_purchase_orders_on_supplier_id"
+  end
+
   create_table "stocks", force: :cascade do |t|
     t.bigint "item_id", null: false
     t.integer "quantity", null: false
@@ -125,5 +139,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_24_101637) do
   add_foreign_key "orders", "customers"
   add_foreign_key "orders", "delivery_addresses"
   add_foreign_key "orders", "products"
+  add_foreign_key "purchase_orders", "items"
+  add_foreign_key "purchase_orders", "suppliers"
   add_foreign_key "stocks", "items"
 end
