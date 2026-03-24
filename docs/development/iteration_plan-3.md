@@ -268,13 +268,13 @@ entity "arrivals" {
 
 ### Definition of Done
 
-- [ ] 全テストがパス（Model Spec + Request Spec + Service Spec）
-- [ ] テストカバレッジ 85% 以上
-- [ ] RuboCop 0 offenses
-- [ ] Brakeman 0 warnings
-- [ ] SonarQube Quality Gate OK
-- [ ] コードレビュー完了（developing-review）
-- [ ] 在庫推移画面がブラウザで動作確認済み
+- [x] 全テストがパス（Model Spec + Request Spec + Service Spec）— 136 examples, 0 failures
+- [x] テストカバレッジ 85% 以上 — 94.01%
+- [x] RuboCop 0 offenses
+- [x] Brakeman 0 warnings
+- [x] SonarQube Quality Gate OK
+- [x] コードレビュー完了（developing-review）— S08_stock_forecast_review_20260324.md
+- [x] 在庫推移画面がブラウザで動作確認済み
 
 ### デモ項目
 
@@ -290,6 +290,7 @@ entity "arrivals" {
 | 日付 | 更新内容 | 更新者 |
 |------|---------|--------|
 | 2026-03-24 | 初版作成 | - |
+| 2026-03-24 | 全タスク完了、DoD チェック完了（136 tests, 94.01% coverage） | - |
 
 ---
 
