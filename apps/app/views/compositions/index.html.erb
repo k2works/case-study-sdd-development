@@ -16,7 +16,7 @@
       <tr>
         <td><%= composition.item.name %></td>
         <td><%= composition.quantity %></td>
-        <td><%= button_to "削除", product_composition_path(@product, composition), method: :delete, class: "btn btn-danger btn-sm" %></td>
+        <td><%= button_to "削除", product_composition_path(@product, composition), method: :delete, class: "btn btn-danger btn-sm", data: { turbo_confirm: "この構成を削除しますか？" } %></td>
       </tr>
     <% end %>
   </tbody>

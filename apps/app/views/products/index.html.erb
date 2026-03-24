@@ -2,23 +2,30 @@
 
 <%= link_to "新規登録", new_product_path, class: "btn btn-primary mb-3" %>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>商品名</th>
-      <th>価格</th>
-      <th>状態</th>
-      <th>操作</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @products.each do |product| %>
+<div class="table-responsive">
+  <table class="table">
+    <thead>
       <tr>
-        <td><%= product.name %></td>
-        <td><%= number_to_currency(product.price, unit: "¥", format: "%u%n") %></td>
-        <td><%= product.active ? "掲載中" : "非掲載" %></td>
-        <td><%= link_to "編集", edit_product_path(product) %></td>
+        <th>商品名</th>
+        <th>価格</th>
+        <th>構成</th>
+        <th>状態</th>
+        <th>操作</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @products.each do |product| %>
+        <tr>
+          <td><%= product.name %></td>
+          <td><%= number_to_currency(product.price, unit: "¥", format: "%u%n") %></td>
+          <td><%= product.compositions.count %>品</td>
+          <td><%= product.active ? "掲載中" : "非掲載" %></td>
+          <td>
+            <%= link_to "編集", edit_product_path(product), class: "btn btn-sm btn-outline-secondary" %>
+            <%= link_to "構成", product_compositions_path(product), class: "btn btn-sm btn-outline-primary" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
