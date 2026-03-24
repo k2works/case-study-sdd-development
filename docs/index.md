@@ -1,95 +1,70 @@
 # プロジェクトドキュメント
 
-プロジェクトのドキュメントです。
+プロジェクトで管理しているドキュメントの入口です。
 
 ## まずこれを読もうリスト
 
-- [ビジネスアーキテクチャ](./analysis/business_architecture.md) - ビジネス構造を定義。設計の基盤。
-- [インセプションデッキ](./analysis/inception_deck.md) - プロジェクトの全体像と方向性を共有。
+- [分析](./analysis/index.md) - ビジネス構造とプロジェクトの前提を整理します。
+- [設計](./design/index.md) - 実装の基盤となるアーキテクチャと設計方針を確認します。
+- [運用](./operation/index.md) - 開発環境構築、CI/CD、運用手順を確認します。
+- [リファレンス](./reference/index.md) - ガイドラインとベストプラクティスを参照します。
 
 ## ドキュメント構成
 
 ### 分析 (`analysis/`)
 
-| ドキュメント | 状態 |
-| :--- | :--- |
-| [ビジネスアーキテクチャ](./analysis/business_architecture.md) | 未着手 |
-| [インセプションデッキ](./analysis/inception_deck.md) | 未着手 |
+- [概要](./analysis/index.md)
+- [ビジネスアーキテクチャ](./analysis/business_architecture.md)
+- [インセプションデッキ](./analysis/inception_deck.md)
 
 ### 要件定義 (`requirements/`)
 
-| ドキュメント | 状態 |
-| :--- | :--- |
-| [要件定義書（RDRA 2.0）](./requirements/requirements_definition.md) | 未着手 |
-| [ビジネスユースケース](./requirements/business_usecase.md) | 未着手 |
-| [システムユースケース](./requirements/system_usecase.md) | 未着手 |
-| [ユーザーストーリー](./requirements/user_story.md) | 未着手 |
+- [概要](./requirements/index.md)
+
+現時点では、個別の要件定義ドキュメントは未作成です。
 
 ### 設計 (`design/`)
 
-| ドキュメント | 状態 |
-| :--- | :--- |
-| [バックエンドアーキテクチャ](./design/architecture_backend.md) | 未着手 |
-| [フロントエンドアーキテクチャ](./design/architecture_frontend.md) | 未着手 |
-| [インフラストラクチャ](./design/architecture_infrastructure.md) | 未着手 |
-| [データモデル設計](./design/data-model.md) | 未着手 |
-| [ドメインモデル設計](./design/domain-model.md) | 未着手 |
-| [UI 設計](./design/ui-design.md) | 未着手 |
-| [テスト戦略](./design/test_strategy.md) | 未着手 |
-| [非機能要件](./design/non_functional.md) | 未着手 |
-| [運用要件](./design/operation.md) | 未着手 |
-| [技術スタック選定](./design/tech_stack.md) | 未着手 |
+- [概要](./design/index.md)
+- [バックエンドアーキテクチャ](./design/architecture_backend.md)
+- [フロントエンドアーキテクチャ](./design/architecture_frontend.md)
+- [インフラストラクチャ](./design/architecture_infrastructure.md)
+- [データモデル設計](./design/data-model.md)
+- [ドメインモデル設計](./design/domain_model.md)
+- [UI 設計](./design/ui-design.md)
+- [テスト戦略](./design/test_strategy.md)
+- [非機能要件](./design/non_functional.md)
+- [運用要件](./design/operation.md)
+- [技術スタック選定](./design/tech_stack.md)
 
 ### 開発 (`development/`)
 
-| ドキュメント | 状態 |
-| :--- | :--- |
-| [リリース計画](./development/release_plan.md) | 未着手 |
+- [概要](./development/index.md)
+
+現時点では、個別の開発計画ドキュメントは未作成です。
 
 ### 運用 (`operation/`)
 
-| ドキュメント | 状態 |
-| :--- | :--- |
-| [アプリケーション開発環境セットアップ手順書](./operation/dev_app_instruction.md) | 未着手 |
-
-### ADR (`adr/`)
-
-技術的意思決定を記録した Architecture Decision Records です。
+- [概要](./operation/index.md)
+- [アプリケーション開発環境セットアップ手順書](./operation/app-development-setup.md)
+- [CI/CD パイプライン設計](./operation/cicd-pipeline.md)
+- [開発スクリプトリファレンス](./operation/develop-script.md)
+- [Heroku 開発環境セットアップ手順書](./operation/heroku-dev-setup.md)
 
 ### リファレンス (`reference/`)
 
-開発ガイドラインやベストプラクティスのリファレンスドキュメントです。
+- [概要](./reference/index.md)
+- [主要ガイド一覧](./reference/index.md#ドキュメント一覧)
 
-- [よいソフトウェアとは](./reference/よいソフトウェアとは.md)
-- [開発ガイド](./reference/開発ガイド.md)
-- [ビジネスアーキテクチャ分析ガイド](./reference/ビジネスアーキテクチャ分析ガイド.md)
-- [要件定義ガイド](./reference/要件定義ガイド.md)
-- [ユースケース作成ガイド](./reference/ユースケース作成ガイド.md)
-- [アーキテクチャ設計ガイド](./reference/アーキテクチャ設計ガイド.md)
-- [データモデル設計ガイド](./reference/データモデル設計ガイド.md)
-- [ドメインモデル設計ガイド](./reference/ドメインモデル設計ガイド.md)
-- [UI 設計ガイド](./reference/UI設計ガイド.md)
-- [テスト戦略ガイド](./reference/テスト戦略ガイド.md)
-- [非機能要件定義ガイド](./reference/非機能要件定義ガイド.md)
-- [運用要件定義ガイド](./reference/運用要件定義ガイド.md)
-- [インフラ設計ガイド](./reference/インフラ設計ガイド.md)
-- [コーディングとテストガイド](./reference/コーディングとテストガイド.md)
-- [エクストリームプログラミング](./reference/エクストリームプログラミング.md)
-- [リリースガイド](./reference/リリースガイド.md)
-- [リリース・イテレーション計画ガイド](./reference/リリース・イテレーション計画ガイド.md)
-- [環境変数管理ガイド](./reference/環境変数管理ガイド.md)
-- [言語別開発ガイド](./reference/言語別開発ガイド.md)
-- [Java アプリケーション環境構築ガイド](./reference/Javaアプリケーション環境構築ガイド.md)
-- [TypeScript アプリケーション環境構築ガイド](./reference/TypeScriptアプリケーション環境構築ガイド.md)
-- [Codex CLI MCP アプリケーション開発フロー](./reference/CodexCLIMCPアプリケーション開発フロー.md)
-- [Codex CLI MCP サーバー設定手順](./reference/CodexCLIMCPサーバー設定手順.md)
-- [SonarQube ローカル環境セットアップ手順書](./reference/SonarQubeローカル環境セットアップ手順書.md)
-- [Vim 操作マニュアル](./reference/Vim操作マニュアル.md)
+### ADR (`adr/`)
+
+- [概要](./adr/index.md)
+
+現時点では、個別の ADR は未作成です。
 
 ### テンプレート (`template/`)
 
-ドキュメント作成用のテンプレートです。
-
+- [概要](./template/index.md)
 - [まずこれを読もうリスト](./template/まずこれを読もうリスト.md)
 - [ビジネスアーキテクチャ](./template/ビジネスアーキテクチャ.md)
 - [要件定義](./template/要件定義.md)
@@ -100,4 +75,9 @@
 - [イテレーション計画](./template/イテレーション計画.md)
 - [イテレーション完了報告書](./template/イテレーション完了報告書.md)
 - [リリース計画](./template/リリース計画.md)
+- [リリース完了報告書](./template/リリース完了報告書.md)
+- [アプリケーション開発環境セットアップ手順書](./template/アプリケーション開発環境セットアップ手順書.md)
+- [開発環境セットアップ手順書](./template/開発環境セットアップ手順書.md)
+- [AWS ステージング環境セットアップ手順書](./template/AWSステージング環境セットアップ手順書.md)
+- [AWS プロダクション環境セットアップ手順書](./template/AWSプロダクション環境セットアップ手順書.md)
 - [README](./template/README.md)
