@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     # Local apps
     "apps.products",
     "apps.orders",
+    "apps.inventory",
 ]
 
 # DRF settings
