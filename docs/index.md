@@ -46,14 +46,21 @@
 | :--- | :--- |
 | [要件定義レビュー](./review/requirements_review_20260324.md) | 2026-03-24 |
 | [設計レビュー](./review/design_review_20260324.md) | 2026-03-24 |
+| [UI/UX レビュー](./review/uiux_review_20260324.md) | 2026-03-24 |
 | [運用レビュー](./review/operation_review_20260324.md) | 2026-03-24 |
+| [IT1 コードレビュー](./review/it1_code_review_20260324.md) | 2026-03-24 |
+| [IT2 コードレビュー](./review/it2_code_review_20260324.md) | 2026-03-24 |
+| [IT2 UI/UX レビュー](./review/it2_uiux_review_20260324.md) | 2026-03-24 |
 
 ### 開発 (`development/`)
 
 | ドキュメント | 状態 |
 | :--- | :--- |
 | [リリース計画](./development/release_plan.md) | 作成済み |
-| [イテレーション 1 計画](./development/iteration_plan-1.md) | 作成済み |
+| [イテレーション 1 計画](./development/iteration_plan-1.md) | 完了 |
+| [イテレーション 1 ふりかえり](./development/retrospective-1.md) | 完了 |
+| [イテレーション 1 完了報告書](./development/iteration_report-1.md) | 完了 |
+| [イテレーション 2 計画](./development/iteration_plan-2.md) | 完了 |
 
 ### 運用 (`operation/`)
 

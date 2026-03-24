@@ -88,11 +88,18 @@ nav:
   - レビュー:
       - 要件定義レビュー: review/requirements_review_20260324.md
       - 設計レビュー: review/design_review_20260324.md
+      - UI/UX レビュー: review/uiux_review_20260324.md
       - 運用レビュー: review/operation_review_20260324.md
+      - IT1 コードレビュー: review/it1_code_review_20260324.md
+      - IT2 コードレビュー: review/it2_code_review_20260324.md
+      - IT2 UI/UX レビュー: review/it2_uiux_review_20260324.md
   - 開発:
       - 概要: development/index.md
       - リリース計画: development/release_plan.md
       - イテレーション 1 計画: development/iteration_plan-1.md
+      - イテレーション 1 ふりかえり: development/retrospective-1.md
+      - イテレーション 1 完了報告書: development/iteration_report-1.md
+      - イテレーション 2 計画: development/iteration_plan-2.md
   - 運用:
       - 概要: operation/index.md
       - アプリケーション開発環境セットアップ: operation/dev_app_instruction.md
