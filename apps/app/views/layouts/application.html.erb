@@ -36,6 +36,9 @@
               <li class="nav-item">
                 <%= link_to "受注管理", orders_path, class: "nav-link #{request.path.start_with?('/orders') ? 'active' : ''}" %>
               </li>
+              <li class="nav-item">
+                <%= link_to "在庫推移", stock_forecasts_path, class: "nav-link #{request.path.start_with?('/stock_forecasts') ? 'active' : ''}" %>
+              </li>
             </ul>
             <ul class="navbar-nav">
               <li class="nav-item">
