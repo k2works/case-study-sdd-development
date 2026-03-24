@@ -91,6 +91,7 @@ nav:
       - IT1 計画: development/iteration_plan-1.md
   - 運用:
       - 概要: operation/index.md
+      - アプリケーション開発環境セットアップ: operation/app-development-setup.md
   - レビュー:
       - 要件定義レビュー: review/requirements_review_20260324.md
       - 設計レビュー: review/design_review_20260324.md
