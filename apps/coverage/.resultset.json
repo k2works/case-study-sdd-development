@@ -1,0 +1,89 @@
+{
+  "RSpec": {
+    "coverage": {
+      "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/models/user.rb": {
+        "lines": [
+          1,
+          1,
+          null,
+          1,
+          null,
+          null,
+          1,
+          1,
+          null,
+          1,
+          2,
+          null,
+          null,
+          1,
+          2,
+          null,
+          null
+        ]
+      },
+      "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/models/application_record.rb": {
+        "lines": [
+          1,
+          1,
+          null
+        ]
+      },
+      "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/helpers/application_helper.rb": {
+        "lines": [
+          1,
+          null
+        ]
+      },
+      "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/channels/application_cable/channel.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/channels/application_cable/connection.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/controllers/application_controller.rb": {
+        "lines": [
+          0,
+          null,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/jobs/application_job.rb": {
+        "lines": [
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0
+        ],
+        "branches": {}
+      },
+      "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/mailers/application_mailer.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      }
+    },
+    "timestamp": 1774333159
+  }
+}
