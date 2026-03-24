@@ -19,9 +19,7 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "apps/**/*.rb": [
-      "bash -c 'cd apps && bundle exec rubocop --force-exclusion'"
-    ]
+    "apps/{app,spec,lib}/**/*.rb": "bash -c 'cd apps && bundle exec rubocop --force-exclusion app/ spec/ lib/'"
   },
   "repository": {
     "type": "git",
