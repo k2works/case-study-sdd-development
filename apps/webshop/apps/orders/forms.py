@@ -1,5 +1,7 @@
 """注文フォーム。"""
 
+from datetime import date, timedelta
+
 from django import forms
 
 
@@ -54,3 +56,10 @@ class OrderForm(forms.Form):
         initial=1,
         widget=forms.NumberInput(attrs={"class": "w-20 border rounded p-2"}),
     )
+
+    def clean_delivery_date(self):
+        value = self.cleaned_data["delivery_date"]
+        tomorrow = date.today() + timedelta(days=1)
+        if value < tomorrow:
+            raise forms.ValidationError("届け日は翌日以降を指定してください")
+        return value

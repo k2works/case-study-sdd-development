@@ -31,13 +31,19 @@ class OrderStatus(enum.Enum):
 
 @dataclass(frozen=True)
 class DeliveryDate:
-    """届け日。翌日以降のみ有効。"""
+    """届け日。新規注文時は翌日以降のみ有効。"""
 
     value: date
+    _skip_validation: bool = False
 
     def __post_init__(self):
-        if self.value <= date.today():
+        if not self._skip_validation and self.value <= date.today():
             raise ValueError("届け日は翌日以降を指定してください")
+
+    @classmethod
+    def reconstruct(cls, value: date) -> DeliveryDate:
+        """DB からの復元用。過去日でもバリデーションをスキップする。"""
+        return cls(value=value, _skip_validation=True)
 
 
 @dataclass(frozen=True)

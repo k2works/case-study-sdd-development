@@ -6,6 +6,8 @@ import uuid
 from datetime import date
 from decimal import Decimal
 
+from django.db import transaction
+
 from apps.orders.domain.entities import DeliveryAddress, Order, OrderLine
 from apps.orders.domain.interfaces import OrderRepository
 from apps.orders.domain.value_objects import (
@@ -37,6 +39,7 @@ class DjangoOrderRepository(OrderRepository):
         except OrderModel.DoesNotExist:
             return None
 
+    @transaction.atomic
     def save(self, order: Order) -> Order:
         if order.id is not None:
             obj = OrderModel.objects.get(pk=order.id)
@@ -90,7 +93,7 @@ class DjangoOrderRepository(OrderRepository):
             id=obj.pk,
             order_number=OrderNumber(obj.order_number),
             status=OrderStatus(obj.status),
-            delivery_date=DeliveryDate(obj.delivery_date),
+            delivery_date=DeliveryDate.reconstruct(obj.delivery_date),
             delivery_address=DeliveryAddress(
                 recipient_name=obj.recipient_name,
                 postal_code=obj.postal_code,

@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
@@ -59,12 +60,15 @@ class OrderFormView(View):
         )
         order.confirm()
         saved = repo.save(order)
+        request.session["completed_order_id"] = saved.id
         return redirect("shop:order_complete", pk=saved.id)
 
 
 class OrderCompleteView(View):
-    """注文完了画面。"""
+    """注文完了画面。セッションで直前の注文のみアクセス許可。"""
 
     def get(self, request, pk):
+        if request.session.get("completed_order_id") != pk:
+            return HttpResponseForbidden("この注文にはアクセスできません")
         order = get_object_or_404(OrderModel, pk=pk)
         return render(request, "shop/order_complete.html", {"order": order})

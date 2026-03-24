@@ -123,14 +123,26 @@ class TestOrderCompleteView:
             message="お誕生日おめでとう",
         )
 
+    def _set_session_order(self, order_pk):
+        session = self.client.session
+        session["completed_order_id"] = order_pk
+        session.save()
+
     def test_完了画面が表示される(self):
+        self._set_session_order(self.order.pk)
         response = self.client.get(f"/shop/order/{self.order.pk}/complete/")
         assert response.status_code == 200
 
     def test_注文番号が表示される(self):
+        self._set_session_order(self.order.pk)
         response = self.client.get(f"/shop/order/{self.order.pk}/complete/")
         assert "ORD-TEST-001" in response.content.decode()
 
     def test_完了画面テンプレートが使用される(self):
+        self._set_session_order(self.order.pk)
         response = self.client.get(f"/shop/order/{self.order.pk}/complete/")
         assert "shop/order_complete.html" in [t.name for t in response.templates]
+
+    def test_セッションなしでアクセスすると403(self):
+        response = self.client.get(f"/shop/order/{self.order.pk}/complete/")
+        assert response.status_code == 403

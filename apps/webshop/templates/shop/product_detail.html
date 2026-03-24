@@ -45,6 +45,11 @@
         </ul>
       </div>
       {% endif %}
+
+      <a href="{% url 'shop:order_form' product.pk %}"
+         class="mt-8 inline-block bg-pink-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-pink-700 transition-colors">
+        この花束を注文する
+      </a>
     </div>
   </div>
 </div>

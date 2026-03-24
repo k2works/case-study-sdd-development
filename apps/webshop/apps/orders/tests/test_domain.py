@@ -71,6 +71,11 @@ class TestDeliveryDate:
         d = date.today() + timedelta(days=5)
         assert DeliveryDate(d) == DeliveryDate(d)
 
+    def test_reconstructで過去日付を復元できる(self):
+        past = date.today() - timedelta(days=30)
+        dd = DeliveryDate.reconstruct(past)
+        assert dd.value == past
+
 
 # --- Message ---
 
