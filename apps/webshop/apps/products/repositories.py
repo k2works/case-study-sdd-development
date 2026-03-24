@@ -2,3 +2,94 @@
 
 domain/interfaces.py で定義された ABC を Django ORM で実装する。
 """
+
+from __future__ import annotations
+
+from apps.products.domain.entities import Item, Supplier
+from apps.products.domain.interfaces import ItemRepository, SupplierRepository
+from apps.products.domain.value_objects import (
+    ItemName,
+    LeadTimeDays,
+    PurchaseUnit,
+    QualityRetentionDays,
+)
+from apps.products.models import Item as ItemModel
+from apps.products.models import Supplier as SupplierModel
+
+
+class DjangoSupplierRepository(SupplierRepository):
+    """仕入先 Repository の Django ORM 実装。"""
+
+    def find_by_id(self, supplier_id: int) -> Supplier | None:
+        try:
+            obj = SupplierModel.objects.get(pk=supplier_id)
+            return self._to_entity(obj)
+        except SupplierModel.DoesNotExist:
+            return None
+
+    def save(self, supplier: Supplier) -> Supplier:
+        if supplier.id and supplier.id > 0:
+            obj = SupplierModel.objects.get(pk=supplier.id)
+            obj.name = supplier.name
+            obj.contact_info = supplier.contact_info
+            obj.save()
+        else:
+            obj = SupplierModel.objects.create(
+                name=supplier.name,
+                contact_info=supplier.contact_info,
+            )
+        return self._to_entity(obj)
+
+    def _to_entity(self, obj: SupplierModel) -> Supplier:
+        return Supplier(
+            id=obj.pk,
+            name=obj.name,
+            contact_info=obj.contact_info,
+        )
+
+
+class DjangoItemRepository(ItemRepository):
+    """単品 Repository の Django ORM 実装。"""
+
+    def find_by_id(self, item_id: int) -> Item | None:
+        try:
+            obj = ItemModel.objects.get(pk=item_id)
+            return self._to_entity(obj)
+        except ItemModel.DoesNotExist:
+            return None
+
+    def find_active(self) -> list[Item]:
+        objs = ItemModel.objects.filter(is_active=True).order_by("name")
+        return [self._to_entity(obj) for obj in objs]
+
+    def save(self, item: Item) -> Item:
+        if item.id and item.id > 0:
+            obj = ItemModel.objects.get(pk=item.id)
+            obj.name = str(item.name)
+            obj.quality_retention_days = item.quality_retention_days.value
+            obj.purchase_unit = item.purchase_unit.value
+            obj.lead_time_days = item.lead_time_days.value
+            obj.supplier_id = item.supplier_id
+            obj.is_active = item.is_active
+            obj.save()
+        else:
+            obj = ItemModel.objects.create(
+                name=str(item.name),
+                quality_retention_days=item.quality_retention_days.value,
+                purchase_unit=item.purchase_unit.value,
+                lead_time_days=item.lead_time_days.value,
+                supplier_id=item.supplier_id,
+                is_active=item.is_active,
+            )
+        return self._to_entity(obj)
+
+    def _to_entity(self, obj: ItemModel) -> Item:
+        return Item(
+            id=obj.pk,
+            name=ItemName(obj.name),
+            quality_retention_days=QualityRetentionDays(obj.quality_retention_days),
+            purchase_unit=PurchaseUnit(obj.purchase_unit),
+            lead_time_days=LeadTimeDays(obj.lead_time_days),
+            supplier_id=obj.supplier_id,
+            is_active=obj.is_active,
+        )
