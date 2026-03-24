@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "rails",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [".claude/scripts/start-rails.sh"],
+      "port": 3000
+    },
+    {
       "name": "mkdocs",
       "runtimeExecutable": "bash",
       "runtimeArgs": [".claude/scripts/start-mkdocs.sh"],
