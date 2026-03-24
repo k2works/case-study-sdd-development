@@ -123,6 +123,13 @@ class TestOrderCompleteView:
             delivery_date=date.today() + timedelta(days=3),
             message="お誕生日おめでとう",
         )
+        OrderLineModel.objects.create(
+            order=self.order,
+            product=self.product,
+            product_name="バースデーブーケ",
+            unit_price="5000.00",
+            quantity=1,
+        )
 
     def _set_session_order(self, order_pk):
         session = self.client.session

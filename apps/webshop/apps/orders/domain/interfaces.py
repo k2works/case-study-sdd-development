@@ -30,6 +30,10 @@ class OrderRepository(ABC):
         """注文一覧を取得する。ステータス・日付範囲でフィルタ可能。"""
 
     @abstractmethod
+    def search_by_order_number(self, query: str) -> list[Order]:
+        """注文番号の部分一致で検索する。"""
+
+    @abstractmethod
     def find_recent_addresses(self) -> list[DeliveryAddress]:
         """過去の注文から重複を除いた届け先一覧を取得する。"""
 

@@ -44,7 +44,14 @@ class FakeOrderRepository(OrderRepository):
             result = [o for o in result if o.delivery_date.value >= date_from]
         if date_to:
             result = [o for o in result if o.delivery_date.value <= date_to]
-        return sorted(result, key=lambda o: o.delivery_date.value, reverse=True)
+        return sorted(result, key=lambda o: o.id or 0, reverse=True)
+
+    def search_by_order_number(self, query: str) -> list[Order]:
+        return [
+            o
+            for o in self._orders.values()
+            if query.lower() in str(o.order_number).lower()
+        ]
 
     def find_recent_addresses(self) -> list[DeliveryAddress]:
         seen: set[str] = set()

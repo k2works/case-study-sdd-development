@@ -18,31 +18,27 @@
     <div>
       <h2 class="text-sm text-gray-500 mb-1">ステータス</h2>
       <span class="inline-block px-3 py-1 rounded text-sm
-        {% if order.status == 'confirmed' %}bg-green-100 text-green-800
-        {% elif order.status == 'cancelled' %}bg-red-100 text-red-800
+        {% if order.status.value == 'confirmed' %}bg-green-100 text-green-800
+        {% elif order.status.value == 'cancelled' %}bg-red-100 text-red-800
         {% else %}bg-yellow-100 text-yellow-800{% endif %}">
-        {{ order.get_status_display }}
+        {{ order.status.label }}
       </span>
     </div>
     <div>
       <h2 class="text-sm text-gray-500 mb-1">届け日</h2>
-      <p>{{ order.delivery_date|date:"Y年m月d日" }}</p>
-    </div>
-    <div>
-      <h2 class="text-sm text-gray-500 mb-1">注文日時</h2>
-      <p>{{ order.created_at|date:"Y年m月d日 H:i" }}</p>
+      <p>{{ order.delivery_date.value|date:"Y年m月d日" }}</p>
     </div>
   </div>
 
   <div class="border-t pt-4 mb-6">
     <h2 class="font-bold mb-2">届け先</h2>
-    <p>{{ order.recipient_name }}</p>
-    <p class="text-sm text-gray-600">〒{{ order.postal_code }}</p>
-    <p class="text-sm text-gray-600">{{ order.address }}</p>
-    <p class="text-sm text-gray-600">{{ order.phone }}</p>
+    <p>{{ order.delivery_address.recipient_name }}</p>
+    <p class="text-sm text-gray-600">〒{{ order.delivery_address.postal_code }}</p>
+    <p class="text-sm text-gray-600">{{ order.delivery_address.address }}</p>
+    <p class="text-sm text-gray-600">{{ order.delivery_address.phone }}</p>
   </div>
 
-  {% if order.message %}
+  {% if order.message.value %}
   <div class="border-t pt-4 mb-6">
     <h2 class="font-bold mb-2">メッセージカード</h2>
     <p class="bg-yellow-50 p-3 rounded text-sm">{{ order.message }}</p>
@@ -61,19 +57,19 @@
         </tr>
       </thead>
       <tbody>
-        {% for line in order.lines.all %}
+        {% for line in order.lines %}
         <tr class="border-t">
           <td class="px-3 py-2">{{ line.product_name }}</td>
-          <td class="px-3 py-2 text-right">¥{{ line.unit_price|floatformat:0 }}</td>
+          <td class="px-3 py-2 text-right">&yen;{{ line.unit_price|floatformat:0 }}</td>
           <td class="px-3 py-2 text-right">{{ line.quantity }}</td>
-          <td class="px-3 py-2 text-right">¥{{ line.subtotal|floatformat:0 }}</td>
+          <td class="px-3 py-2 text-right">&yen;{{ line.subtotal|floatformat:0 }}</td>
         </tr>
         {% endfor %}
       </tbody>
       <tfoot class="border-t-2 font-bold">
         <tr>
           <td colspan="3" class="px-3 py-2 text-right">合計</td>
-          <td class="px-3 py-2 text-right">¥{{ order.total|floatformat:0 }}</td>
+          <td class="px-3 py-2 text-right">&yen;{{ order.total_amount|floatformat:0 }}</td>
         </tr>
       </tfoot>
     </table>

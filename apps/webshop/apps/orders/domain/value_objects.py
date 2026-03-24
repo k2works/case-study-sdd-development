@@ -35,6 +35,18 @@ class OrderStatus(enum.Enum):
     CONFIRMED = "confirmed"
     CANCELLED = "cancelled"
 
+    @property
+    def label(self) -> str:
+        """日本語ラベルを返す。"""
+        return _STATUS_LABELS[self]
+
+
+_STATUS_LABELS = {
+    OrderStatus.PENDING: "保留中",
+    OrderStatus.CONFIRMED: "確定",
+    OrderStatus.CANCELLED: "キャンセル",
+}
+
 
 @dataclass(frozen=True)
 class DeliveryDate:

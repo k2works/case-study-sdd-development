@@ -19,7 +19,6 @@
     <thead class="bg-gray-100">
       <tr>
         <th class="px-4 py-3 text-left">注文番号</th>
-        <th class="px-4 py-3 text-left">注文日</th>
         <th class="px-4 py-3 text-left">商品</th>
         <th class="px-4 py-3 text-left">届け日</th>
         <th class="px-4 py-3 text-left">ステータス</th>
@@ -30,17 +29,16 @@
       {% for order in orders %}
       <tr class="hover:bg-gray-50">
         <td class="px-4 py-3 font-mono">{{ order.order_number }}</td>
-        <td class="px-4 py-3">{{ order.created_at|date:"Y/m/d" }}</td>
         <td class="px-4 py-3">
-          {% for line in order.lines.all %}{{ line.product_name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+          {% for line in order.lines %}{{ line.product_name }}{% if not forloop.last %}, {% endif %}{% endfor %}
         </td>
-        <td class="px-4 py-3">{{ order.delivery_date|date:"Y/m/d" }}</td>
+        <td class="px-4 py-3">{{ order.delivery_date.value|date:"Y/m/d" }}</td>
         <td class="px-4 py-3">
           <span class="inline-block px-2 py-1 rounded text-xs
-            {% if order.status == 'confirmed' %}bg-green-100 text-green-800
-            {% elif order.status == 'cancelled' %}bg-red-100 text-red-800
+            {% if order.status.value == 'confirmed' %}bg-green-100 text-green-800
+            {% elif order.status.value == 'cancelled' %}bg-red-100 text-red-800
             {% else %}bg-yellow-100 text-yellow-800{% endif %}">
-            {{ order.get_status_display }}
+            {{ order.status.label }}
           </span>
         </td>
         <td class="px-4 py-3">

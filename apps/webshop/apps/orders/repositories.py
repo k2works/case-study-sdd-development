@@ -56,13 +56,21 @@ class DjangoOrderRepository(OrderRepository):
         qs = qs.order_by("-created_at")
         return [self._to_entity(obj) for obj in qs]
 
+    def search_by_order_number(self, query: str) -> list[Order]:
+        qs = (
+            OrderModel.objects.prefetch_related("lines")
+            .filter(order_number__icontains=query)
+            .order_by("-created_at")
+        )
+        return [self._to_entity(obj) for obj in qs]
+
     def find_recent_addresses(self) -> list[DeliveryAddress]:
         rows = (
             OrderModel.objects.values(
                 "recipient_name", "postal_code", "address", "phone"
             )
             .distinct()
-            .order_by("-recipient_name")
+            .order_by("recipient_name")
         )
         return [
             DeliveryAddress(

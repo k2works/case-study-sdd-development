@@ -81,6 +81,10 @@ class OrderService:
             date_to=date_to,
         )
 
+    def search_orders_by_number(self, query: str) -> list[Order]:
+        """注文番号の部分一致で検索する。"""
+        return self._order_repo.search_by_order_number(query)
+
     def list_recent_addresses(self) -> list[DeliveryAddress]:
         """過去の届け先を重複なしで取得する。"""
         return self._order_repo.find_recent_addresses()

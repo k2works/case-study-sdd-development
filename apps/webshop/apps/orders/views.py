@@ -3,18 +3,19 @@
 from datetime import date, datetime
 from decimal import Decimal
 
-from django.http import HttpResponseForbidden
+from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
+from apps.orders.domain.value_objects import OrderStatus
 from apps.orders.forms import OrderForm
-from apps.orders.models import Order as OrderModel
 from apps.orders.repositories import DjangoOrderRepository
 from apps.orders.services import OrderService, PlaceOrderCommand
 from apps.products.models import Product
 
 
 def _get_order_service() -> OrderService:
+    """OrderService のファクトリ。DI コンテナの代替。"""
     return OrderService(order_repo=DjangoOrderRepository())
 
 
@@ -38,15 +39,12 @@ class StaffOrderListView(View):
             "shop/staff_order_list.html",
             {
                 "orders": orders,
+                "order_count": len(orders),
                 "current_status": status or "",
                 "date_from": request.GET.get("date_from", ""),
                 "date_to": request.GET.get("date_to", ""),
-                "status_choices": [
-                    ("", "すべて"),
-                    ("pending", "保留中"),
-                    ("confirmed", "確定"),
-                    ("cancelled", "キャンセル"),
-                ],
+                "status_choices": [("", "すべて")]
+                + [(s.value, s.label) for s in OrderStatus],
             },
         )
 
@@ -55,7 +53,10 @@ class StaffOrderDetailView(View):
     """受注詳細画面（スタッフ向け）。"""
 
     def get(self, request, pk):
-        order = get_object_or_404(OrderModel.objects.prefetch_related("lines"), pk=pk)
+        service = _get_order_service()
+        order = service.find_order(pk)
+        if order is None:
+            raise Http404
         return render(request, "shop/staff_order_detail.html", {"order": order})
 
 
@@ -63,19 +64,14 @@ class StaffOrderDetailView(View):
 
 
 class OrderHistoryView(View):
-    """注文履歴画面。注文番号で検索可能。"""
+    """注文履歴画面。注文番号の部分一致で検索可能。"""
 
     def get(self, request):
         query = request.GET.get("q", "").strip()
         orders = []
         if query:
-            from apps.orders.models import Order as OM
-
-            orders = list(
-                OM.objects.prefetch_related("lines")
-                .filter(order_number__icontains=query)
-                .order_by("-created_at")
-            )
+            service = _get_order_service()
+            orders = service.search_orders_by_number(query)
         return render(
             request,
             "shop/order_history.html",
@@ -87,10 +83,10 @@ class OrderHistoryDetailView(View):
     """注文詳細画面（得意先向け）。注文番号でアクセス。"""
 
     def get(self, request, order_number):
-        order = get_object_or_404(
-            OrderModel.objects.prefetch_related("lines"),
-            order_number=order_number,
-        )
+        service = _get_order_service()
+        order = service.find_order_by_number(order_number)
+        if order is None:
+            raise Http404
         return render(request, "shop/order_history_detail.html", {"order": order})
 
 
@@ -118,6 +114,7 @@ class AddressSelectView(View):
 
 
 def _parse_date(value: str | None) -> date | None:
+    """日付文字列をパースする。無効値は None を返す。"""
     if not value:
         return None
     try:
@@ -182,7 +179,10 @@ class OrderCompleteView(View):
     def get(self, request, pk):
         if request.session.get("completed_order_id") != pk:
             return HttpResponseForbidden("この注文にはアクセスできません")
-        order = get_object_or_404(OrderModel, pk=pk)
+        service = _get_order_service()
+        order = service.find_order(pk)
+        if order is None:
+            raise Http404
         return render(request, "shop/order_complete.html", {"order": order})
 
 
@@ -218,7 +218,14 @@ class OrderCancelView(View):
             )
 
         if action == "cancel":
-            order_id = int(request.POST.get("order_id"))
+            try:
+                order_id = int(request.POST.get("order_id", "0"))
+            except (TypeError, ValueError):
+                return render(
+                    request,
+                    "shop/order_cancel.html",
+                    {"order": None, "error": "無効な注文IDです"},
+                )
             try:
                 service.cancel_order(order_id)
                 return render(

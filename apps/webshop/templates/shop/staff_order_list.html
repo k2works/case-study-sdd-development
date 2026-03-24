@@ -27,6 +27,7 @@
 </form>
 
 {% if orders %}
+<p class="text-sm text-gray-500 mb-2">{{ order_count }} 件の受注</p>
 <div class="overflow-x-auto">
   <table class="w-full bg-white rounded-lg shadow text-sm">
     <thead class="bg-gray-100">
@@ -51,7 +52,7 @@
             {% if order.status.value == 'confirmed' %}bg-green-100 text-green-800
             {% elif order.status.value == 'cancelled' %}bg-red-100 text-red-800
             {% else %}bg-yellow-100 text-yellow-800{% endif %}">
-            {{ order.status.value }}
+            {{ order.status.label }}
           </span>
         </td>
         <td class="px-4 py-3">
