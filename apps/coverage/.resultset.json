@@ -8,6 +8,8 @@
           null,
           1,
           null,
+          1,
+          null,
           null,
           1,
           1,
@@ -45,6 +47,28 @@
           null
         ]
       },
+      "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/models/customer.rb": {
+        "lines": [
+          1,
+          1,
+          1,
+          1,
+          null,
+          1,
+          null
+        ]
+      },
+      "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/models/delivery_address.rb": {
+        "lines": [
+          1,
+          1,
+          null,
+          1,
+          1,
+          1,
+          null
+        ]
+      },
       "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/models/item.rb": {
         "lines": [
           1,
@@ -54,6 +78,37 @@
           1,
           1,
           1,
+          null
+        ]
+      },
+      "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/models/order.rb": {
+        "lines": [
+          1,
+          1,
+          null,
+          1,
+          1,
+          1,
+          null,
+          1,
+          1,
+          1,
+          1,
+          null,
+          1,
+          1,
+          null,
+          1,
+          0,
+          null,
+          null,
+          1,
+          null,
+          1,
+          18,
+          1,
+          null,
+          null,
           null
         ]
       },
@@ -266,6 +321,6 @@
         "branches": {}
       }
     },
-    "timestamp": 1774336972
+    "timestamp": 1774337451
   }
 }

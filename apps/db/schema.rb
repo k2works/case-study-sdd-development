@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_24_070004) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_24_072822) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -25,6 +25,25 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_24_070004) do
     t.index ["product_id"], name: "index_compositions_on_product_id"
   end
 
+  create_table "customers", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.string "phone"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_customers_on_user_id", unique: true
+  end
+
+  create_table "delivery_addresses", force: :cascade do |t|
+    t.bigint "customer_id", null: false
+    t.string "recipient_name", null: false
+    t.string "address", null: false
+    t.string "phone", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["customer_id"], name: "index_delivery_addresses_on_customer_id"
+  end
+
   create_table "items", force: :cascade do |t|
     t.string "name", null: false
     t.integer "quality_retention_days", null: false
@@ -34,6 +53,24 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_24_070004) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["supplier_id"], name: "index_items_on_supplier_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.bigint "customer_id", null: false
+    t.bigint "product_id", null: false
+    t.bigint "delivery_address_id", null: false
+    t.date "delivery_date", null: false
+    t.text "message"
+    t.integer "price", null: false
+    t.string "status", default: "ordered", null: false
+    t.datetime "ordered_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["customer_id"], name: "index_orders_on_customer_id"
+    t.index ["delivery_address_id"], name: "index_orders_on_delivery_address_id"
+    t.index ["delivery_date"], name: "index_orders_on_delivery_date"
+    t.index ["product_id"], name: "index_orders_on_product_id"
+    t.index ["status"], name: "index_orders_on_status"
   end
 
   create_table "products", force: :cascade do |t|
@@ -69,5 +106,10 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_24_070004) do
 
   add_foreign_key "compositions", "items"
   add_foreign_key "compositions", "products"
+  add_foreign_key "customers", "users"
+  add_foreign_key "delivery_addresses", "customers"
   add_foreign_key "items", "suppliers"
+  add_foreign_key "orders", "customers"
+  add_foreign_key "orders", "delivery_addresses"
+  add_foreign_key "orders", "products"
 end

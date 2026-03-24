@@ -1,6 +1,8 @@
 class User < ApplicationRecord
   ROLES = %w[customer staff].freeze
 
+  has_one :customer, dependent: :destroy
+
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
