@@ -46,6 +46,7 @@ class Shop::OrdersController < ApplicationController
   end
 
   def complete
+    # 注文完了画面の表示のみ（データ操作なし）
   end
 
   private

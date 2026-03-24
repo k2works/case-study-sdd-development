@@ -21,6 +21,7 @@ class ItemsController < ApplicationController
   end
 
   def edit
+    # @item は before_action で設定済み
   end
 
   def update

@@ -21,6 +21,7 @@ class ProductsController < ApplicationController
   end
 
   def edit
+    # @product は before_action で設定済み
   end
 
   def update
