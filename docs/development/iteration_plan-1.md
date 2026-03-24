@@ -85,13 +85,13 @@
 
 | # | タスク | 見積もり | 状態 |
 | :--- | :--- | :--- | :--- |
-| 0.1 | uv プロジェクト初期化（pyproject.toml 作成） | 1h | [ ] |
-| 0.2 | Django 5.2 + DRF + PostgreSQL の依存関係追加 | 1h | [ ] |
-| 0.3 | Docker Compose（PostgreSQL）セットアップ | 1h | [ ] |
-| 0.4 | Django プロジェクト作成（settings, urls, wsgi） | 2h | [ ] |
-| 0.5 | tox.ini 設定（test, lint, type） | 1h | [ ] |
-| 0.6 | Ruff + mypy 設定（.ruff.toml, pyproject.toml） | 1h | [ ] |
-| 0.7 | CI 基盤（GitHub Actions ワークフロー） | 2h | [ ] |
+| 0.1 | uv プロジェクト初期化（pyproject.toml 作成） | 1h | [x] |
+| 0.2 | Django 5.2 + DRF + PostgreSQL の依存関係追加 | 1h | [x] |
+| 0.3 | Docker Compose（PostgreSQL）セットアップ | 1h | [x] |
+| 0.4 | Django プロジェクト作成（settings, urls, wsgi） | 2h | [x] |
+| 0.5 | tox.ini 設定（test, lint, type） | 1h | [x] |
+| 0.6 | Ruff + mypy 設定（.ruff.toml, pyproject.toml） | 1h | [x] |
+| 0.7 | CI 基盤（GitHub Actions ワークフロー） | 2h | [x] |
 
 **小計**: 9h（理想時間）
 
@@ -99,13 +99,13 @@
 
 | # | タスク | 見積もり | 状態 |
 | :--- | :--- | :--- | :--- |
-| 1.1 | ドメイン層: Item エンティティ + 値オブジェクト（ItemName, QualityRetentionDays, PurchaseUnit, LeadTimeDays）のテスト・実装 | 3h | [ ] |
-| 1.2 | ドメイン層: Supplier エンティティのテスト・実装 | 1h | [ ] |
-| 1.3 | ドメイン層: ItemRepository インターフェース定義 | 0.5h | [ ] |
-| 1.4 | インフラ層: Django ORM Model（products_item, products_supplier）+ マイグレーション | 2h | [ ] |
-| 1.5 | インフラ層: Repository 実装 + 統合テスト | 2h | [ ] |
-| 1.6 | プレゼンテーション層: Django Admin 設定 | 1h | [ ] |
-| 1.7 | プレゼンテーション層: DRF Serializer + ViewSet + API テスト | 2h | [ ] |
+| 1.1 | ドメイン層: Item エンティティ + 値オブジェクト（ItemName, QualityRetentionDays, PurchaseUnit, LeadTimeDays）のテスト・実装 | 3h | [x] |
+| 1.2 | ドメイン層: Supplier エンティティのテスト・実装 | 1h | [x] |
+| 1.3 | ドメイン層: ItemRepository インターフェース定義 | 0.5h | [x] |
+| 1.4 | インフラ層: Django ORM Model（products_item, products_supplier）+ マイグレーション | 2h | [x] |
+| 1.5 | インフラ層: Repository 実装 + 統合テスト | 2h | [x] |
+| 1.6 | プレゼンテーション層: Django Admin 設定 | 1h | [x] |
+| 1.7 | プレゼンテーション層: DRF Serializer + ViewSet + API テスト | 2h | [x] |
 
 **小計**: 11.5h（理想時間）
 
@@ -113,12 +113,12 @@
 
 | # | タスク | 見積もり | 状態 |
 | :--- | :--- | :--- | :--- |
-| 2.1 | ドメイン層: Product エンティティ + 値オブジェクト（ProductName, Price）のテスト・実装 | 2h | [ ] |
-| 2.2 | ドメイン層: ProductRepository インターフェース定義 | 0.5h | [ ] |
-| 2.3 | インフラ層: Django ORM Model（products_product）+ マイグレーション | 1h | [ ] |
-| 2.4 | インフラ層: Repository 実装 + 統合テスト | 1.5h | [ ] |
-| 2.5 | プレゼンテーション層: Django Admin 設定 | 0.5h | [ ] |
-| 2.6 | プレゼンテーション層: DRF Serializer + ViewSet + API テスト | 2h | [ ] |
+| 2.1 | ドメイン層: Product エンティティ + 値オブジェクト（ProductName, Price）のテスト・実装 | 2h | [x] |
+| 2.2 | ドメイン層: ProductRepository インターフェース定義 | 0.5h | [x] |
+| 2.3 | インフラ層: Django ORM Model（products_product）+ マイグレーション | 1h | [x] |
+| 2.4 | インフラ層: Repository 実装 + 統合テスト | 1.5h | [x] |
+| 2.5 | プレゼンテーション層: Django Admin 設定 | 0.5h | [x] |
+| 2.6 | プレゼンテーション層: DRF Serializer + ViewSet + API テスト | 2h | [x] |
 
 **小計**: 7.5h（理想時間）
 
@@ -126,12 +126,12 @@
 
 | # | タスク | 見積もり | 状態 |
 | :--- | :--- | :--- | :--- |
-| 3.1 | ドメイン層: Composition エンティティのテスト・実装 | 1.5h | [ ] |
-| 3.2 | ドメイン層: Product に構成管理メソッド追加（add_composition, get_required_items）のテスト・実装 | 2h | [ ] |
-| 3.3 | インフラ層: Django ORM Model（products_composition）+ マイグレーション | 1h | [ ] |
-| 3.4 | インフラ層: Repository 実装 + 統合テスト | 1.5h | [ ] |
-| 3.5 | プレゼンテーション層: Django Admin インライン設定 | 1h | [ ] |
-| 3.6 | プレゼンテーション層: 商品詳細 API に構成情報を含める + テスト | 1.5h | [ ] |
+| 3.1 | ドメイン層: Composition エンティティのテスト・実装 | 1.5h | [x] |
+| 3.2 | ドメイン層: Product に構成管理メソッド追加（add_composition, get_required_items）のテスト・実装 | 2h | [x] |
+| 3.3 | インフラ層: Django ORM Model（products_composition）+ マイグレーション | 1h | [x] |
+| 3.4 | インフラ層: Repository 実装 + 統合テスト | 1.5h | [x] |
+| 3.5 | プレゼンテーション層: Django Admin インライン設定 | 1h | [x] |
+| 3.6 | プレゼンテーション層: 商品詳細 API に構成情報を含める + テスト | 1.5h | [x] |
 
 **小計**: 8.5h（理想時間）
 
@@ -139,14 +139,14 @@
 
 | カテゴリ | SP | 理想時間 | 状態 |
 | :--- | :--- | :--- | :--- |
-| 環境構築 | - | 9h | [ ] |
-| US-001: 単品マスタ | 3 | 11.5h | [ ] |
-| US-002: 商品登録 | 3 | 7.5h | [ ] |
-| US-003: 花束構成 | 3 | 8.5h | [ ] |
+| 環境構築 | - | 9h | [x] |
+| US-001: 単品マスタ | 3 | 11.5h | [x] |
+| US-002: 商品登録 | 3 | 7.5h | [x] |
+| US-003: 花束構成 | 3 | 8.5h | [x] |
 | **合計** | **9** | **36.5h** | |
 
 **1 SP あたり**: 約 3h（環境構築除く）/ 約 4h（環境構築込み）
-**進捗率**: 0% (0/9 SP)
+**進捗率**: 100% (9/9 SP)
 
 ---
 
@@ -387,3 +387,4 @@ UI/UX レビュー（2026-03-24）の指摘のうち、IT1 で対応するもの
 | 日付 | 更新内容 | 更新者 |
 | :--- | :--- | :--- |
 | 2026-03-24 | 初版作成 | - |
+| 2026-03-24 | IT1 完了: 全タスク完了、70 テスト Green、カバレッジ 97%、SonarQube Quality Gate OK | - |
