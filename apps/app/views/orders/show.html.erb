@@ -1,0 +1,43 @@
+<h1>受注詳細 #<%= @order.id %></h1>
+
+<%= link_to "受注一覧に戻る", orders_path, class: "btn btn-secondary mb-3" %>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h5>注文情報</h5>
+    <table class="table table-borderless">
+      <tr><th>商品</th><td><%= @order.product.name %></td></tr>
+      <tr><th>価格</th><td><%= number_to_currency(@order.price, unit: "¥", format: "%u%n") %></td></tr>
+      <tr><th>届け日</th><td><%= @order.delivery_date %></td></tr>
+      <tr><th>状態</th><td><span class="badge bg-primary"><%= @order.status %></span></td></tr>
+      <tr><th>注文日時</th><td><%= @order.ordered_at&.strftime("%Y-%m-%d %H:%M") %></td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h5>得意先</h5>
+    <p><%= @order.customer.name %></p>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h5>届け先</h5>
+    <table class="table table-borderless">
+      <tr><th>氏名</th><td><%= @order.delivery_address.recipient_name %></td></tr>
+      <tr><th>住所</th><td><%= @order.delivery_address.address %></td></tr>
+      <tr><th>電話番号</th><td><%= @order.delivery_address.phone %></td></tr>
+    </table>
+  </div>
+</div>
+
+<% if @order.message.present? %>
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5>お届けメッセージ</h5>
+      <p><%= @order.message %></p>
+    </div>
+  </div>
+<% end %>
