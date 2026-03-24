@@ -31,7 +31,7 @@ class TestDjangoSupplierRepository:
         self.repo = DjangoSupplierRepository()
 
     def test_仕入先を保存して取得できる(self):
-        supplier = Supplier(id=0, name="花卉市場A", contact_info="03-1234-5678")
+        supplier = Supplier(id=None, name="花卉市場A", contact_info="03-1234-5678")
         saved = self.repo.save(supplier)
 
         assert saved.id > 0
@@ -46,7 +46,7 @@ class TestDjangoSupplierRepository:
         assert self.repo.find_by_id(9999) is None
 
     def test_仕入先を更新できる(self):
-        supplier = Supplier(id=0, name="花卉市場A", contact_info="03-1234-5678")
+        supplier = Supplier(id=None, name="花卉市場A", contact_info="03-1234-5678")
         saved = self.repo.save(supplier)
 
         saved.name = "花卉市場B"
@@ -64,12 +64,12 @@ class TestDjangoItemRepository:
     def setup_method(self):
         self.item_repo = DjangoItemRepository()
         self.supplier_repo = DjangoSupplierRepository()
-        supplier = Supplier(id=0, name="花卉市場A")
+        supplier = Supplier(id=None, name="花卉市場A")
         self.supplier = self.supplier_repo.save(supplier)
 
     def test_単品を保存して取得できる(self):
         item = Item(
-            id=0,
+            id=None,
             name=ItemName("バラ（赤）"),
             quality_retention_days=QualityRetentionDays(7),
             purchase_unit=PurchaseUnit(10),
@@ -87,7 +87,7 @@ class TestDjangoItemRepository:
 
     def test_有効な単品一覧を取得できる(self):
         item1 = Item(
-            id=0,
+            id=None,
             name=ItemName("バラ（赤）"),
             quality_retention_days=QualityRetentionDays(7),
             purchase_unit=PurchaseUnit(10),
@@ -95,7 +95,7 @@ class TestDjangoItemRepository:
             supplier_id=self.supplier.id,
         )
         item2 = Item(
-            id=0,
+            id=None,
             name=ItemName("カスミソウ"),
             quality_retention_days=QualityRetentionDays(5),
             purchase_unit=PurchaseUnit(20),
@@ -123,7 +123,7 @@ class TestDjangoProductRepository:
 
     def test_商品を保存して取得できる(self):
         product = Product(
-            id=0,
+            id=None,
             name=ProductName("バースデーブーケ"),
             description="お誕生日用の花束",
             price=Price(Decimal("5000")),
@@ -140,13 +140,13 @@ class TestDjangoProductRepository:
 
     def test_有効な商品一覧を取得できる(self):
         p1 = Product(
-            id=0,
+            id=None,
             name=ProductName("バースデーブーケ"),
             description="",
             price=Price(Decimal("5000")),
         )
         p2 = Product(
-            id=0,
+            id=None,
             name=ProductName("廃止ブーケ"),
             description="",
             price=Price(Decimal("3000")),
@@ -158,6 +158,35 @@ class TestDjangoProductRepository:
         active = self.repo.find_active()
         assert len(active) == 1
         assert active[0].name == ProductName("バースデーブーケ")
+
+    def test_商品に構成を追加して保存できる(self):
+        supplier_repo = DjangoSupplierRepository()
+        supplier = supplier_repo.save(Supplier(id=None, name="花卉市場A"))
+        from apps.products.models import Item as ItemModel
+
+        item_obj = ItemModel.objects.create(
+            name="バラ",
+            quality_retention_days=7,
+            purchase_unit=10,
+            lead_time_days=3,
+            supplier_id=supplier.id,
+        )
+        product = Product(
+            id=None,
+            name=ProductName("ブーケ"),
+            description="",
+            price=Price(Decimal("5000")),
+        )
+        saved = self.repo.save(product)
+        saved.add_composition(item_id=item_obj.pk, quantity=5)
+        self.repo.save(saved)
+
+        found = self.repo.find_by_id(saved.id)
+        assert found is not None
+        assert len(found.compositions) == 1
+        assert found.compositions[0].item_id == item_obj.pk
+        assert found.compositions[0].quantity == 5
+        assert found.get_required_items() == {item_obj.pk: 5}
 
     def test_存在しないIDで取得するとNone(self):
         assert self.repo.find_by_id(9999) is None

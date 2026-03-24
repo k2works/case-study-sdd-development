@@ -22,7 +22,7 @@ from apps.products.domain.value_objects import (
 class Supplier:
     """仕入先エンティティ。"""
 
-    id: int
+    id: int | None
     name: str
     contact_info: str = ""
 
@@ -39,7 +39,7 @@ class Supplier:
 class Item:
     """単品（花）エンティティ。集約ルート。"""
 
-    id: int
+    id: int | None
     name: ItemName
     quality_retention_days: QualityRetentionDays
     purchase_unit: PurchaseUnit
@@ -74,7 +74,7 @@ class Composition:
 class Product:
     """商品（花束）エンティティ。集約ルート。"""
 
-    id: int
+    id: int | None
     name: ProductName
     description: str
     price: Price

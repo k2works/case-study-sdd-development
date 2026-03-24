@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from apps.products.domain.entities import Item, Product, Supplier
+from apps.products.domain.entities import Composition, Item, Product, Supplier
 from apps.products.domain.interfaces import (
     ItemRepository,
     ProductRepository,
@@ -21,6 +21,7 @@ from apps.products.domain.value_objects import (
     PurchaseUnit,
     QualityRetentionDays,
 )
+from apps.products.models import Composition as CompositionModel
 from apps.products.models import Item as ItemModel
 from apps.products.models import Product as ProductModel
 from apps.products.models import Supplier as SupplierModel
@@ -37,7 +38,7 @@ class DjangoSupplierRepository(SupplierRepository):
             return None
 
     def save(self, supplier: Supplier) -> Supplier:
-        if supplier.id and supplier.id > 0:
+        if supplier.id is not None:
             obj = SupplierModel.objects.get(pk=supplier.id)
             obj.name = supplier.name
             obj.contact_info = supplier.contact_info
@@ -72,7 +73,7 @@ class DjangoItemRepository(ItemRepository):
         return [self._to_entity(obj) for obj in objs]
 
     def save(self, item: Item) -> Item:
-        if item.id and item.id > 0:
+        if item.id is not None:
             obj = ItemModel.objects.get(pk=item.id)
             obj.name = str(item.name)
             obj.quality_retention_days = item.quality_retention_days.value
@@ -109,17 +110,23 @@ class DjangoProductRepository(ProductRepository):
 
     def find_by_id(self, product_id: int) -> Product | None:
         try:
-            obj = ProductModel.objects.get(pk=product_id)
+            obj = ProductModel.objects.prefetch_related("compositions").get(
+                pk=product_id
+            )
             return self._to_entity(obj)
         except ProductModel.DoesNotExist:
             return None
 
     def find_active(self) -> list[Product]:
-        objs = ProductModel.objects.filter(is_active=True).order_by("name")
+        objs = (
+            ProductModel.objects.filter(is_active=True)
+            .prefetch_related("compositions")
+            .order_by("name")
+        )
         return [self._to_entity(obj) for obj in objs]
 
     def save(self, product: Product) -> Product:
-        if product.id and product.id > 0:
+        if product.id is not None:
             obj = ProductModel.objects.get(pk=product.id)
             obj.name = str(product.name)
             obj.description = product.description
@@ -135,9 +142,25 @@ class DjangoProductRepository(ProductRepository):
                 image_url=product.image_url,
                 is_active=product.is_active,
             )
+        # Composition の同期
+        CompositionModel.objects.filter(product=obj).delete()
+        for comp in product.compositions:
+            CompositionModel.objects.create(
+                product=obj,
+                item_id=comp.item_id,
+                quantity=comp.quantity,
+            )
         return self._to_entity(obj)
 
     def _to_entity(self, obj: ProductModel) -> Product:
+        compositions = [
+            Composition(
+                product_id=obj.pk,
+                item_id=c.item_id,
+                quantity=c.quantity,
+            )
+            for c in obj.compositions.all()
+        ]
         return Product(
             id=obj.pk,
             name=ProductName(obj.name),
@@ -145,4 +168,5 @@ class DjangoProductRepository(ProductRepository):
             price=Price(Decimal(str(obj.price))),
             image_url=obj.image_url,
             is_active=obj.is_active,
+            compositions=compositions,
         )

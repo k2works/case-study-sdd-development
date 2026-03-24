@@ -3,21 +3,12 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 
-from apps.products.models import Item, Product, Supplier
+from apps.products.models import Item, Product
 from apps.products.serializers import (
     ItemSerializer,
     ProductDetailSerializer,
     ProductSerializer,
-    SupplierSerializer,
 )
-
-
-class SupplierViewSet(viewsets.ReadOnlyModelViewSet):
-    """仕入先の読み取り専用 API。"""
-
-    queryset = Supplier.objects.all()
-    serializer_class = SupplierSerializer
-    permission_classes = [AllowAny]
 
 
 class ItemViewSet(viewsets.ReadOnlyModelViewSet):

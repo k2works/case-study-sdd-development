@@ -88,6 +88,16 @@ class TestQualityRetentionDays:
         assert days.is_near_expiry(arrived, date(2026, 4, 5)) is True
         assert days.is_near_expiry(arrived, date(2026, 4, 4)) is False
 
+    def test_品質維持期限当日は期限間近と判定される(self):
+        days = QualityRetentionDays(7)
+        arrived = date(2026, 4, 1)
+        assert days.is_near_expiry(arrived, date(2026, 4, 7)) is True
+
+    def test_品質維持期限超過は期限間近ではない(self):
+        days = QualityRetentionDays(7)
+        arrived = date(2026, 4, 1)
+        assert days.is_near_expiry(arrived, date(2026, 4, 8)) is False
+
 
 class TestPurchaseUnit:
     """購入単位の値オブジェクトテスト。"""
@@ -301,6 +311,17 @@ class TestProduct:
         product.remove_composition(item_id=1)
         assert len(product.compositions) == 1
 
+    def test_存在しない単品を構成から削除しても例外にならない(self):
+        product = Product(
+            id=1,
+            name=ProductName("バースデーブーケ"),
+            description="",
+            price=Price(Decimal("5000")),
+        )
+        product.add_composition(item_id=1, quantity=5)
+        product.remove_composition(item_id=999)
+        assert len(product.compositions) == 1
+
     def test_必要な単品数量を取得できる(self):
         product = Product(
             id=1,
@@ -323,6 +344,14 @@ class TestComposition:
         assert comp.item_id == 2
         assert comp.quantity == 5
 
-    def test_数量が0以下でエラー(self):
+    def test_数量1で生成できる(self):
+        comp = Composition(product_id=1, item_id=2, quantity=1)
+        assert comp.quantity == 1
+
+    def test_数量が0でエラー(self):
         with pytest.raises(ValueError):
             Composition(product_id=1, item_id=2, quantity=0)
+
+    def test_数量が負数でエラー(self):
+        with pytest.raises(ValueError):
+            Composition(product_id=1, item_id=2, quantity=-1)

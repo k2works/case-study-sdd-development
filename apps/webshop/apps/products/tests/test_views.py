@@ -10,31 +10,6 @@ from apps.products.models import Composition, Item, Product, Supplier
 
 
 @pytest.mark.django_db
-class TestSupplierAPI:
-    """仕入先 API のテスト。"""
-
-    def setup_method(self):
-        self.client = Client()
-        self.supplier = Supplier.objects.create(
-            name="花卉市場A", contact_info="03-1234-5678"
-        )
-
-    def test_仕入先一覧を取得できる(self):
-        response = self.client.get("/api/suppliers/")
-        assert response.status_code == 200
-        data = response.json()
-        assert len(data) == 1
-        assert data[0]["name"] == "花卉市場A"
-
-    def test_仕入先詳細を取得できる(self):
-        response = self.client.get(f"/api/suppliers/{self.supplier.pk}/")
-        assert response.status_code == 200
-        data = response.json()
-        assert data["name"] == "花卉市場A"
-        assert data["contact_info"] == "03-1234-5678"
-
-
-@pytest.mark.django_db
 class TestItemAPI:
     """単品 API のテスト。"""
 
@@ -70,13 +45,15 @@ class TestItemAPI:
         data = response.json()
         assert data["name"] == "バラ（赤）"
         assert data["quality_retention_days"] == 7
-        assert data["purchase_unit"] == 10
-        assert data["lead_time_days"] == 3
         assert data["supplier"]["name"] == "花卉市場A"
 
     def test_存在しない単品で404(self):
         response = self.client.get("/api/items/9999/")
         assert response.status_code == 404
+
+    def test_単品の作成はできない(self):
+        response = self.client.post("/api/items/", {"name": "不正"})
+        assert response.status_code == 405
 
 
 @pytest.mark.django_db
@@ -138,3 +115,11 @@ class TestProductAPI:
     def test_存在しない商品で404(self):
         response = self.client.get("/api/products/9999/")
         assert response.status_code == 404
+
+    def test_商品の作成はできない(self):
+        response = self.client.post("/api/products/", {"name": "不正"})
+        assert response.status_code == 405
+
+    def test_商品の削除はできない(self):
+        response = self.client.delete(f"/api/products/{self.product.pk}/")
+        assert response.status_code == 405
