@@ -5,12 +5,9 @@ from decimal import Decimal
 
 import pytest
 
-from apps.orders.domain.entities import DeliveryAddress, Order, OrderLine
+from apps.orders.domain.entities import Order
 from apps.orders.domain.interfaces import OrderRepository
 from apps.orders.domain.value_objects import (
-    DeliveryDate,
-    Message,
-    OrderNumber,
     OrderStatus,
 )
 from apps.orders.services import OrderService, PlaceOrderCommand

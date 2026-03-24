@@ -92,7 +92,11 @@ class OrderCancelView(View):
                     "shop/order_cancel.html",
                     {"order": None, "error": "注文が見つかりません"},
                 )
-            return render(request, "shop/order_cancel.html", {"order": order, "error": None})
+            return render(
+                request,
+                "shop/order_cancel.html",
+                {"order": order, "error": None},
+            )
 
         if action == "cancel":
             order_id = int(request.POST.get("order_id"))
