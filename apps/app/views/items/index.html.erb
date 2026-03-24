@@ -1,0 +1,28 @@
+<h1>単品一覧</h1>
+
+<%= link_to "新規登録", new_item_path, class: "btn btn-primary mb-3" %>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>単品名</th>
+      <th>品質維持日数</th>
+      <th>購入単位</th>
+      <th>リードタイム</th>
+      <th>仕入先</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @items.each do |item| %>
+      <tr>
+        <td><%= item.name %></td>
+        <td><%= item.quality_retention_days %>日</td>
+        <td><%= item.purchase_unit %>本</td>
+        <td><%= item.lead_time_days %>日</td>
+        <td><%= item.supplier.name %></td>
+        <td><%= link_to "編集", edit_item_path(item) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

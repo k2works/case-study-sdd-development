@@ -1,0 +1,50 @@
+<h1><%= @product.name %> - 花束構成</h1>
+
+<%= link_to "商品一覧に戻る", products_path, class: "btn btn-secondary mb-3" %>
+
+<h2>構成一覧</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>単品名</th>
+      <th>数量</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @compositions.each do |composition| %>
+      <tr>
+        <td><%= composition.item.name %></td>
+        <td><%= composition.quantity %></td>
+        <td><%= button_to "削除", product_composition_path(@product, composition), method: :delete, class: "btn btn-danger btn-sm", data: { turbo_confirm: "この構成を削除しますか？" } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<h2>構成を追加</h2>
+<%= form_with(model: [@product, @composition]) do |form| %>
+  <% if @composition.errors.any? %>
+    <div class="alert alert-danger">
+      <ul>
+        <% @composition.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="row g-3 align-items-end">
+    <div class="col-auto">
+      <%= form.label :item_id, "単品", class: "form-label" %>
+      <%= form.collection_select :item_id, Item.all, :id, :name, { prompt: "選択" }, class: "form-select" %>
+    </div>
+    <div class="col-auto">
+      <%= form.label :quantity, "数量", class: "form-label" %>
+      <%= form.number_field :quantity, class: "form-control", min: 1 %>
+    </div>
+    <div class="col-auto">
+      <%= form.submit "追加", class: "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>

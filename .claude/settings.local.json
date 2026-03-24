@@ -1,8 +1,19 @@
 {
   "permissions": {
-    "defaultMode": "plan",
-    "allow": [],
-    "deny": [],
-    "ask": []
+    "allow": [
+      "Bash",
+      "Read",
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "Task",
+      "TodoWrite",
+      "NotebookEdit",
+      "mcp__Claude_Preview__preview_start"
+    ],
+    "defaultMode": "bypassPermissions"
   }
 }

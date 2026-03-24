@@ -1,0 +1,35 @@
+<h1>注文入力 - <%= @product.name %>（<%= number_to_currency(@product.price, unit: "¥", format: "%u%n") %>）</h1>
+
+<%= form_with url: confirm_shop_orders_path, method: :post, local: true do |form| %>
+  <%= form.hidden_field :product_id, value: @product.id, name: "order[product_id]" %>
+
+  <h2>届け日</h2>
+  <div class="mb-3">
+    <%= form.label :delivery_date, "届け日", class: "form-label", for: "order_delivery_date" %>
+    <%= form.date_field :delivery_date, class: "form-control", min: Date.tomorrow, name: "order[delivery_date]", id: "order_delivery_date" %>
+  </div>
+
+  <h2>届け先</h2>
+  <div class="mb-3">
+    <%= form.label :recipient_name, "氏名", class: "form-label", for: "order_recipient_name" %>
+    <%= form.text_field :recipient_name, class: "form-control", name: "order[recipient_name]", id: "order_recipient_name" %>
+  </div>
+  <div class="mb-3">
+    <%= form.label :address, "住所", class: "form-label", for: "order_address" %>
+    <%= form.text_field :address, class: "form-control", name: "order[address]", id: "order_address" %>
+  </div>
+  <div class="mb-3">
+    <%= form.label :phone, "電話番号", class: "form-label", for: "order_phone" %>
+    <%= form.text_field :phone, class: "form-control", name: "order[phone]", id: "order_phone" %>
+  </div>
+
+  <h2>お届けメッセージ</h2>
+  <div class="mb-3">
+    <%= form.text_area :message, class: "form-control", rows: 3, name: "order[message]", id: "order_message" %>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= link_to "戻る", shop_path, class: "btn btn-secondary" %>
+    <%= form.submit "確認画面へ", class: "btn btn-primary" %>
+  </div>
+<% end %>

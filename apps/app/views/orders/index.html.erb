@@ -1,0 +1,42 @@
+<h1>受注一覧</h1>
+
+<%= form_with url: orders_path, method: :get, local: true, class: "row g-3 mb-4" do |form| %>
+  <div class="col-auto">
+    <%= form.label :delivery_date, "届け日", class: "form-label" %>
+    <%= form.date_field :delivery_date, value: params[:delivery_date], class: "form-control" %>
+  </div>
+  <div class="col-auto">
+    <%= form.label :status, "状態", class: "form-label" %>
+    <%= form.select :status, options_for_select(Order::STATUSES.map { |s| [I18n.t("order.status.#{s}", default: s), s] }, params[:status]), { include_blank: "すべて" }, class: "form-select" %>
+  </div>
+  <div class="col-auto align-self-end">
+    <%= form.submit "検索", class: "btn btn-outline-primary" %>
+  </div>
+<% end %>
+
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>受注ID</th>
+        <th>得意先</th>
+        <th>商品</th>
+        <th>届け日</th>
+        <th>状態</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @orders.each do |order| %>
+        <tr>
+          <td><%= order.id %></td>
+          <td><%= order.customer.name %></td>
+          <td><%= order.product.name %></td>
+          <td><%= order.delivery_date %></td>
+          <td><span class="badge bg-<%= order.status == 'ordered' ? 'primary' : order.status == 'shipped' ? 'success' : 'secondary' %>"><%= order.status %></span></td>
+          <td><%= link_to "詳細", order_path(order), class: "btn btn-sm btn-outline-secondary" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

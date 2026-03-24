@@ -1,0 +1,6 @@
+projectKey=frere-memoire-webshop
+serverUrl=http://localhost:9000
+serverVersion=25.12.0.117093
+dashboardUrl=http://localhost:9000/dashboard?id=frere-memoire-webshop
+ceTaskId=70fe4da5-4070-48cc-b6f3-e4195067630e
+ceTaskUrl=http://localhost:9000/api/ce/task?id=70fe4da5-4070-48cc-b6f3-e4195067630e
