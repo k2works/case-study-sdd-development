@@ -32,7 +32,7 @@
 | [バックエンドアーキテクチャ](./design/architecture_backend.md) | 作成済み |
 | [フロントエンドアーキテクチャ](./design/architecture_frontend.md) | 作成済み |
 | [インフラストラクチャ](./design/architecture_infrastructure.md) | 作成済み |
-| [データモデル設計](./design/data-model.md) | 未着手 |
+| [データモデル設計](./design/data-model.md) | 作成済み |
 | [ドメインモデル設計](./design/domain-model.md) | 未着手 |
 | [UI 設計](./design/ui-design.md) | 未着手 |
 | [テスト戦略](./design/test_strategy.md) | 未着手 |
