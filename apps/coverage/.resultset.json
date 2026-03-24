@@ -105,8 +105,8 @@
           1,
           null,
           1,
-          18,
-          1,
+          20,
+          2,
           null,
           null,
           null
@@ -281,6 +281,79 @@
           null
         ]
       },
+      "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/controllers/shop_controller.rb": {
+        "lines": [
+          1,
+          1,
+          null,
+          1,
+          1,
+          null,
+          null
+        ]
+      },
+      "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/controllers/shop/orders_controller.rb": {
+        "lines": [
+          1,
+          1,
+          1,
+          null,
+          1,
+          1,
+          1,
+          null,
+          null,
+          1,
+          1,
+          1,
+          1,
+          null,
+          null,
+          1,
+          2,
+          2,
+          null,
+          2,
+          null,
+          null,
+          null,
+          null,
+          null,
+          2,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          2,
+          1,
+          null,
+          1,
+          null,
+          null,
+          null,
+          1,
+          null,
+          null,
+          1,
+          null,
+          1,
+          5,
+          0,
+          null,
+          null,
+          null,
+          1,
+          14,
+          null,
+          null
+        ]
+      },
       "/Users/k2works/IdeaProjects/case-study-sdd-development/.claude/worktrees/priceless-kilby/apps/app/channels/application_cable/channel.rb": {
         "lines": [
           0,
@@ -321,6 +394,6 @@
         "branches": {}
       }
     },
-    "timestamp": 1774337451
+    "timestamp": 1774337635
   }
 }

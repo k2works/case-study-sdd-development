@@ -1,0 +1,16 @@
+<h1>商品カタログ</h1>
+
+<div class="row">
+  <% @products.each do |product| %>
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title"><%= product.name %></h5>
+          <p class="card-text"><%= product.description %></p>
+          <p class="card-text fw-bold"><%= number_to_currency(product.price, unit: "¥", format: "%u%n") %></p>
+          <%= link_to "注文する", new_shop_order_path(product_id: product.id), class: "btn btn-primary" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
