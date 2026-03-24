@@ -5,7 +5,7 @@ description = "フレール・メモワール WEB ショップシステム"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "django>=5.2",
+    "django>=5.2,<6",
     "djangorestframework>=3.15",
     "drf-spectacular>=0.27",
     "psycopg[binary]>=3.2",
@@ -28,7 +28,7 @@ dev = [
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
-testpaths = ["tests"]
+testpaths = ["tests", "apps"]
 pythonpath = ["."]
 addopts = "--cov=apps --cov-report=term-missing -v"
 
