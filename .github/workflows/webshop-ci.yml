@@ -1,0 +1,43 @@
+name: WebShop CI
+
+on:
+  push:
+    paths:
+      - "apps/webshop/**"
+      - ".github/workflows/webshop-ci.yml"
+  pull_request:
+    paths:
+      - "apps/webshop/**"
+      - ".github/workflows/webshop-ci.yml"
+
+defaults:
+  run:
+    working-directory: apps/webshop
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --frozen
+      - run: uv run pytest --tb=short -q
