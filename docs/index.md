@@ -60,6 +60,7 @@
 | [IT4 計画](./development/iteration_plan-4.md) | 完了 |
 | [IT4 ふりかえり](./development/retrospective-4.md) | 完了 |
 | [IT4 完了報告書](./development/iteration_report-4.md) | 完了 |
+| [IT5 計画](./development/iteration_plan-5.md) | 進行中 |
 
 ### 運用 (`operation/`)
 
