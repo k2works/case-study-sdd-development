@@ -98,6 +98,9 @@ nav:
       - 要件定義レビュー: review/requirements_review_20260324.md
       - 設計レビュー: review/design_review_20260324.md
       - 運用レビュー: review/operation_review_20260324.md
+      - UI/UX レビュー: review/ui_design_uiux_review_20260324.md
+      - 初期構築レビュー: review/webshop_initial_setup_review_20260324.md
+      - IT1 コードレビュー: review/it1_code_review_20260324.md
   - リファレンス:
       - 概要: reference/index.md
       - よいソフトウェアとは: reference/よいソフトウェアとは.md
