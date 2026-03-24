@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_24_072822) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_24_101637) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -82,6 +82,19 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_24_072822) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "stocks", force: :cascade do |t|
+    t.bigint "item_id", null: false
+    t.integer "quantity", null: false
+    t.date "arrived_date", null: false
+    t.date "expiry_date", null: false
+    t.string "status", default: "available", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expiry_date"], name: "index_stocks_on_expiry_date"
+    t.index ["item_id", "status"], name: "index_stocks_on_item_id_and_status"
+    t.index ["item_id"], name: "index_stocks_on_item_id"
+  end
+
   create_table "suppliers", force: :cascade do |t|
     t.string "name", null: false
     t.string "phone"
@@ -112,4 +125,5 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_24_072822) do
   add_foreign_key "orders", "customers"
   add_foreign_key "orders", "delivery_addresses"
   add_foreign_key "orders", "products"
+  add_foreign_key "stocks", "items"
 end
