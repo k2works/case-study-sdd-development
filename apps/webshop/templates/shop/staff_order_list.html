@@ -1,0 +1,72 @@
+{% extends "shop/base.html" %}
+
+{% block title %}受注一覧 - フレール・メモワール{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">受注一覧</h1>
+
+<form method="get" class="mb-6 flex flex-wrap gap-4 items-end">
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">ステータス</label>
+    <select name="status" class="border rounded px-3 py-2 text-sm">
+      {% for value, label in status_choices %}
+      <option value="{{ value }}" {% if value == current_status %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">届け日（開始）</label>
+    <input type="date" name="date_from" value="{{ date_from }}" class="border rounded px-3 py-2 text-sm">
+  </div>
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">届け日（終了）</label>
+    <input type="date" name="date_to" value="{{ date_to }}" class="border rounded px-3 py-2 text-sm">
+  </div>
+  <button type="submit" class="bg-pink-600 text-white px-4 py-2 rounded text-sm hover:bg-pink-700 transition">絞り込み</button>
+  <a href="{% url 'staff_orders:order_list' %}" class="text-sm text-gray-500 hover:text-gray-700 underline">クリア</a>
+</form>
+
+{% if orders %}
+<div class="overflow-x-auto">
+  <table class="w-full bg-white rounded-lg shadow text-sm">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-4 py-3 text-left">注文番号</th>
+        <th class="px-4 py-3 text-left">届け先</th>
+        <th class="px-4 py-3 text-left">届け日</th>
+        <th class="px-4 py-3 text-left">ステータス</th>
+        <th class="px-4 py-3 text-left">商品</th>
+        <th class="px-4 py-3 text-right">合計</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y">
+      {% for order in orders %}
+      <tr class="hover:bg-gray-50">
+        <td class="px-4 py-3 font-mono">{{ order.order_number }}</td>
+        <td class="px-4 py-3">{{ order.delivery_address.recipient_name }}</td>
+        <td class="px-4 py-3">{{ order.delivery_date.value|date:"Y/m/d" }}</td>
+        <td class="px-4 py-3">
+          <span class="inline-block px-2 py-1 rounded text-xs
+            {% if order.status.value == 'confirmed' %}bg-green-100 text-green-800
+            {% elif order.status.value == 'cancelled' %}bg-red-100 text-red-800
+            {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+            {{ order.status.value }}
+          </span>
+        </td>
+        <td class="px-4 py-3">
+          {% for line in order.lines %}{{ line.product_name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+        </td>
+        <td class="px-4 py-3 text-right">¥{{ order.total_amount|floatformat:0 }}</td>
+        <td class="px-4 py-3">
+          <a href="{% url 'staff_orders:order_detail' order.id %}" class="text-pink-600 hover:underline text-sm">詳細</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-gray-500 text-center py-8">現在、該当する受注はありません。</p>
+{% endif %}
+{% endblock %}

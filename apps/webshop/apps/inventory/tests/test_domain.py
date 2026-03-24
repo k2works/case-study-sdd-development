@@ -189,11 +189,13 @@ class TestStockForecastService:
 
     def test_複数ロットの在庫推移(self):
         lot1 = self._make_lot(
-            id=1, remaining_quantity=30,
+            id=1,
+            remaining_quantity=30,
             expiry_date=ExpiryDate(date(2026, 4, 3)),
         )
         lot2 = self._make_lot(
-            id=2, remaining_quantity=50,
+            id=2,
+            remaining_quantity=50,
             expiry_date=ExpiryDate(date(2026, 4, 5)),
         )
         service = StockForecastService()

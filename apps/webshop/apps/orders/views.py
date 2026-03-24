@@ -1,5 +1,6 @@
 """注文画面の View。"""
 
+from datetime import date, datetime
 from decimal import Decimal
 
 from django.http import HttpResponseForbidden
@@ -17,12 +18,130 @@ def _get_order_service() -> OrderService:
     return OrderService(order_repo=DjangoOrderRepository())
 
 
+# --- スタッフ向け View ---
+
+
+class StaffOrderListView(View):
+    """受注一覧画面（スタッフ向け）。ステータス・日付でフィルタ可能。"""
+
+    def get(self, request):
+        service = _get_order_service()
+        status = request.GET.get("status") or None
+        date_from = _parse_date(request.GET.get("date_from"))
+        date_to = _parse_date(request.GET.get("date_to"))
+
+        orders = service.list_orders(
+            status=status, date_from=date_from, date_to=date_to
+        )
+        return render(
+            request,
+            "shop/staff_order_list.html",
+            {
+                "orders": orders,
+                "current_status": status or "",
+                "date_from": request.GET.get("date_from", ""),
+                "date_to": request.GET.get("date_to", ""),
+                "status_choices": [
+                    ("", "すべて"),
+                    ("pending", "保留中"),
+                    ("confirmed", "確定"),
+                    ("cancelled", "キャンセル"),
+                ],
+            },
+        )
+
+
+class StaffOrderDetailView(View):
+    """受注詳細画面（スタッフ向け）。"""
+
+    def get(self, request, pk):
+        order = get_object_or_404(OrderModel.objects.prefetch_related("lines"), pk=pk)
+        return render(request, "shop/staff_order_detail.html", {"order": order})
+
+
+# --- 得意先向け View ---
+
+
+class OrderHistoryView(View):
+    """注文履歴画面。注文番号で検索可能。"""
+
+    def get(self, request):
+        query = request.GET.get("q", "").strip()
+        orders = []
+        if query:
+            from apps.orders.models import Order as OM
+
+            orders = list(
+                OM.objects.prefetch_related("lines")
+                .filter(order_number__icontains=query)
+                .order_by("-created_at")
+            )
+        return render(
+            request,
+            "shop/order_history.html",
+            {"orders": orders, "query": query},
+        )
+
+
+class OrderHistoryDetailView(View):
+    """注文詳細画面（得意先向け）。注文番号でアクセス。"""
+
+    def get(self, request, order_number):
+        order = get_object_or_404(
+            OrderModel.objects.prefetch_related("lines"),
+            order_number=order_number,
+        )
+        return render(request, "shop/order_history_detail.html", {"order": order})
+
+
+class AddressSelectView(View):
+    """届け先選択画面。過去の届け先一覧を表示し選択する。"""
+
+    def get(self, request, pk):
+        product = get_object_or_404(Product, pk=pk, is_active=True)
+        service = _get_order_service()
+        addresses = service.list_recent_addresses()
+        return render(
+            request,
+            "shop/address_select.html",
+            {"product": product, "addresses": addresses},
+        )
+
+    def post(self, request, pk):
+        request.session["selected_address"] = {
+            "recipient_name": request.POST.get("recipient_name", ""),
+            "postal_code": request.POST.get("postal_code", ""),
+            "address": request.POST.get("address", ""),
+            "phone": request.POST.get("phone", ""),
+        }
+        return redirect("shop:order_form", pk=pk)
+
+
+def _parse_date(value: str | None) -> date | None:
+    if not value:
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
 class OrderFormView(View):
     """注文入力画面。"""
 
     def get(self, request, pk):
         product = get_object_or_404(Product, pk=pk, is_active=True)
-        form = OrderForm()
+        # セッションから届け先コピーがあればプリフィル
+        initial = {}
+        selected = request.session.pop("selected_address", None)
+        if selected:
+            initial = {
+                "recipient_name": selected.get("recipient_name", ""),
+                "postal_code": selected.get("postal_code", ""),
+                "address": selected.get("address", ""),
+                "phone": selected.get("phone", ""),
+            }
+        form = OrderForm(initial=initial)
         return render(
             request,
             "shop/order_form.html",

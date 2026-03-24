@@ -67,6 +67,24 @@ class OrderService:
         """注文番号で注文を取得する。"""
         return self._order_repo.find_by_order_number(order_number)
 
+    def list_orders(
+        self,
+        *,
+        status: str | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
+    ) -> list[Order]:
+        """注文一覧を取得する。ステータス・日付範囲でフィルタ可能。"""
+        return self._order_repo.find_all(
+            status=status,
+            date_from=date_from,
+            date_to=date_to,
+        )
+
+    def list_recent_addresses(self) -> list[DeliveryAddress]:
+        """過去の届け先を重複なしで取得する。"""
+        return self._order_repo.find_recent_addresses()
+
     def cancel_order(self, order_id: int) -> Order:
         """注文をキャンセルする。"""
         order = self._order_repo.find_by_id(order_id)

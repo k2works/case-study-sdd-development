@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from datetime import date
 
-from apps.orders.domain.entities import Order
+from apps.orders.domain.entities import DeliveryAddress, Order
 
 
 class OrderRepository(ABC):
@@ -17,6 +18,20 @@ class OrderRepository(ABC):
     @abstractmethod
     def find_by_order_number(self, order_number: str) -> Order | None:
         """注文番号で注文を取得する。"""
+
+    @abstractmethod
+    def find_all(
+        self,
+        *,
+        status: str | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
+    ) -> list[Order]:
+        """注文一覧を取得する。ステータス・日付範囲でフィルタ可能。"""
+
+    @abstractmethod
+    def find_recent_addresses(self) -> list[DeliveryAddress]:
+        """過去の注文から重複を除いた届け先一覧を取得する。"""
 
     @abstractmethod
     def save(self, order: Order) -> Order:

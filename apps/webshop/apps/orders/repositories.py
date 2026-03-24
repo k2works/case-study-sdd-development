@@ -39,6 +39,41 @@ class DjangoOrderRepository(OrderRepository):
         except OrderModel.DoesNotExist:
             return None
 
+    def find_all(
+        self,
+        *,
+        status: str | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
+    ) -> list[Order]:
+        qs = OrderModel.objects.prefetch_related("lines").all()
+        if status:
+            qs = qs.filter(status=status)
+        if date_from:
+            qs = qs.filter(delivery_date__gte=date_from)
+        if date_to:
+            qs = qs.filter(delivery_date__lte=date_to)
+        qs = qs.order_by("-created_at")
+        return [self._to_entity(obj) for obj in qs]
+
+    def find_recent_addresses(self) -> list[DeliveryAddress]:
+        rows = (
+            OrderModel.objects.values(
+                "recipient_name", "postal_code", "address", "phone"
+            )
+            .distinct()
+            .order_by("-recipient_name")
+        )
+        return [
+            DeliveryAddress(
+                recipient_name=row["recipient_name"],
+                postal_code=row["postal_code"],
+                address=row["address"],
+                phone=row["phone"],
+            )
+            for row in rows
+        ]
+
     @transaction.atomic
     def save(self, order: Order) -> Order:
         if order.id is not None:

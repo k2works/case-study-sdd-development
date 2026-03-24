@@ -5,7 +5,7 @@ from decimal import Decimal
 
 import pytest
 
-from apps.orders.domain.entities import Order
+from apps.orders.domain.entities import DeliveryAddress, Order
 from apps.orders.domain.interfaces import OrderRepository
 from apps.orders.domain.value_objects import (
     OrderStatus,
@@ -29,6 +29,37 @@ class FakeOrderRepository(OrderRepository):
             if str(order.order_number) == order_number:
                 return order
         return None
+
+    def find_all(
+        self,
+        *,
+        status: str | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
+    ) -> list[Order]:
+        result = list(self._orders.values())
+        if status:
+            result = [o for o in result if o.status.value == status]
+        if date_from:
+            result = [o for o in result if o.delivery_date.value >= date_from]
+        if date_to:
+            result = [o for o in result if o.delivery_date.value <= date_to]
+        return sorted(result, key=lambda o: o.delivery_date.value, reverse=True)
+
+    def find_recent_addresses(self) -> list[DeliveryAddress]:
+        seen: set[str] = set()
+        addresses: list[DeliveryAddress] = []
+        for order in sorted(
+            self._orders.values(),
+            key=lambda o: o.id or 0,
+            reverse=True,
+        ):
+            addr = order.delivery_address
+            key = f"{addr.recipient_name}|{addr.address}"
+            if key not in seen:
+                seen.add(key)
+                addresses.append(order.delivery_address)
+        return addresses
 
     def save(self, order: Order) -> Order:
         if order.id is None:
@@ -185,3 +216,107 @@ class TestOrderServiceCancel:
         service.cancel_order(order.id)
         found = repo.find_by_id(order.id)
         assert found.status == OrderStatus.CANCELLED
+
+
+class TestOrderServiceListOrders:
+    """注文一覧のテスト。"""
+
+    def _make_command(self, **kwargs) -> PlaceOrderCommand:
+        defaults = {
+            "product_id": 1,
+            "product_name": "バースデーブーケ",
+            "unit_price": Decimal("5000"),
+            "quantity": 1,
+            "delivery_date": date.today() + timedelta(days=5),
+            "recipient_name": "山田太郎",
+            "postal_code": "100-0001",
+            "address": "東京都千代田区千代田1-1",
+            "phone": "03-1234-5678",
+        }
+        defaults.update(kwargs)
+        return PlaceOrderCommand(**defaults)
+
+    def test_全注文を取得できる(self):
+        repo = FakeOrderRepository()
+        service = OrderService(order_repo=repo)
+        service.place_order(self._make_command())
+        service.place_order(
+            self._make_command(delivery_date=date.today() + timedelta(days=7))
+        )
+
+        orders = service.list_orders()
+        assert len(orders) == 2
+
+    def test_ステータスでフィルタできる(self):
+        repo = FakeOrderRepository()
+        service = OrderService(order_repo=repo)
+        order = service.place_order(
+            self._make_command(delivery_date=date.today() + timedelta(days=10))
+        )
+        service.cancel_order(order.id)
+        service.place_order(
+            self._make_command(delivery_date=date.today() + timedelta(days=7))
+        )
+
+        confirmed = service.list_orders(status="confirmed")
+        assert len(confirmed) == 1
+        cancelled = service.list_orders(status="cancelled")
+        assert len(cancelled) == 1
+
+    def test_日付範囲でフィルタできる(self):
+        repo = FakeOrderRepository()
+        service = OrderService(order_repo=repo)
+        d1 = date.today() + timedelta(days=5)
+        d2 = date.today() + timedelta(days=10)
+        service.place_order(self._make_command(delivery_date=d1))
+        service.place_order(self._make_command(delivery_date=d2))
+
+        filtered = service.list_orders(date_from=d2, date_to=d2)
+        assert len(filtered) == 1
+        assert filtered[0].delivery_date.value == d2
+
+
+class TestOrderServiceListRecentAddresses:
+    """過去の届け先一覧のテスト。"""
+
+    def _make_command(self, **kwargs) -> PlaceOrderCommand:
+        defaults = {
+            "product_id": 1,
+            "product_name": "ブーケ",
+            "unit_price": Decimal("5000"),
+            "quantity": 1,
+            "delivery_date": date.today() + timedelta(days=5),
+            "recipient_name": "山田花子",
+            "postal_code": "100-0001",
+            "address": "東京都千代田区千代田1-1",
+            "phone": "03-1234-5678",
+        }
+        defaults.update(kwargs)
+        return PlaceOrderCommand(**defaults)
+
+    def test_過去の届け先を重複なしで取得できる(self):
+        repo = FakeOrderRepository()
+        service = OrderService(order_repo=repo)
+        # 同じ届け先に 2 回注文
+        service.place_order(
+            self._make_command(delivery_date=date.today() + timedelta(days=5))
+        )
+        service.place_order(
+            self._make_command(delivery_date=date.today() + timedelta(days=7))
+        )
+        # 別の届け先に 1 回注文
+        service.place_order(
+            self._make_command(
+                delivery_date=date.today() + timedelta(days=9),
+                recipient_name="田中太郎",
+                address="大阪府大阪市北区1-1",
+            )
+        )
+
+        addresses = service.list_recent_addresses()
+        assert len(addresses) == 2
+
+    def test_注文がない場合は空リスト(self):
+        repo = FakeOrderRepository()
+        service = OrderService(order_repo=repo)
+        assert service.list_recent_addresses() == []
