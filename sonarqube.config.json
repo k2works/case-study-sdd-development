@@ -1,0 +1,11 @@
+{
+  "projects": [
+    {
+      "name": "webshop",
+      "label": "Webshop Backend",
+      "projectKey": "fleur-memoire-backend",
+      "scanType": "sonar-scanner",
+      "srcDir": "apps/webshop"
+    }
+  ]
+}

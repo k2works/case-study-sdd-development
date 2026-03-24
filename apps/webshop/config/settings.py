@@ -15,14 +15,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY",
-    "django-insecure-q+dhqox=l!f)lw-n+otr=bgq7*3w61a8ymot2&5+36ei*)a0nq",
-)
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-only-not-for-production")
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() in ("true", "1")
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(",")
+
+INTERNAL_IPS = ["127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -67,10 +66,11 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
