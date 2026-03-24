@@ -190,13 +190,17 @@ volumes:
 
 | サービス | 構成 | 月額概算 |
 | :--- | :--- | :--- |
-| ECS Fargate | 0.25 vCPU x 0.5 GB x 2 タスク | $15 |
-| RDS PostgreSQL | db.t4g.micro、Multi-AZ | $30 |
+| ECS Fargate | 0.5 vCPU x 1 GB x 2 タスク | $30 |
+| RDS PostgreSQL | db.t4g.micro、Multi-AZ、暗号化有効 | $30 |
 | S3 | 10 GB | $1 |
 | CloudFront | 10 GB 転送量 | $1 |
 | SES | 1,000 通/月 | $1 |
 | Route 53 | 1 ホストゾーン | $1 |
 | ALB | 1 台 | $20 |
-| **合計** | | **約 $70/月** |
+| VPC Endpoint（S3, ECR, CloudWatch, SES） | 4 エンドポイント | $30 |
+| その他（CloudWatch Logs, ECR, データ転送） | | $5 |
+| **合計** | | **約 $95/月** |
 
-※ 小規模運用を想定した最小構成。受注量の増加に応じて ECS タスク数と RDS インスタンスクラスをスケールアップ
+※ NAT Gateway（$30+/月）の代わりに VPC Endpoint を使用してコストを最適化。
+※ ステージング環境は追加で約 $45/月（ECS 1 タスク + RDS Single-AZ）。
+※ RDS は保存時暗号化（AES-256）を有効化。
