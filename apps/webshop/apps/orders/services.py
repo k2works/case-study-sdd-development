@@ -66,3 +66,11 @@ class OrderService:
     def find_order_by_number(self, order_number: str) -> Order | None:
         """注文番号で注文を取得する。"""
         return self._order_repo.find_by_order_number(order_number)
+
+    def cancel_order(self, order_id: int) -> Order:
+        """注文をキャンセルする。"""
+        order = self._order_repo.find_by_id(order_id)
+        if order is None:
+            raise ValueError("注文が見つかりません")
+        order.cancel(current_date=date.today())
+        return self._order_repo.save(order)

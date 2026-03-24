@@ -147,3 +147,44 @@ class TestOrderServiceFind:
 
         found = service.find_order_by_number(str(order.order_number))
         assert found is not None
+
+
+class TestOrderServiceCancel:
+    """注文キャンセルのテスト。"""
+
+    def _place_order(self, repo, days_ahead=10):
+        service = OrderService(order_repo=repo)
+        return service.place_order(
+            PlaceOrderCommand(
+                product_id=1,
+                product_name="ブーケ",
+                unit_price=Decimal("5000"),
+                quantity=1,
+                delivery_date=date.today() + timedelta(days=days_ahead),
+                recipient_name="山田太郎",
+                postal_code="100-0001",
+                address="東京都千代田区千代田1-1",
+                phone="03-1234-5678",
+            )
+        )
+
+    def test_確定済み注文をキャンセルできる(self):
+        repo = FakeOrderRepository()
+        order = self._place_order(repo)
+        service = OrderService(order_repo=repo)
+        cancelled = service.cancel_order(order.id)
+        assert cancelled.status == OrderStatus.CANCELLED
+
+    def test_存在しない注文をキャンセルするとエラー(self):
+        repo = FakeOrderRepository()
+        service = OrderService(order_repo=repo)
+        with pytest.raises(ValueError, match="注文が見つかりません"):
+            service.cancel_order(9999)
+
+    def test_キャンセル結果がリポジトリに保存される(self):
+        repo = FakeOrderRepository()
+        order = self._place_order(repo)
+        service = OrderService(order_repo=repo)
+        service.cancel_order(order.id)
+        found = repo.find_by_id(order.id)
+        assert found.status == OrderStatus.CANCELLED

@@ -251,3 +251,35 @@ class TestOrder:
     def test_明細なしで生成するとエラー(self):
         with pytest.raises(ValueError):
             self._make_order(lines=[])
+
+    def test_確定済み注文をキャンセルできる(self):
+        order = self._make_order(
+            delivery_date=DeliveryDate(date.today() + timedelta(days=10))
+        )
+        order.confirm()
+        order.cancel(current_date=date.today())
+        assert order.status == OrderStatus.CANCELLED
+
+    def test_保留中の注文をキャンセルできる(self):
+        order = self._make_order(
+            delivery_date=DeliveryDate(date.today() + timedelta(days=10))
+        )
+        order.cancel(current_date=date.today())
+        assert order.status == OrderStatus.CANCELLED
+
+    def test_キャンセル済み注文を再キャンセルするとエラー(self):
+        order = self._make_order(
+            delivery_date=DeliveryDate(date.today() + timedelta(days=10))
+        )
+        order.confirm()
+        order.cancel(current_date=date.today())
+        with pytest.raises(ValueError, match="既にキャンセル済み"):
+            order.cancel(current_date=date.today())
+
+    def test_キャンセル期限を過ぎるとエラー(self):
+        order = self._make_order(
+            delivery_date=DeliveryDate(date.today() + timedelta(days=3))
+        )
+        order.confirm()
+        with pytest.raises(ValueError, match="キャンセル期限"):
+            order.cancel(current_date=date.today() + timedelta(days=1))

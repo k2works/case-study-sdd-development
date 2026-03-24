@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from apps.orders.views import OrderCompleteView, OrderFormView
+from apps.orders.views import OrderCancelView, OrderCompleteView, OrderFormView
 from apps.products.shop_views import ProductDetailView, ProductListView
 
 app_name = "shop"
@@ -16,4 +16,5 @@ urlpatterns = [
         OrderCompleteView.as_view(),
         name="order_complete",
     ),
+    path("order/cancel/", OrderCancelView.as_view(), name="order_cancel"),
 ]

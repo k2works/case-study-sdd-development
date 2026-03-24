@@ -65,3 +65,50 @@ class OrderCompleteView(View):
             return HttpResponseForbidden("この注文にはアクセスできません")
         order = get_object_or_404(OrderModel, pk=pk)
         return render(request, "shop/order_complete.html", {"order": order})
+
+
+class OrderCancelView(View):
+    """注文キャンセル画面。注文番号で検索しキャンセルする。"""
+
+    def get(self, request):
+        return render(request, "shop/order_cancel.html", {"order": None, "error": None})
+
+    def post(self, request):
+        action = request.POST.get("action", "search")
+        service = _get_order_service()
+
+        if action == "search":
+            order_number = request.POST.get("order_number", "").strip()
+            if not order_number:
+                return render(
+                    request,
+                    "shop/order_cancel.html",
+                    {"order": None, "error": "注文番号を入力してください"},
+                )
+            order = service.find_order_by_number(order_number)
+            if order is None:
+                return render(
+                    request,
+                    "shop/order_cancel.html",
+                    {"order": None, "error": "注文が見つかりません"},
+                )
+            return render(request, "shop/order_cancel.html", {"order": order, "error": None})
+
+        if action == "cancel":
+            order_id = int(request.POST.get("order_id"))
+            try:
+                service.cancel_order(order_id)
+                return render(
+                    request,
+                    "shop/order_cancel_complete.html",
+                    {"order_id": order_id},
+                )
+            except ValueError as e:
+                order = service.find_order(order_id)
+                return render(
+                    request,
+                    "shop/order_cancel.html",
+                    {"order": order, "error": str(e)},
+                )
+
+        return render(request, "shop/order_cancel.html", {"order": None, "error": None})
