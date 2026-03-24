@@ -1,0 +1,28 @@
+{% extends "shop/base.html" %}
+
+{% block title %}注文完了{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-8 max-w-2xl mx-auto text-center">
+  <div class="text-green-500 text-5xl mb-4">&#10003;</div>
+  <h1 class="text-2xl font-bold text-gray-800 mb-4">ご注文ありがとうございます</h1>
+
+  <div class="bg-gray-50 rounded p-6 mb-6">
+    <p class="text-sm text-gray-500 mb-1">注文番号</p>
+    <p class="text-xl font-mono font-bold text-gray-800">{{ order.order_number }}</p>
+  </div>
+
+  <div class="text-left space-y-2 text-sm text-gray-600 mb-8">
+    <p><span class="font-medium">届け先:</span> {{ order.recipient_name }}</p>
+    <p><span class="font-medium">届け日:</span> {{ order.delivery_date }}</p>
+    {% if order.message %}
+    <p><span class="font-medium">メッセージ:</span> {{ order.message }}</p>
+    {% endif %}
+  </div>
+
+  <a href="{% url 'shop:product_list' %}"
+     class="inline-block bg-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-pink-700 transition-colors">
+    商品一覧に戻る
+  </a>
+</div>
+{% endblock %}
