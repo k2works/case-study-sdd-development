@@ -17,28 +17,32 @@ class Shop::OrdersController < ApplicationController
     @product = Product.find(order_params[:product_id])
     customer = current_user.customer
 
-    delivery_address = customer.delivery_addresses.create!(
-      recipient_name: order_params[:recipient_name],
-      address: order_params[:address],
-      phone: order_params[:phone]
-    )
+    ActiveRecord::Base.transaction do
+      delivery_address = customer.delivery_addresses.create!(
+        recipient_name: order_params[:recipient_name],
+        address: order_params[:address],
+        phone: order_params[:phone]
+      )
 
-    @order = Order.new(
-      customer: customer,
-      product: @product,
-      delivery_address: delivery_address,
-      delivery_date: order_params[:delivery_date],
-      message: order_params[:message],
-      price: @product.price,
-      status: "ordered",
-      ordered_at: Time.current
-    )
+      @order = Order.new(
+        customer: customer,
+        product: @product,
+        delivery_address: delivery_address,
+        delivery_date: order_params[:delivery_date],
+        message: order_params[:message],
+        price: @product.price,
+        status: "ordered",
+        ordered_at: Time.current
+      )
 
-    if @order.save
-      redirect_to complete_shop_orders_path
-    else
-      render :new, status: :unprocessable_entity
+      if @order.save
+        redirect_to complete_shop_orders_path
+      else
+        raise ActiveRecord::Rollback
+      end
     end
+
+    render :new, status: :unprocessable_entity unless @order&.persisted?
   end
 
   def complete
