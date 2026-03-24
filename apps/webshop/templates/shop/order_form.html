@@ -16,7 +16,7 @@
     <p class="text-pink-600 text-lg font-bold">&yen;{{ product.price|floatformat:0|intcomma }}</p>
   </div>
 
-  <form method="post">
+  <form method="post" id="order-form">
     {% csrf_token %}
 
     <div class="space-y-4">
@@ -34,11 +34,19 @@
     </div>
 
     <div class="mt-8">
-      <button type="submit"
-              class="w-full bg-pink-600 text-white py-3 rounded-lg font-semibold hover:bg-pink-700 transition-colors">
+      <button type="submit" id="submit-btn"
+              class="w-full bg-pink-600 text-white py-3 rounded-lg font-semibold hover:bg-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
         注文を確定する
       </button>
     </div>
   </form>
+
+  <script>
+    document.getElementById('order-form').addEventListener('submit', function() {
+      var btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = '注文処理中...';
+    });
+  </script>
 </div>
 {% endblock %}
