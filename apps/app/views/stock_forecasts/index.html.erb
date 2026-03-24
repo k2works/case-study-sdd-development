@@ -1,4 +1,4 @@
-<div class="container-fluid py-3">
+<div class="py-3">
   <h1 class="h3 mb-4">在庫推移</h1>
 
   <div class="card mb-4">
@@ -19,7 +19,7 @@
           <%= date_field_tag :end_date, @end_date || Date.current + 13.days, class: "form-control" %>
         </div>
         <div class="col-md-2">
-          <%= submit_tag "表示", class: "btn btn-primary w-100" %>
+          <%= submit_tag "表示", class: "btn btn-outline-primary w-100" %>
         </div>
       <% end %>
     </div>
@@ -50,15 +50,29 @@
                 <tr class="<%= 'table-danger' if daily[:effective_stock] < 0 %>">
                   <td><%= daily[:date].strftime("%m/%d (%a)") %></td>
                   <td class="text-end"><%= daily[:available_stock] %></td>
-                  <td class="text-end text-info"><%= daily[:incoming] %></td>
-                  <td class="text-end text-warning"><%= daily[:allocated] %></td>
-                  <td class="text-end text-danger"><%= daily[:expired] %></td>
-                  <td class="text-end"><strong><%= daily[:effective_stock] %></strong></td>
+                  <td class="text-end"><%= daily[:incoming] > 0 ? "+#{daily[:incoming]}" : daily[:incoming] %></td>
+                  <td class="text-end"><%= daily[:allocated] > 0 ? "-#{daily[:allocated]}" : daily[:allocated] %></td>
+                  <td class="text-end text-danger"><%= daily[:expired] > 0 ? "#{daily[:expired]}" : daily[:expired] %></td>
+                  <td class="text-end">
+                    <strong><%= daily[:effective_stock] %></strong>
+                    <% if daily[:effective_stock] < 0 %>
+                      <span class="badge bg-danger ms-1">不足</span>
+                    <% end %>
+                  </td>
                 </tr>
               <% end %>
             </tbody>
           </table>
         </div>
+      </div>
+      <div class="card-footer text-muted small">
+        有効在庫 = 良品在庫 + 入荷予定 - 引当済み（廃棄対象は良品在庫から既に除外済み）
+      </div>
+    </div>
+  <% else %>
+    <div class="card">
+      <div class="card-body text-center text-muted py-5">
+        <p class="mb-0">単品を選択して「表示」を押すと、日別の在庫推移が表示されます。</p>
       </div>
     </div>
   <% end %>
