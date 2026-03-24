@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "mkdocs",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [".claude/scripts/start-mkdocs.sh"],
+      "port": 8000
+    },
+    {
+      "name": "sonarqube",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [".claude/scripts/start-sonarqube.sh"],
+      "port": 9000
+    }
+  ]
+}
