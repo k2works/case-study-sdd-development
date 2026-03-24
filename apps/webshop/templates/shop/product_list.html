@@ -1,0 +1,33 @@
+{% extends "shop/base.html" %}
+{% load humanize %}
+
+{% block title %}商品一覧 — フレール・メモワール{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold text-gray-800 mb-8">花束コレクション</h1>
+
+{% if products %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {% for product in products %}
+  <a href="{% url 'shop:product_detail' product.pk %}"
+     class="bg-white rounded-lg shadow hover:shadow-md transition-shadow overflow-hidden">
+    {% if product.image_url %}
+    <img src="{{ product.image_url }}" alt="{{ product.name }}"
+         class="w-full h-48 object-cover">
+    {% else %}
+    <div class="w-full h-48 bg-pink-100 flex items-center justify-center">
+      <span class="text-pink-300 text-4xl">&#127801;</span>
+    </div>
+    {% endif %}
+    <div class="p-4">
+      <h2 class="text-lg font-semibold text-gray-800">{{ product.name }}</h2>
+      <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ product.description }}</p>
+      <p class="text-xl font-bold text-pink-600 mt-3">&yen;{{ product.price|floatformat:0|intcomma }}</p>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p class="text-gray-500">現在販売中の商品はありません。</p>
+{% endif %}
+{% endblock %}

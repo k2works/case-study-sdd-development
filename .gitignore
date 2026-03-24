@@ -20,6 +20,34 @@ Thumbs.db
 dist/
 build/
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+.eggs/
+*.whl
+
+# Python virtual environments
+.venv/
+venv/
+
+# Testing
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+*.mo
+staticfiles/
+media/
+
 # Logs
 *.log
 npm-debug.log*

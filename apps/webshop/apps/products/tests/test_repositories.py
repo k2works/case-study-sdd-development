@@ -1,0 +1,192 @@
+"""商品管理の Repository 統合テスト。
+
+Django ORM を使用した CRUD 操作をテストする。
+"""
+
+from decimal import Decimal
+
+import pytest
+
+from apps.products.domain.entities import Item, Product, Supplier
+from apps.products.domain.value_objects import (
+    ItemName,
+    LeadTimeDays,
+    Price,
+    ProductName,
+    PurchaseUnit,
+    QualityRetentionDays,
+)
+from apps.products.repositories import (
+    DjangoItemRepository,
+    DjangoProductRepository,
+    DjangoSupplierRepository,
+)
+
+
+@pytest.mark.django_db
+class TestDjangoSupplierRepository:
+    """仕入先 Repository の統合テスト。"""
+
+    def setup_method(self):
+        self.repo = DjangoSupplierRepository()
+
+    def test_仕入先を保存して取得できる(self):
+        supplier = Supplier(id=None, name="花卉市場A", contact_info="03-1234-5678")
+        saved = self.repo.save(supplier)
+
+        assert saved.id > 0
+        assert saved.name == "花卉市場A"
+
+        found = self.repo.find_by_id(saved.id)
+        assert found is not None
+        assert found.name == "花卉市場A"
+        assert found.contact_info == "03-1234-5678"
+
+    def test_存在しないIDで取得するとNone(self):
+        assert self.repo.find_by_id(9999) is None
+
+    def test_仕入先を更新できる(self):
+        supplier = Supplier(id=None, name="花卉市場A", contact_info="03-1234-5678")
+        saved = self.repo.save(supplier)
+
+        saved.name = "花卉市場B"
+        updated = self.repo.save(saved)
+
+        found = self.repo.find_by_id(updated.id)
+        assert found is not None
+        assert found.name == "花卉市場B"
+
+
+@pytest.mark.django_db
+class TestDjangoItemRepository:
+    """単品 Repository の統合テスト。"""
+
+    def setup_method(self):
+        self.item_repo = DjangoItemRepository()
+        self.supplier_repo = DjangoSupplierRepository()
+        supplier = Supplier(id=None, name="花卉市場A")
+        self.supplier = self.supplier_repo.save(supplier)
+
+    def test_単品を保存して取得できる(self):
+        item = Item(
+            id=None,
+            name=ItemName("バラ（赤）"),
+            quality_retention_days=QualityRetentionDays(7),
+            purchase_unit=PurchaseUnit(10),
+            lead_time_days=LeadTimeDays(3),
+            supplier_id=self.supplier.id,
+        )
+        saved = self.item_repo.save(item)
+
+        assert saved.id > 0
+        found = self.item_repo.find_by_id(saved.id)
+        assert found is not None
+        assert found.name == ItemName("バラ（赤）")
+        assert found.quality_retention_days == QualityRetentionDays(7)
+        assert found.supplier_id == self.supplier.id
+
+    def test_有効な単品一覧を取得できる(self):
+        item1 = Item(
+            id=None,
+            name=ItemName("バラ（赤）"),
+            quality_retention_days=QualityRetentionDays(7),
+            purchase_unit=PurchaseUnit(10),
+            lead_time_days=LeadTimeDays(3),
+            supplier_id=self.supplier.id,
+        )
+        item2 = Item(
+            id=None,
+            name=ItemName("カスミソウ"),
+            quality_retention_days=QualityRetentionDays(5),
+            purchase_unit=PurchaseUnit(20),
+            lead_time_days=LeadTimeDays(2),
+            supplier_id=self.supplier.id,
+            is_active=False,
+        )
+        self.item_repo.save(item1)
+        self.item_repo.save(item2)
+
+        active_items = self.item_repo.find_active()
+        assert len(active_items) == 1
+        assert active_items[0].name == ItemName("バラ（赤）")
+
+    def test_存在しないIDで取得するとNone(self):
+        assert self.item_repo.find_by_id(9999) is None
+
+
+@pytest.mark.django_db
+class TestDjangoProductRepository:
+    """商品 Repository の統合テスト。"""
+
+    def setup_method(self):
+        self.repo = DjangoProductRepository()
+
+    def test_商品を保存して取得できる(self):
+        product = Product(
+            id=None,
+            name=ProductName("バースデーブーケ"),
+            description="お誕生日用の花束",
+            price=Price(Decimal("5000")),
+            image_url="https://example.com/img.jpg",
+        )
+        saved = self.repo.save(product)
+
+        assert saved.id > 0
+        found = self.repo.find_by_id(saved.id)
+        assert found is not None
+        assert found.name == ProductName("バースデーブーケ")
+        assert found.price == Price(Decimal("5000"))
+        assert found.image_url == "https://example.com/img.jpg"
+
+    def test_有効な商品一覧を取得できる(self):
+        p1 = Product(
+            id=None,
+            name=ProductName("バースデーブーケ"),
+            description="",
+            price=Price(Decimal("5000")),
+        )
+        p2 = Product(
+            id=None,
+            name=ProductName("廃止ブーケ"),
+            description="",
+            price=Price(Decimal("3000")),
+            is_active=False,
+        )
+        self.repo.save(p1)
+        self.repo.save(p2)
+
+        active = self.repo.find_active()
+        assert len(active) == 1
+        assert active[0].name == ProductName("バースデーブーケ")
+
+    def test_商品に構成を追加して保存できる(self):
+        supplier_repo = DjangoSupplierRepository()
+        supplier = supplier_repo.save(Supplier(id=None, name="花卉市場A"))
+        from apps.products.models import Item as ItemModel
+
+        item_obj = ItemModel.objects.create(
+            name="バラ",
+            quality_retention_days=7,
+            purchase_unit=10,
+            lead_time_days=3,
+            supplier_id=supplier.id,
+        )
+        product = Product(
+            id=None,
+            name=ProductName("ブーケ"),
+            description="",
+            price=Price(Decimal("5000")),
+        )
+        saved = self.repo.save(product)
+        saved.add_composition(item_id=item_obj.pk, quantity=5)
+        self.repo.save(saved)
+
+        found = self.repo.find_by_id(saved.id)
+        assert found is not None
+        assert len(found.compositions) == 1
+        assert found.compositions[0].item_id == item_obj.pk
+        assert found.compositions[0].quantity == 5
+        assert found.get_required_items() == {item_obj.pk: 5}
+
+    def test_存在しないIDで取得するとNone(self):
+        assert self.repo.find_by_id(9999) is None

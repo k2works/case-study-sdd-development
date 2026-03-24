@@ -1,0 +1,54 @@
+[project]
+name = "fleur-memoire"
+version = "0.1.0"
+description = "フレール・メモワール WEB ショップシステム"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.2,<6",
+    "djangorestframework>=3.15",
+    "drf-spectacular>=0.27",
+    "psycopg[binary]>=3.2",
+    "gunicorn>=22",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-django>=4.0",
+    "pytest-cov>=6.0",
+    "factory-boy>=3.3",
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "django-stubs>=5.0",
+    "tox>=4.0",
+    "bandit>=1.7",
+    "pip-audit>=2.0",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+testpaths = ["tests", "apps"]
+pythonpath = ["."]
+addopts = "--cov=apps --cov-report=term-missing -v"
+
+[tool.coverage.run]
+source = ["apps"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.",
+]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "config.settings"

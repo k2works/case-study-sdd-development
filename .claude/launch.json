@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "mkdocs",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "npm", "run", "docs:serve"],
+      "port": 8000
+    },
+    {
+      "name": "django",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd", "apps/webshop", "&&", "uv", "run", "python", "manage.py", "runserver", "8080"],
+      "port": 8080
+    },
+    {
+      "name": "sonarqube",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "docker", "compose", "-f", "ops/docker/sonarqube-local/docker-compose.yml", "up", "-d"],
+      "port": 9000
+    }
+  ]
+}

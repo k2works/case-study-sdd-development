@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "case-study-sdd-development",
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
@@ -15,11 +15,12 @@
     "claude:yolo": "claude --dangerously-skip-permissions",
     "copilot:yolo": "copilot --allow-all-tools",
     "codex:yolo": "codex --yolo",
-    "gemini:yolo": "gemini --yolo"
+    "gemini:yolo": "gemini --yolo",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/k2works/{project_name}.git"
+    "url": "git+https://github.com/k2works/case-study-sdd-development.git"
   },
   "keywords": [
     "ai",
@@ -29,13 +30,23 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/k2works/{project_name}/issues"
+    "url": "https://github.com/k2works/case-study-sdd-development/issues"
   },
-  "homepage": "https://github.com/k2works/{project_name}#readme",
+  "homepage": "https://github.com/k2works/case-study-sdd-development#readme",
   "type": "module",
   "dependencies": {
     "@k2works/claude-code-booster": "^2.7.1",
     "dotenv": "^17.2.3",
     "gulp": "^5.0.0"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0"
+  },
+  "lint-staged": {
+    "apps/webshop/**/*.py": [
+      "bash -c 'cd apps/webshop && uv run ruff check --fix'",
+      "bash -c 'cd apps/webshop && uv run ruff format'"
+    ]
   }
 }
