@@ -6,7 +6,7 @@
 
 ### 環境セットアップ
 
-- [アプリケーション開発環境セットアップ手順書](./dev_app_instruction.md) - ローカル開発環境の構築手順
+- [アプリケーション開発環境セットアップ手順書](./app-development-setup.md) - Ruby 3.3 / Rails 7.2 / PostgreSQL 16 のローカル開発環境構築
 
 ### 運用コマンド
 
