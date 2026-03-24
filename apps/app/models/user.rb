@@ -15,3 +15,4 @@ class User < ApplicationRecord
     role == "staff"
   end
 end
+# test comment
