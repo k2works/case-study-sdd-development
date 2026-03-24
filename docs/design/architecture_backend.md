@@ -95,7 +95,7 @@ apps/
 │   ├── domain/         # ドメイン層
 │   │   ├── entities.py       # 商品、単品、商品構成エンティティ
 │   │   ├── value_objects.py  # 品質維持日数、購入単位
-│   │   └── repositories.py  # Repository インターフェース（ABC）
+│   │   └── interfaces.py     # Repository インターフェース（ABC）
 │   ├── services.py     # アプリケーション層
 │   ├── models.py       # インフラ層（Django ORM）
 │   ├── repositories.py # インフラ層（Repository 実装）
@@ -217,6 +217,22 @@ shipping --> orders : 出荷対象参照
 | POST | `/api/shipments/` | 出荷処理 | shipping |
 | POST | `/api/auth/login/` | ログイン | accounts |
 | POST | `/api/auth/register/` | 新規登録 | accounts |
+
+### エンドポイントの種別
+
+| 種別 | パスプレフィックス | レスポンス形式 | 用途 |
+| :--- | :--- | :--- | :--- |
+| REST API | `/api/` | JSON | 将来の外部連携・モバイルアプリ向け |
+| HTMX パーシャル | `/shop/partials/` | HTML フラグメント | 顧客向け画面の部分更新（HTMX） |
+| Django View | `/shop/`, `/admin/` | HTML ページ | 通常のページ遷移 |
+
+HTMX パーシャルエンドポイント:
+
+| メソッド | パス | 説明 |
+| :--- | :--- | :--- |
+| GET | `/shop/partials/available-dates/?product_id=N` | 届け日候補（カレンダー） |
+| GET | `/shop/partials/delivery-addresses/` | 過去の届け先一覧 |
+| GET | `/shop/partials/order-status/{id}/` | 注文ステータス表示 |
 
 ### 認証方式
 

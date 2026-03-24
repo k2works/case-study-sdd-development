@@ -317,6 +317,8 @@ class StockLotStatus <<値オブジェクト>> #E3F2FD {
   + {static} NEAR_EXPIRY
   + {static} EXPIRED
   + {static} DEPLETED
+  + can_transition_to(next): bool
+  + can_allocate(): bool
 }
 
 StockLot *-- ExpiryDate
@@ -329,7 +331,13 @@ StockLot *-- StockLotStatus
 
 - remaining_quantity >= 0
 - remaining_quantity <= quantity
-- expired 状態のロットからは引当不可
+- expired / depleted 状態のロットからは引当不可（`can_allocate()` で判定）
+- ステータス遷移ルール:
+  - AVAILABLE → NEAR_EXPIRY（品質維持期限 2 日前、自動）
+  - AVAILABLE → DEPLETED（remaining_quantity = 0）
+  - NEAR_EXPIRY → EXPIRED（品質維持日数超過、自動）
+  - NEAR_EXPIRY → DEPLETED（remaining_quantity = 0）
+  - 逆遷移（EXPIRED → AVAILABLE 等）は不可
 
 ## ドメインサービス
 
@@ -380,9 +388,14 @@ class DailyForecast <<値オブジェクト>> #E3F2FD {
 StockForecastService ..> DailyForecast : 生成
 
 note right of StockForecastService
-  単品ごとの日別在庫推移を計算する。
-  在庫残 = 前日繰越 + 当日入荷 - 当日出庫 - 当日廃棄
-  受注・入荷登録時にイベント駆動で即時更新。
+  責務境界:
+  - SQL（CTE）による日別集計は Repository 実装に委譲
+  - ドメインサービスは DailyForecast の加工・判定に専念
+  - Repository インターフェース:
+    calculate_forecast(item_id, start, end): list[DailyForecast]
+  テスト戦略:
+  - 単体テスト: インメモリ Repository で日別計算ロジックを網羅
+  - 統合テスト: SQL 実装と Python 実装の結果一致を検証
 end note
 
 @enduml
