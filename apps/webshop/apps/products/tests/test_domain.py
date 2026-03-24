@@ -8,7 +8,7 @@ from decimal import Decimal
 
 import pytest
 
-from apps.products.domain.entities import Item, Product, Supplier
+from apps.products.domain.entities import Composition, Item, Product, Supplier
 from apps.products.domain.value_objects import (
     ItemName,
     LeadTimeDays,
@@ -266,3 +266,63 @@ class TestProduct:
         )
         product.deactivate()
         assert product.is_active is False
+
+    def test_構成を追加できる(self):
+        product = Product(
+            id=1,
+            name=ProductName("バースデーブーケ"),
+            description="",
+            price=Price(Decimal("5000")),
+        )
+        product.add_composition(item_id=1, quantity=5)
+        product.add_composition(item_id=2, quantity=3)
+        assert len(product.compositions) == 2
+
+    def test_同じ単品を重複して追加するとエラー(self):
+        product = Product(
+            id=1,
+            name=ProductName("バースデーブーケ"),
+            description="",
+            price=Price(Decimal("5000")),
+        )
+        product.add_composition(item_id=1, quantity=5)
+        with pytest.raises(ValueError):
+            product.add_composition(item_id=1, quantity=3)
+
+    def test_構成を削除できる(self):
+        product = Product(
+            id=1,
+            name=ProductName("バースデーブーケ"),
+            description="",
+            price=Price(Decimal("5000")),
+        )
+        product.add_composition(item_id=1, quantity=5)
+        product.add_composition(item_id=2, quantity=3)
+        product.remove_composition(item_id=1)
+        assert len(product.compositions) == 1
+
+    def test_必要な単品数量を取得できる(self):
+        product = Product(
+            id=1,
+            name=ProductName("バースデーブーケ"),
+            description="",
+            price=Price(Decimal("5000")),
+        )
+        product.add_composition(item_id=1, quantity=5)
+        product.add_composition(item_id=2, quantity=3)
+        required = product.get_required_items()
+        assert required == {1: 5, 2: 3}
+
+
+class TestComposition:
+    """Composition エンティティのテスト。"""
+
+    def test_構成を生成できる(self):
+        comp = Composition(product_id=1, item_id=2, quantity=5)
+        assert comp.product_id == 1
+        assert comp.item_id == 2
+        assert comp.quantity == 5
+
+    def test_数量が0以下でエラー(self):
+        with pytest.raises(ValueError):
+            Composition(product_id=1, item_id=2, quantity=0)

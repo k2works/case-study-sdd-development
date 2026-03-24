@@ -6,6 +6,7 @@ from rest_framework.permissions import AllowAny
 from apps.products.models import Item, Product, Supplier
 from apps.products.serializers import (
     ItemSerializer,
+    ProductDetailSerializer,
     ProductSerializer,
     SupplierSerializer,
 )
@@ -32,8 +33,15 @@ class ItemViewSet(viewsets.ReadOnlyModelViewSet):
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     """商品の読み取り専用 API（有効な商品のみ、認証不要）。"""
 
-    serializer_class = ProductSerializer
     permission_classes = [AllowAny]
 
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return ProductDetailSerializer
+        return ProductSerializer
+
     def get_queryset(self):
-        return Product.objects.filter(is_active=True).order_by("name")
+        qs = Product.objects.filter(is_active=True).order_by("name")
+        if self.action == "retrieve":
+            qs = qs.prefetch_related("compositions__item__supplier")
+        return qs

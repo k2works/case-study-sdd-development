@@ -6,7 +6,7 @@ DRF ViewSet のリクエスト/レスポンスをテストする。
 import pytest
 from django.test import Client
 
-from apps.products.models import Item, Product, Supplier
+from apps.products.models import Composition, Item, Product, Supplier
 
 
 @pytest.mark.django_db
@@ -117,6 +117,23 @@ class TestProductAPI:
         response = self.client.get("/api/products/")
         assert response.status_code == 200
         assert response.json() == []
+
+    def test_商品詳細に構成花材が含まれる(self):
+        supplier = Supplier.objects.create(name="花卉市場A")
+        item = Item.objects.create(
+            name="バラ（赤）",
+            quality_retention_days=7,
+            purchase_unit=10,
+            lead_time_days=3,
+            supplier=supplier,
+        )
+        Composition.objects.create(product=self.product, item=item, quantity=5)
+        response = self.client.get(f"/api/products/{self.product.pk}/")
+        data = response.json()
+        assert "compositions" in data
+        assert len(data["compositions"]) == 1
+        assert data["compositions"][0]["item"]["name"] == "バラ（赤）"
+        assert data["compositions"][0]["quantity"] == 5
 
     def test_存在しない商品で404(self):
         response = self.client.get("/api/products/9999/")

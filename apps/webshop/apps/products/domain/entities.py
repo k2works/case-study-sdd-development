@@ -57,6 +57,20 @@ class Item:
 
 
 @dataclass
+class Composition:
+    """商品構成エンティティ。花束を構成する単品と数量。"""
+
+    product_id: int
+    item_id: int
+    quantity: int
+
+    def __post_init__(self) -> None:
+        if self.quantity < 1:
+            msg = "数量は1以上です"
+            raise ValueError(msg)
+
+
+@dataclass
 class Product:
     """商品（花束）エンティティ。集約ルート。"""
 
@@ -66,6 +80,24 @@ class Product:
     price: Price
     image_url: str = ""
     is_active: bool = field(default=True)
+    compositions: list[Composition] = field(default_factory=list)
+
+    def add_composition(self, item_id: int, quantity: int) -> None:
+        """構成に単品を追加する。同じ単品の重複は不可。"""
+        if any(c.item_id == item_id for c in self.compositions):
+            msg = f"単品 {item_id} は既に構成に含まれています"
+            raise ValueError(msg)
+        self.compositions.append(
+            Composition(product_id=self.id, item_id=item_id, quantity=quantity)
+        )
+
+    def remove_composition(self, item_id: int) -> None:
+        """構成から単品を削除する。"""
+        self.compositions = [c for c in self.compositions if c.item_id != item_id]
+
+    def get_required_items(self) -> dict[int, int]:
+        """構成単品の必要数量を返す。{item_id: quantity}"""
+        return {c.item_id: c.quantity for c in self.compositions}
 
     def deactivate(self) -> None:
         """商品を無効化する。"""

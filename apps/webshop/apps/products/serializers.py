@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from apps.products.models import Item, Product, Supplier
+from apps.products.models import Composition, Item, Product, Supplier
 
 
 class SupplierSerializer(serializers.ModelSerializer):
@@ -27,6 +27,14 @@ class ItemSerializer(serializers.ModelSerializer):
         ]
 
 
+class CompositionSerializer(serializers.ModelSerializer):
+    item = ItemSerializer(read_only=True)
+
+    class Meta:
+        model = Composition
+        fields = ["id", "item", "quantity"]
+
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -37,4 +45,22 @@ class ProductSerializer(serializers.ModelSerializer):
             "price",
             "image_url",
             "is_active",
+        ]
+
+
+class ProductDetailSerializer(serializers.ModelSerializer):
+    """商品詳細（構成花材含む）。"""
+
+    compositions = CompositionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Product
+        fields = [
+            "id",
+            "name",
+            "description",
+            "price",
+            "image_url",
+            "is_active",
+            "compositions",
         ]

@@ -67,3 +67,35 @@ class Product(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class Composition(models.Model):
+    """商品構成（花束の単品と数量）モデル。"""
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="compositions",
+        verbose_name="商品",
+    )
+    item = models.ForeignKey(
+        Item,
+        on_delete=models.PROTECT,
+        related_name="compositions",
+        verbose_name="単品",
+    )
+    quantity = models.PositiveIntegerField("数量")
+
+    class Meta:
+        db_table = "products_composition"
+        verbose_name = "商品構成"
+        verbose_name_plural = "商品構成"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product", "item"],
+                name="unique_product_item",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.product.name} - {self.item.name} x{self.quantity}"

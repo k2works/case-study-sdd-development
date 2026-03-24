@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from apps.products.models import Item, Product, Supplier
+from apps.products.models import Composition, Item, Product, Supplier
 
 
 @admin.register(Supplier)
@@ -26,8 +26,14 @@ class ItemAdmin(admin.ModelAdmin):
     search_fields = ("name",)
 
 
+class CompositionInline(admin.TabularInline):
+    model = Composition
+    extra = 1
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "price", "is_active", "created_at")
     list_filter = ("is_active",)
     search_fields = ("name",)
+    inlines = [CompositionInline]
