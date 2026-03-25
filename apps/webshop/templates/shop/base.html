@@ -20,8 +20,13 @@
           <a href="{% url 'shop:product_list' %}" class="text-gray-600 hover:text-pink-600 transition">商品一覧</a>
           <a href="{% url 'shop:order_history' %}" class="text-gray-600 hover:text-pink-600 transition">注文履歴</a>
           <a href="{% url 'shop:order_cancel' %}" class="text-gray-600 hover:text-pink-600 transition">注文キャンセル</a>
-          <a href="{% url 'staff_orders:order_list' %}" class="text-gray-600 hover:text-pink-600 transition">受注管理</a>
-          <a href="{% url 'inventory:stock_forecast' %}" class="text-gray-600 hover:text-pink-600 transition">在庫推移</a>
+          <span class="border-l border-gray-300"></span>
+          <a href="{% url 'staff_orders:order_list' %}" class="text-gray-600 hover:text-indigo-600 transition">受注管理</a>
+          <a href="{% url 'purchasing:order_list' %}" class="text-gray-600 hover:text-indigo-600 transition">発注管理</a>
+          <a href="{% url 'purchasing:expiry_alert' %}" class="text-gray-600 hover:text-indigo-600 transition">品質アラート</a>
+          <a href="{% url 'shipping:bundling_list' %}" class="text-gray-600 hover:text-indigo-600 transition">結束一覧</a>
+          <a href="{% url 'shipping:shipment_list' %}" class="text-gray-600 hover:text-indigo-600 transition">出荷管理</a>
+          <a href="{% url 'inventory:stock_forecast' %}" class="text-gray-600 hover:text-indigo-600 transition">在庫推移</a>
         </nav>
       </div>
     </div>
