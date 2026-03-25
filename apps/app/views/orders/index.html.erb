@@ -7,7 +7,7 @@
   </div>
   <div class="col-auto">
     <%= form.label :status, "状態", class: "form-label" %>
-    <%= form.select :status, options_for_select(Order::STATUSES.map { |s| [I18n.t("order.status.#{s}", default: s), s] }, params[:status]), { include_blank: "すべて" }, class: "form-select" %>
+    <%= form.select :status, options_for_select(Order.statuses.keys.map { |s| [I18n.t("order.status.#{s}", default: s), s] }, params[:status]), { include_blank: "すべて" }, class: "form-select" %>
   </div>
   <div class="col-auto align-self-end">
     <%= form.submit "検索", class: "btn btn-outline-primary" %>
