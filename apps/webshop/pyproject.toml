@@ -30,7 +30,7 @@ dev = [
 DJANGO_SETTINGS_MODULE = "config.settings"
 testpaths = ["tests", "apps"]
 pythonpath = ["."]
-addopts = "--cov=apps --cov-report=term-missing -v"
+addopts = "--cov=apps --cov-report=term-missing --cov-report=xml:coverage.xml -v"
 
 [tool.coverage.run]
 source = ["apps"]

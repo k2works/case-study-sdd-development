@@ -5,7 +5,12 @@
       "label": "Webshop Backend",
       "projectKey": "fleur-memoire-backend",
       "scanType": "sonar-scanner",
-      "srcDir": "apps/webshop"
+      "srcDir": "apps/webshop",
+      "sources": "apps,config",
+      "tests": "apps,tests",
+      "testInclusions": "**/tests/**,**/test_*.py",
+      "exclusions": "**/migrations/**,**/__pycache__/**,**/manage.py,**/management/commands/seed.py",
+      "coverageReportPaths": "coverage.xml"
     }
   ]
 }

@@ -299,15 +299,34 @@ function runScan(project, token, hostUrl) {
 
     case 'sonar-scanner':
     default:
-      execSync(
-        `npx sonarqube-scanner ` +
-        `-Dsonar.projectKey=${project.projectKey} ` +
-        `-Dsonar.projectName="${project.label}" ` +
-        `-Dsonar.sources=src ` +
-        `-Dsonar.tests=src ` +
-        `-Dsonar.test.inclusions="**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx" ` +
-        `-Dsonar.host.url=${hostUrl} ` +
+      // プロジェクトごとにソース/テスト定義を上書き可能にする
+      const sources = project.sources || 'src';
+      const tests = project.tests || 'src';
+      const testInclusions =
+        project.testInclusions || '**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx';
+      const exclusions = project.exclusions;
+      const coverageReportPaths = project.coverageReportPaths;
+
+      const scannerArgs = [
+        'npx sonarqube-scanner',
+        `-Dsonar.projectKey=${project.projectKey}`,
+        `-Dsonar.projectName="${project.label}"`,
+        `-Dsonar.sources=${sources}`,
+        `-Dsonar.tests=${tests}`,
+        `-Dsonar.test.inclusions="${testInclusions}"`,
+        `-Dsonar.host.url=${hostUrl}`,
         `-Dsonar.token=${token}`,
+      ];
+
+      if (exclusions) {
+        scannerArgs.push(`-Dsonar.exclusions="${exclusions}"`);
+      }
+      if (coverageReportPaths) {
+        scannerArgs.push(`-Dsonar.python.coverage.reportPaths=${coverageReportPaths}`);
+      }
+
+      execSync(
+        scannerArgs.join(' '),
         { stdio: 'inherit', cwd, env: cleanDockerEnv() },
       );
       break;
