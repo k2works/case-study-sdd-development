@@ -23,7 +23,7 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(",")
 
 CSRF_TRUSTED_ORIGINS = os.environ.get(
     "DJANGO_CSRF_TRUSTED_ORIGINS",
-    "http://localhost:8001,http://127.0.0.1:8001",
+    "http://localhost:8001,http://127.0.0.1:8001,https://localhost:8001,https://127.0.0.1:8001",
 ).split(",")
 
 INTERNAL_IPS = ["127.0.0.1", "localhost"]
