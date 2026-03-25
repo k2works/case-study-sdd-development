@@ -66,7 +66,13 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
+  <% if ENV.fetch("DATABASE_ADAPTER", "postgresql") == "sqlite3" %>
+  adapter: sqlite3
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  database: db/data/production.sqlite3
+  <% else %>
   <<: *default
   database: app_production
   username: app
   password: <%= ENV["APP_DATABASE_PASSWORD"] %>
+  <% end %>

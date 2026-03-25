@@ -7,6 +7,7 @@
 ### 環境セットアップ
 
 - [アプリケーション開発環境セットアップ手順書](./app-development-setup.md) - Ruby 3.3 / Rails 7.2 / PostgreSQL 16 のローカル開発環境構築
+- [開発環境セットアップ手順書](./dev-environment-setup.md) - Heroku コンテナデプロイ（デモ用・SQLite）
 
 ### 運用コマンド
 
