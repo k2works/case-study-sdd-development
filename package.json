@@ -12,6 +12,7 @@
     "vault:decrypt": "gulp vault:decrypt",
     "vault:view": "gulp vault:view",
     "vault:rekey": "gulp vault:rekey",
+    "dev:setup": "gulp dev:setup",
     "dev:test": "gulp dev:test",
     "dev:check": "gulp dev:check",
     "dev:server": "gulp dev:server",

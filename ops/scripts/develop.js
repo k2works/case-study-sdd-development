@@ -10,6 +10,7 @@ import { cleanDockerEnv, isDockerAvailable, openUrl } from './shared.js';
 
 const APPS_DIR = path.resolve('apps');
 const POSTGRES_DIR = path.resolve('ops/docker/postgres');
+const NIX_RUBY_SHELL = path.resolve('ops/nix/environments/ruby/shell.nix');
 const POSTGRES_CONTAINER = 'frere-memoire-postgres';
 const RAILS_PORT = 3000;
 
@@ -26,6 +27,76 @@ const RAILS_PORT = 3000;
 function execInApps(command, options = {}) {
   const defaults = { cwd: APPS_DIR, stdio: 'inherit', env: cleanDockerEnv() };
   return execSync(command, { ...defaults, ...options });
+}
+
+/**
+ * rbenv が利用可能か確認する
+ * @returns {boolean}
+ */
+function isRbenvAvailable() {
+  try {
+    execSync('rbenv --version', { stdio: 'pipe' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * nix-shell が利用可能か確認する
+ * @returns {boolean}
+ */
+function isNixAvailable() {
+  try {
+    execSync('nix-shell --version', { stdio: 'pipe' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Ruby 環境に応じたコマンドラッパーを返す
+ * rbenv があればそのまま実行、なければ nix-shell 経由で実行する
+ * @param {string} command - 実行するコマンド
+ * @param {object} [options] - execSync オプション
+ * @returns {string} ラップされたコマンド
+ */
+function rubyCommand(command) {
+  if (isRbenvAvailable()) {
+    return command;
+  }
+  if (isNixAvailable()) {
+    return `nix-shell ${NIX_RUBY_SHELL} --run "${command.replace(/"/g, '\\"')}"`;
+  }
+  console.error('エラー: rbenv も nix も見つかりません。いずれかをインストールしてください。');
+  process.exit(1);
+}
+
+/**
+ * Ruby 環境をセットアップする（rbenv または nix）
+ */
+function setupRubyEnvironment() {
+  if (isRbenvAvailable()) {
+    console.log('Ruby 環境: rbenv を使用します');
+    const rubyVersion = execSync('cat .ruby-version', { cwd: APPS_DIR, stdio: 'pipe' }).toString().trim();
+    console.log(`  必要な Ruby バージョン: ${rubyVersion}`);
+    try {
+      execSync(`rbenv versions --bare | grep -q "^${rubyVersion}$"`, { stdio: 'pipe' });
+      console.log(`  Ruby ${rubyVersion} はインストール済みです`);
+    } catch {
+      console.log(`  Ruby ${rubyVersion} をインストールしています...`);
+      execSync(`rbenv install ${rubyVersion}`, { stdio: 'inherit' });
+    }
+    execSync('rbenv rehash', { stdio: 'inherit' });
+  } else if (isNixAvailable()) {
+    console.log('Ruby 環境: nix を使用します');
+    console.log('  nix-shell で Ruby 環境を確認しています...');
+    execSync(`nix-shell ${NIX_RUBY_SHELL} --run "ruby --version"`, { stdio: 'inherit' });
+  } else {
+    console.error('エラー: rbenv も nix も見つかりません。いずれかをインストールしてください。');
+    process.exit(1);
+  }
 }
 
 /**
@@ -119,6 +190,27 @@ export default function(gulp) {
     done();
   }));
 
+  // --- セットアップタスク ---
+
+  gulp.task('dev:setup', gulp.series((done) => {
+    console.log('=== 開発環境セットアップ ===\n');
+
+    // 1. Ruby 環境
+    console.log('-- Ruby 環境 --');
+    setupRubyEnvironment();
+
+    // 2. Bundle install
+    console.log('\n-- 依存パッケージ --');
+    const bundleCmd = rubyCommand('bundle install');
+    execSync(bundleCmd, { cwd: APPS_DIR, stdio: 'inherit' });
+
+    done();
+  }, 'dev:db:setup', (done) => {
+    console.log('\n=== セットアップ完了 ===');
+    console.log('  npx gulp dev:server  でサーバーを起動できます');
+    done();
+  }));
+
   // --- テストタスク ---
 
   gulp.task('dev:test', (done) => {
@@ -171,6 +263,8 @@ export default function(gulp) {
   gulp.task('dev:help', (done) => {
     console.log(`
 === アプリケーション開発コマンド ===
+
+  dev:setup               開発環境セットアップ（Ruby + bundle + DB）
 
   dev:db:start            PostgreSQL を起動
   dev:db:stop             PostgreSQL を停止
