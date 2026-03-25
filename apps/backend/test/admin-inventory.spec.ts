@@ -31,6 +31,7 @@ describe("GET /admin/inventory-projections", () => {
       dates: ["2026-04-10", "2026-04-11", "2026-04-12"],
       items: [
         {
+          materialId: "MAT-001",
           materialName: "バラ赤",
           projections: [
             { date: "2026-04-10", projectedQuantity: 12 },
@@ -39,6 +40,7 @@ describe("GET /admin/inventory-projections", () => {
           ],
         },
         {
+          materialId: "MAT-002",
           materialName: "カスミソウ",
           projections: [
             { date: "2026-04-10", projectedQuantity: 6 },

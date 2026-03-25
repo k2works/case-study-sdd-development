@@ -7,7 +7,7 @@ describe("AdminPage", () => {
   beforeEach(() => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockImplementation((input: RequestInfo | URL) => {
+      vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
         const url = String(input);
 
         if (url.endsWith("/admin/orders/ORD-1001")) {
@@ -34,6 +34,7 @@ describe("AdminPage", () => {
               dates: ["2026-04-10", "2026-04-11", "2026-04-12"],
               items: [
                 {
+                  materialId: "MAT-001",
                   materialName: "バラ赤",
                   projections: [
                     { date: "2026-04-10", projectedQuantity: 12 },
@@ -42,6 +43,7 @@ describe("AdminPage", () => {
                   ],
                 },
                 {
+                  materialId: "MAT-002",
                   materialName: "カスミソウ",
                   projections: [
                     { date: "2026-04-10", projectedQuantity: 6 },
@@ -51,6 +53,65 @@ describe("AdminPage", () => {
                 },
               ],
             }),
+          });
+        }
+
+        if (url.endsWith("/admin/materials") && init?.method === "POST") {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              materialId: "MAT-001",
+              materialName: "バラ赤 特選",
+              shelfLifeDays: 5,
+              purchaseUnit: 10,
+              leadTimeDays: 2,
+              supplierName: "東京フラワー商事",
+            }),
+          });
+        }
+
+        if (url.endsWith("/admin/materials")) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              {
+                materialId: "MAT-001",
+                materialName: "バラ赤",
+                shelfLifeDays: 5,
+                purchaseUnit: 10,
+                leadTimeDays: 2,
+                supplierName: "東京フラワー商事",
+              },
+              {
+                materialId: "MAT-002",
+                materialName: "カスミソウ",
+                shelfLifeDays: 4,
+                purchaseUnit: 6,
+                leadTimeDays: 1,
+                supplierName: "関東グリーンサプライ",
+              },
+            ],
+          });
+        }
+
+        if (url.includes("/admin/purchase-orders/candidates")) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              {
+                supplierName: "東京フラワー商事",
+                items: [
+                  {
+                    materialId: "MAT-001",
+                    materialName: "バラ赤",
+                    shortageDate: "2026-04-11",
+                    shortageQuantity: 2,
+                    suggestedQuantity: 10,
+                    purchaseUnit: 10,
+                  },
+                ],
+              },
+            ],
           });
         }
 
@@ -145,6 +206,16 @@ describe("AdminPage", () => {
     expect(screen.getByText("-2")).toBeInTheDocument();
   });
 
+  it("在庫管理から発注管理へ主導線で移動できる", async () => {
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "在庫管理" }));
+    fireEvent.click(await screen.findByRole("button", { name: "発注候補を確認する" }));
+
+    expect(await screen.findByRole("heading", { level: 1, name: "発注管理" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "発注管理" })).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("不足見込みと廃棄注意を識別表示する", async () => {
     render(<AdminPage />);
 
@@ -166,6 +237,278 @@ describe("AdminPage", () => {
     await waitFor(() => {
       expect(screen.getByText("開始日は終了日以前で指定してください。")).toBeInTheDocument();
     });
+  });
+
+  it("花材一覧から編集内容を保存できる", async () => {
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "花材管理" }));
+
+    expect(await screen.findByRole("heading", { level: 1, name: "花材管理" })).toBeInTheDocument();
+    expect(screen.getByText("バラ赤")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "バラ赤 を編集" }));
+    fireEvent.change(screen.getByLabelText("花材名"), {
+      target: { value: "バラ赤 特選" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "花材を保存する" }));
+
+    expect(await screen.findByText("花材を保存しました。")).toBeInTheDocument();
+  });
+
+  it("仕入先別の発注候補を確認して確定できる", async () => {
+    const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+
+      if (url.endsWith("/admin/materials")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [],
+        });
+      }
+
+      if (url.includes("/admin/purchase-orders/candidates")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [
+            {
+              supplierName: "東京フラワー商事",
+              items: [
+                {
+                  materialId: "MAT-001",
+                  materialName: "バラ赤",
+                  shortageDate: "2026-04-11",
+                  shortageQuantity: 2,
+                  suggestedQuantity: 10,
+                  purchaseUnit: 10,
+                },
+              ],
+            },
+          ],
+        });
+      }
+
+      if (url.endsWith("/admin/purchase-orders") && init?.method === "POST") {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            purchaseOrderId: "PO-0001",
+            status: "送信待ち",
+          }),
+        });
+      }
+
+      if (url.includes("/admin/inventory-projections")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            startDate: "2026-04-10",
+            endDate: "2026-04-12",
+            dates: ["2026-04-10", "2026-04-11", "2026-04-12"],
+            items: [],
+          }),
+        });
+      }
+
+      return Promise.resolve({
+        ok: true,
+        json: async () => [],
+      });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "発注管理" }));
+
+    expect(await screen.findByRole("heading", { level: 1, name: "発注管理" })).toBeInTheDocument();
+    expect(screen.getByText("東京フラワー商事")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("10")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "発注を確定する" }));
+
+    expect(await screen.findByText("発注を登録しました。状態: 送信待ち")).toBeInTheDocument();
+  });
+
+  it("花材保存の通信例外を画面で案内する", async () => {
+    const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+
+      if (url.endsWith("/admin/materials") && init?.method === "POST") {
+        return Promise.reject(new TypeError("Failed to fetch"));
+      }
+
+      if (url.endsWith("/admin/materials")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [
+            {
+              materialId: "MAT-001",
+              materialName: "バラ赤",
+              shelfLifeDays: 5,
+              purchaseUnit: 10,
+              leadTimeDays: 2,
+              supplierName: "東京フラワー商事",
+            },
+          ],
+        });
+      }
+
+      if (url.includes("/admin/inventory-projections")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            startDate: "2026-04-10",
+            endDate: "2026-04-12",
+            dates: ["2026-04-10", "2026-04-11", "2026-04-12"],
+            items: [],
+          }),
+        });
+      }
+
+      return Promise.resolve({
+        ok: true,
+        json: async () => [],
+      });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "花材管理" }));
+    fireEvent.click(await screen.findByRole("button", { name: "バラ赤 を編集" }));
+    fireEvent.click(screen.getByRole("button", { name: "花材を保存する" }));
+
+    expect(await screen.findByText("花材を保存できませんでした。")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "再試行" })).toBeInTheDocument();
+  });
+
+  it("発注確定の通信例外を画面で案内する", async () => {
+    const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+
+      if (url.includes("/admin/purchase-orders/candidates")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [
+            {
+              supplierName: "東京フラワー商事",
+              items: [
+                {
+                  materialId: "MAT-001",
+                  materialName: "バラ赤",
+                  shortageDate: "2026-04-11",
+                  shortageQuantity: 2,
+                  suggestedQuantity: 10,
+                  purchaseUnit: 10,
+                },
+              ],
+            },
+          ],
+        });
+      }
+
+      if (url.endsWith("/admin/purchase-orders") && init?.method === "POST") {
+        return Promise.reject(new TypeError("Failed to fetch"));
+      }
+
+      if (url.includes("/admin/inventory-projections")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            startDate: "2026-04-10",
+            endDate: "2026-04-12",
+            dates: ["2026-04-10", "2026-04-11", "2026-04-12"],
+            items: [],
+          }),
+        });
+      }
+
+      return Promise.resolve({
+        ok: true,
+        json: async () => [],
+      });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "発注管理" }));
+    fireEvent.click(await screen.findByRole("button", { name: "発注を確定する" }));
+
+    expect((await screen.findAllByText("発注を登録できませんでした。")).length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { name: "再試行" })).toBeInTheDocument();
+  });
+});
+
+describe("AdminPage loading state", () => {
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
+
+  it("各ワークベンチの読み込み中を表示できる", async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation((input: RequestInfo | URL) => {
+        const url = String(input);
+
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            if (url.includes("/admin/inventory-projections")) {
+              resolve({
+                ok: true,
+                json: async () => ({
+                  startDate: "2026-04-10",
+                  endDate: "2026-04-12",
+                  dates: ["2026-04-10"],
+                  items: [],
+                }),
+              });
+              return;
+            }
+
+            if (url.endsWith("/admin/materials")) {
+              resolve({
+                ok: true,
+                json: async () => [],
+              });
+              return;
+            }
+
+            if (url.includes("/admin/purchase-orders/candidates")) {
+              resolve({
+                ok: true,
+                json: async () => [],
+              });
+              return;
+            }
+
+            resolve({
+              ok: true,
+              json: async () => [],
+            });
+          }, 50);
+        });
+      }),
+    );
+
+    render(<AdminPage />);
+
+    expect(screen.getByText("受注一覧を読み込んでいます。")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "在庫管理" }));
+    expect(screen.getByText("在庫推移を読み込んでいます。")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "花材管理" }));
+    expect(screen.getByText("花材一覧を読み込んでいます。")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "発注管理" }));
+    expect(screen.getByText("発注候補を読み込んでいます。")).toBeInTheDocument();
+
+    await vi.runAllTimersAsync();
+    vi.useRealTimers();
   });
 });
 
