@@ -5,7 +5,11 @@
       "label": "フレール・メモワール WEB ショップ",
       "projectKey": "frere-memoire-webshop",
       "scanType": "sonar-scanner",
-      "srcDir": "apps"
+      "srcDir": "apps",
+      "sources": "app,lib",
+      "tests": "spec",
+      "testInclusions": "**/*_spec.rb",
+      "rubyCoverageReportPaths": "coverage/coverage.json"
     }
   ]
 }

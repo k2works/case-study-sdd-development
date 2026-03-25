@@ -12,7 +12,7 @@
   <h2>届け先</h2>
   <% if @past_addresses.any? %>
     <div class="mb-3">
-      <label class="form-label">過去の届け先からコピー</label>
+      <label class="form-label" for="past_address_select">過去の届け先からコピー</label>
       <select class="form-select" id="past_address_select" data-controller="address-copy" data-action="change->address-copy#copy">
         <option value="">選択してください</option>
         <% @past_addresses.each do |addr| %>

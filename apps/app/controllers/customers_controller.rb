@@ -8,6 +8,7 @@ class CustomersController < ApplicationController
   end
 
   def edit
+    # 編集フォーム表示のみを行うため、処理は view に委譲する
   end
 
   def update

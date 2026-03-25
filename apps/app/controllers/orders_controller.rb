@@ -10,6 +10,7 @@ class OrdersController < ApplicationController
   end
 
   def show
+    # 詳細表示のみを行うため、処理は view に委譲する
   end
 
   def update

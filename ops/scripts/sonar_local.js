@@ -266,6 +266,11 @@ function requireSonarToken() {
  */
 function runScan(project, token, hostUrl) {
   const cwd = path.join(process.cwd(), project.srcDir);
+  const sources = project.sources || 'src';
+  const tests = project.tests || 'src';
+  const testInclusions =
+    project.testInclusions || '**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx';
+  const rubyCoverageReportPaths = project.rubyCoverageReportPaths || 'coverage/coverage.json';
 
   switch (project.scanType) {
     case 'sbt':
@@ -303,9 +308,10 @@ function runScan(project, token, hostUrl) {
         `npx sonarqube-scanner ` +
         `-Dsonar.projectKey=${project.projectKey} ` +
         `-Dsonar.projectName="${project.label}" ` +
-        `-Dsonar.sources=src ` +
-        `-Dsonar.tests=src ` +
-        `-Dsonar.test.inclusions="**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx" ` +
+        `-Dsonar.sources=${sources} ` +
+        `-Dsonar.tests=${tests} ` +
+        `-Dsonar.test.inclusions="${testInclusions}" ` +
+        `-Dsonar.ruby.coverage.reportPaths=${rubyCoverageReportPaths} ` +
         `-Dsonar.host.url=${hostUrl} ` +
         `-Dsonar.token=${token}`,
         { stdio: 'inherit', cwd, env: cleanDockerEnv() },

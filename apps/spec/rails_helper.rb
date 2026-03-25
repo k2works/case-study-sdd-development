@@ -1,5 +1,12 @@
 # SimpleCov must be started before any application code is loaded
 require 'simplecov'
+require 'simplecov_json_formatter'
+
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
+  SimpleCov::Formatter::HTMLFormatter,
+  SimpleCov::Formatter::JSONFormatter
+])
+
 SimpleCov.start 'rails' do
   minimum_coverage 80
 end
