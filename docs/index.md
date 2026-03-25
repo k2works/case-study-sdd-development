@@ -53,12 +53,13 @@
 | [IT2 UI/UX レビュー](./review/it2_uiux_review_20260324.md) | 2026-03-24 |
 | [IT3 開発前コードレビュー](./review/it3_pre_code_review_20260324.md) | 2026-03-24 |
 | [IT3 開発前 UI/UX レビュー](./review/it3_pre_uiux_review_20260324.md) | 2026-03-24 |
+| [IT4 コードレビュー](./review/it4_code_review_20260324.md) | 2026-03-24 |
 
 ### 開発 (`development/`)
 
 | ドキュメント | 状態 |
 | :--- | :--- |
-| [リリース計画](./development/release_plan.md) | 作成済み |
+| [リリース計画](./development/release_plan.md) | 更新済み |
 | [イテレーション 1 計画](./development/iteration_plan-1.md) | 完了 |
 | [イテレーション 1 ふりかえり](./development/retrospective-1.md) | 完了 |
 | [イテレーション 1 完了報告書](./development/iteration_report-1.md) | 完了 |
@@ -68,7 +69,11 @@
 | [イテレーション 3 計画](./development/iteration_plan-3.md) | 完了 |
 | [イテレーション 3 ふりかえり](./development/retrospective-3.md) | 完了 |
 | [イテレーション 3 完了報告書](./development/iteration_report-3.md) | 完了 |
-| [イテレーション 4 計画](./development/iteration_plan-4.md) | 進行中 |
+| [イテレーション 4 計画](./development/iteration_plan-4.md) | 完了 |
+| [イテレーション 4 ふりかえり](./development/retrospective-4.md) | 完了 |
+| [イテレーション 4 完了報告書](./development/iteration_report-4.md) | 完了 |
+| [イテレーション 5 計画](./development/iteration_plan-5.md) | 完了 |
+| [イテレーション 6 計画](./development/iteration_plan-6.md) | 完了 |
 
 ### 運用 (`operation/`)
 
@@ -128,4 +133,9 @@
 - [イテレーション計画](./template/イテレーション計画.md)
 - [イテレーション完了報告書](./template/イテレーション完了報告書.md)
 - [リリース計画](./template/リリース計画.md)
+- [リリース完了報告書](./template/リリース完了報告書.md)
+- [アプリケーション開発環境セットアップ手順書](./template/アプリケーション開発環境セットアップ手順書.md)
+- [開発環境セットアップ手順書](./template/開発環境セットアップ手順書.md)
+- [AWS ステージング環境セットアップ手順書](./template/AWSステージング環境セットアップ手順書.md)
+- [AWS プロダクション環境セットアップ手順書](./template/AWSプロダクション環境セットアップ手順書.md)
 - [README](./template/README.md)
