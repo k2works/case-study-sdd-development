@@ -7,7 +7,6 @@
 from datetime import date, timedelta
 from decimal import Decimal
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
@@ -147,7 +146,9 @@ class Command(BaseCommand):
         )
         Composition.objects.create(product=bouquet_cheerful, item=gerbera, quantity=4)
         Composition.objects.create(product=bouquet_cheerful, item=carnation, quantity=3)
-        Composition.objects.create(product=bouquet_cheerful, item=baby_breath, quantity=2)
+        Composition.objects.create(
+            product=bouquet_cheerful, item=baby_breath, quantity=2
+        )
 
         bouquet_seasonal = Product.objects.create(
             name="季節のおまかせ花束",
