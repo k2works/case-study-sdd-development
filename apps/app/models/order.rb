@@ -30,12 +30,12 @@ class Order < ApplicationRecord
   end
 
   def cancel!
-    raise NotModifiableError, "受注済み以外の注文はキャンセルできません" unless ordered?
+    raise NotModifiableError, "受注済み以外の注文はキャンセルできません" unless cancellable?
     cancelled!
   end
 
   def change_delivery_date!(new_date)
-    raise NotModifiableError, "受注済み以外の注文は届け日を変更できません" unless ordered?
+    raise NotModifiableError, "受注済み以外の注文は届け日を変更できません" unless cancellable?
     raise InvalidDateError, "届け日は未来日を指定してください" if new_date <= Date.current
     update!(delivery_date: new_date)
   end

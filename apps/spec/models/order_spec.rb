@@ -115,6 +115,11 @@ RSpec.describe Order, type: :model do
       order = create(:order, status: :shipped)
       expect { order.cancel! }.to raise_error(Order::NotModifiableError)
     end
+
+    it "cancelled 状態からはキャンセルできない" do
+      order = create(:order, status: :cancelled)
+      expect { order.cancel! }.to raise_error(Order::NotModifiableError)
+    end
   end
 
   describe "#change_delivery_date!" do

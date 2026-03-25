@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe OrderService, type: :service do
-  let(:service) { OrderService.new(current_date: Date.new(2026, 4, 1)) }
+  let(:service) { OrderService.new }
   let(:customer) { create(:customer) }
   let(:product) { create(:product) }
   let(:delivery_address) { create(:delivery_address, customer: customer) }
@@ -65,9 +65,13 @@ RSpec.describe OrderService, type: :service do
       }.to raise_error(Order::NotModifiableError)
     end
 
-    it "キャンセル後の注文は在庫推移の引当対象から外れる" do
-      service.cancel(order: ordered_order)
-      expect(ordered_order.reload.status).to eq("cancelled")
+    it "cancelled 状態の注文はキャンセル不可" do
+      cancelled_order = create(:order, customer: customer, product: product,
+                               delivery_address: delivery_address, status: :cancelled,
+                               delivery_date: Date.new(2026, 4, 15))
+      expect {
+        service.cancel(order: cancelled_order)
+      }.to raise_error(Order::NotModifiableError)
     end
   end
 end

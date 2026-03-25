@@ -4,7 +4,7 @@ class CustomersController < ApplicationController
   before_action :set_customer, only: [ :edit, :update ]
 
   def index
-    @customers = Customer.includes(:user).order(:name)
+    @customers = Customer.includes(:user, :orders).order(:name)
   end
 
   def edit

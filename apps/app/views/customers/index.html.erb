@@ -20,7 +20,7 @@
                 <td><%= customer.id %></td>
                 <td><%= customer.name %></td>
                 <td><%= customer.phone || "-" %></td>
-                <td><%= customer.orders.count %></td>
+                <td><%= customer.orders.size %></td>
                 <td><%= link_to "編集", edit_customer_path(customer), class: "btn btn-sm btn-outline-primary" %></td>
               </tr>
             <% end %>
