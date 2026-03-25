@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 
+from django.db import transaction
+
 from apps.inventory.domain.entities import StockLot
 from apps.inventory.domain.interfaces import StockLotRepository
 from apps.inventory.domain.value_objects import ExpiryDate, StockLotStatus
@@ -62,6 +64,7 @@ class PurchasingService:
         )
         return self._po_repo.save(po)
 
+    @transaction.atomic
     def receive_arrival(self, command: ReceiveArrivalCommand) -> Arrival:
         """入荷を受け入れ、在庫ロットを作成する。"""
         po = self._po_repo.find_by_id(command.purchase_order_id)

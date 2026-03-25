@@ -22,12 +22,22 @@ class PurchaseOrder:
     expected_arrival_date: date
     status: PurchaseOrderStatus
     ordered_at: datetime
+    _skip_validation: bool = False
 
     def __post_init__(self):
+        if self._skip_validation:
+            return
         if self.quantity < 1:
             raise ValueError("発注数量は 1 以上にしてください")
         if self.expected_arrival_date <= date.today():
             raise ValueError("入荷予定日は未来の日付を指定してください")
+
+    @classmethod
+    def reconstruct(cls, **kwargs) -> PurchaseOrder:
+        """DB から復元する際にバリデーションをスキップして生成する。"""
+        po = cls(**kwargs, _skip_validation=True)
+        object.__setattr__(po, "_skip_validation", False)
+        return po
 
     def receive(self) -> None:
         """入荷済みに遷移する。"""

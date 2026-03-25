@@ -364,17 +364,28 @@ class TestOrderServiceChangeDeliveryDate:
                 999, date.today() + timedelta(days=14)
             )
 
-    def test_変更期限超過でエラー(self):
+    def test_変更期限ギリギリで変更できる(self):
         repo = FakeOrderRepository()
         service = OrderService(order_repo=repo)
-        # 届け日が3日後 → 変更期限は今日 → 明日以降はNG
+        # 届け日が3日後 → 変更期限は今日 → 今日はまだ変更可能
         order = service.place_order(
             self._make_command(
                 delivery_date=date.today() + timedelta(days=3)
             )
         )
-        # change_delivery_date は内部で date.today() を使うので
-        # 期限内であれば変更可能（3日前まで＝今日がギリギリ）
         new_date = date.today() + timedelta(days=14)
         updated = service.change_delivery_date(order.id, new_date)
         assert updated.delivery_date.value == new_date
+
+    def test_変更期限超過でエラー(self):
+        repo = FakeOrderRepository()
+        service = OrderService(order_repo=repo)
+        # 届け日が2日後 → 変更期限は昨日 → 今日は変更不可
+        order = service.place_order(
+            self._make_command(
+                delivery_date=date.today() + timedelta(days=2)
+            )
+        )
+        new_date = date.today() + timedelta(days=14)
+        with pytest.raises(ValueError, match="変更期限を過ぎています"):
+            service.change_delivery_date(order.id, new_date)

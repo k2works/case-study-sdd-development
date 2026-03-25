@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import logging
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
+
+from django.utils import timezone
 
 from apps.orders.domain.interfaces import OrderRepository
 from apps.products.models import Composition
@@ -94,7 +96,7 @@ class ShippingService:
         self._order_repo.save(order)
 
         # 出荷記録を作成
-        now = datetime.now()
+        now = timezone.now()
         shipment = Shipment(
             id=None,
             order_id=order.id,

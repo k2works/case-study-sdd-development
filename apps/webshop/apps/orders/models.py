@@ -15,6 +15,8 @@ class Order(models.Model):
         choices=[
             ("pending", "保留中"),
             ("confirmed", "確定"),
+            ("preparing", "出荷準備中"),
+            ("shipped", "出荷済み"),
             ("cancelled", "キャンセル"),
         ],
         default="pending",

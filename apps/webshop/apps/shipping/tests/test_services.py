@@ -172,6 +172,54 @@ class TestShippingServiceShipOrder:
         with pytest.raises(ValueError, match="注文が見つかりません"):
             self.service.ship_order(999)
 
+    def test_出荷済み注文を再出荷するとエラー(self):
+        order = self._create_confirmed_order()
+        self.service.ship_order(order.pk)
+        with pytest.raises(ValueError):
+            self.service.ship_order(order.pk)
+
+    def test_キャンセル済み注文を出荷するとエラー(self):
+        order = OrderModel.objects.create(
+            order_number="ORD-SHIP-CAN",
+            delivery_date=date.today() + timedelta(days=1),
+            status="cancelled",
+            recipient_name="山田太郎",
+            postal_code="100-0001",
+            address="東京都千代田区",
+            phone="03-1234-5678",
+            message="テスト",
+        )
+        OrderLineModel.objects.create(
+            order=order,
+            product_id=self.product.pk,
+            product_name=self.product.name,
+            unit_price=self.product.price,
+            quantity=1,
+        )
+        with pytest.raises(ValueError):
+            self.service.ship_order(order.pk)
+
+    def test_保留中注文を出荷するとエラー(self):
+        order = OrderModel.objects.create(
+            order_number="ORD-SHIP-PEN",
+            delivery_date=date.today() + timedelta(days=1),
+            status="pending",
+            recipient_name="山田太郎",
+            postal_code="100-0001",
+            address="東京都千代田区",
+            phone="03-1234-5678",
+            message="テスト",
+        )
+        OrderLineModel.objects.create(
+            order=order,
+            product_id=self.product.pk,
+            product_name=self.product.name,
+            unit_price=self.product.price,
+            quantity=1,
+        )
+        with pytest.raises(ValueError):
+            self.service.ship_order(order.pk)
+
     def test_出荷対象一覧を取得できる(self):
         self._create_confirmed_order()
         orders = self.service.list_shippable_orders(

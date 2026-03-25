@@ -182,7 +182,49 @@ class TestExpiryAlertView:
         assert "バラ（赤）" in content
         assert "30" in content
 
-    def test_期限が3日以上先の在庫ロットは表示されない(self):
+    def test_当日期限の在庫ロットはアクティブでないため表示されない(self):
+        # 残り 0 日（当日期限）→ find_active_by_item_id で除外される
+        StockLotModel.objects.create(
+            item=self.item,
+            quantity=50,
+            remaining_quantity=20,
+            arrived_at=date.today() - timedelta(days=7),
+            expiry_date=date.today(),
+            status="available",
+        )
+        response = self.client.get("/staff/purchasing/alerts/expiry/")
+        content = response.content.decode()
+        assert "期限が近い在庫はありません" in content
+
+    def test_残り2日の在庫ロットが表示される(self):
+        # 閾値ちょうど（残り 2 日）
+        StockLotModel.objects.create(
+            item=self.item,
+            quantity=50,
+            remaining_quantity=30,
+            arrived_at=date.today() - timedelta(days=5),
+            expiry_date=date.today() + timedelta(days=2),
+            status="available",
+        )
+        response = self.client.get("/staff/purchasing/alerts/expiry/")
+        content = response.content.decode()
+        assert "バラ（赤）" in content
+
+    def test_残り3日の在庫ロットは表示されない(self):
+        # 閾値+1（残り 3 日）
+        StockLotModel.objects.create(
+            item=self.item,
+            quantity=50,
+            remaining_quantity=30,
+            arrived_at=date.today() - timedelta(days=4),
+            expiry_date=date.today() + timedelta(days=3),
+            status="available",
+        )
+        response = self.client.get("/staff/purchasing/alerts/expiry/")
+        content = response.content.decode()
+        assert "期限が近い在庫はありません" in content
+
+    def test_期限が5日以上先の在庫ロットは表示されない(self):
         # 残り 5 日のロットを作成
         StockLotModel.objects.create(
             item=self.item,

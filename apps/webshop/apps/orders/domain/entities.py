@@ -109,7 +109,7 @@ class Order:
             raise ValueError("出荷準備以降の注文は変更できません")
         if current_date > self.delivery_date.change_deadline():
             raise ValueError("変更期限を過ぎています")
-        object.__setattr__(self, "delivery_date", new_date)
+        self.delivery_date = new_date
 
     @property
     def shipping_date(self) -> date:

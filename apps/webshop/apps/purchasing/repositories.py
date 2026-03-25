@@ -60,7 +60,7 @@ class DjangoPurchaseOrderRepository(PurchaseOrderRepository):
         return self._to_entity(obj)
 
     def _to_entity(self, obj: PurchaseOrderModel) -> PurchaseOrder:
-        return PurchaseOrder(
+        return PurchaseOrder.reconstruct(
             id=obj.pk,
             item_id=obj.item_id,
             supplier_id=obj.supplier_id,
