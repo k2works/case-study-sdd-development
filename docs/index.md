@@ -77,6 +77,9 @@
 | [イテレーション 5 ふりかえり](./development/retrospective-5.md) | 完了 |
 | [イテレーション 5 完了報告書](./development/iteration_report-5.md) | 完了 |
 | [イテレーション 6 計画](./development/iteration_plan-6.md) | 完了 |
+| [イテレーション 6 ふりかえり](./development/retrospective-6.md) | 完了 |
+| [イテレーション 6 完了報告書](./development/iteration_report-6.md) | 完了 |
+| [リリース完了報告書 v0.2.0](./development/release_report-0_2_0.md) | 完了 |
 
 ### 運用 (`operation/`)
 
