@@ -41,6 +41,7 @@
 
 - [概要](./development/index.md)
 - [リリース計画](./development/release_plan.md)
+- [イテレーション 1 計画](./development/iteration_plan-1.md)
 
 ### 運用 (`operation/`)
 
