@@ -20,13 +20,17 @@ const RAILS_PORT = 3000;
 
 /**
  * apps/ ディレクトリでコマンドを実行する
+ * Ruby 環境が nix の場合は nix-shell 経由で実行する
  * @param {string} command - 実行するコマンド
  * @param {object} [options] - execSync オプション
+ * @param {boolean} [options.raw] - true の場合 rubyCommand ラップをスキップ
  * @returns {string|void}
  */
 function execInApps(command, options = {}) {
+  const { raw, ...execOptions } = options;
   const defaults = { cwd: APPS_DIR, stdio: 'inherit', env: cleanDockerEnv() };
-  return execSync(command, { ...defaults, ...options });
+  const cmd = raw ? command : rubyCommand(command);
+  return execSync(cmd, { ...defaults, ...execOptions });
 }
 
 /**
@@ -241,8 +245,7 @@ export default function(gulp) {
 
     // 2. Bundle install
     console.log('\n-- 依存パッケージ --');
-    const bundleCmd = rubyCommand('bundle install');
-    execSync(bundleCmd, { cwd: APPS_DIR, stdio: 'inherit' });
+    execInApps('bundle install');
 
     done();
   }, 'dev:db:setup', (done) => {
