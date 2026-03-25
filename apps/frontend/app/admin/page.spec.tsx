@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import AdminPage from "./page";
+import AdminPage, { getInventoryAlertLabel } from "./page";
 
 describe("AdminPage", () => {
   beforeEach(() => {
@@ -21,6 +21,35 @@ describe("AdminPage", () => {
               shippingDate: "2026-04-09",
               status: "confirmed",
               deliveryAddress: "東京都港区南青山 1-2-3",
+            }),
+          });
+        }
+
+        if (url.includes("/admin/inventory-projections")) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              startDate: "2026-04-10",
+              endDate: "2026-04-12",
+              dates: ["2026-04-10", "2026-04-11", "2026-04-12"],
+              items: [
+                {
+                  materialName: "バラ赤",
+                  projections: [
+                    { date: "2026-04-10", projectedQuantity: 12 },
+                    { date: "2026-04-11", projectedQuantity: -2 },
+                    { date: "2026-04-12", projectedQuantity: 24 },
+                  ],
+                },
+                {
+                  materialName: "カスミソウ",
+                  projections: [
+                    { date: "2026-04-10", projectedQuantity: 6 },
+                    { date: "2026-04-11", projectedQuantity: 5 },
+                    { date: "2026-04-12", projectedQuantity: 22 },
+                  ],
+                },
+              ],
             }),
           });
         }
@@ -64,7 +93,7 @@ describe("AdminPage", () => {
     expect(screen.getByText("ORD-1001")).toBeInTheDocument();
     expect(screen.getByText("青山フラワー")).toBeInTheDocument();
     expect(screen.getByText("ローズガーデン")).toBeInTheDocument();
-    expect(screen.getByText("2026-04-10")).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "2026-04-10" })).toBeInTheDocument();
     expect(screen.getByText("confirmed")).toBeInTheDocument();
   });
 
@@ -90,5 +119,33 @@ describe("AdminPage", () => {
     await waitFor(() => {
       expect(screen.getByText("条件に一致する受注はありません。")).toBeInTheDocument();
     });
+  });
+
+  it("対象期間を指定して在庫推移を表示する", async () => {
+    render(<AdminPage />);
+
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "在庫推移" }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("期間開始")).toHaveValue("2026-04-10");
+    expect(screen.getByLabelText("期間終了")).toHaveValue("2026-04-12");
+    expect(screen.getByText("バラ赤")).toBeInTheDocument();
+    expect(screen.getByText("2026-04-11")).toBeInTheDocument();
+    expect(screen.getByText("-2")).toBeInTheDocument();
+  });
+
+  it("不足見込みと廃棄注意を識別表示する", async () => {
+    render(<AdminPage />);
+
+    expect(await screen.findByText("不足見込み")).toBeInTheDocument();
+    expect((await screen.findAllByText("廃棄注意")).length).toBeGreaterThan(0);
+  });
+});
+
+describe("getInventoryAlertLabel", () => {
+  it("数量に応じて注意ラベルを返す", () => {
+    expect(getInventoryAlertLabel(-1)).toBe("不足見込み");
+    expect(getInventoryAlertLabel(22)).toBe("廃棄注意");
+    expect(getInventoryAlertLabel(10)).toBeNull();
   });
 });

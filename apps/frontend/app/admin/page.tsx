@@ -15,11 +15,45 @@ type OrderDetail = OrderSummary & {
   deliveryAddress: string;
 };
 
+type InventoryProjection = {
+  date: string;
+  projectedQuantity: number;
+};
+
+type InventoryProjectionItem = {
+  materialName: string;
+  projections: InventoryProjection[];
+};
+
+type InventoryProjectionResponse = {
+  startDate: string;
+  endDate: string;
+  dates: string[];
+  items: InventoryProjectionItem[];
+};
+
+export function getInventoryAlertLabel(projectedQuantity: number): string | null {
+  if (projectedQuantity < 0) {
+    return "不足見込み";
+  }
+
+  if (projectedQuantity >= 20) {
+    return "廃棄注意";
+  }
+
+  return null;
+}
+
 export default function AdminPage() {
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
   const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [customerName, setCustomerName] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
+  const [startDate, setStartDate] = useState("2026-04-10");
+  const [endDate, setEndDate] = useState("2026-04-12");
+  const [inventoryProjection, setInventoryProjection] = useState<InventoryProjectionResponse | null>(
+    null,
+  );
 
   useEffect(() => {
     let active = true;
@@ -44,6 +78,31 @@ export default function AdminPage() {
       active = false;
     };
   }, [apiBaseUrl]);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadInventoryProjection = async () => {
+      const query = new URLSearchParams({ startDate, endDate });
+      const response = await fetch(`${apiBaseUrl}/admin/inventory-projections?${query.toString()}`);
+
+      if (!response.ok) {
+        return;
+      }
+
+      const data = (await response.json()) as InventoryProjectionResponse;
+
+      if (active) {
+        setInventoryProjection(data);
+      }
+    };
+
+    void loadInventoryProjection();
+
+    return () => {
+      active = false;
+    };
+  }, [apiBaseUrl, endDate, startDate]);
 
   const filteredOrders = orders.filter((order) =>
     order.customerName.includes(customerName.trim()),
@@ -137,6 +196,58 @@ export default function AdminPage() {
             </dl>
           </section>
         ) : null}
+
+        <section>
+          <h2>在庫推移</h2>
+          <div>
+            <label htmlFor="startDate">期間開始</label>
+            <input
+              id="startDate"
+              name="startDate"
+              type="date"
+              value={startDate}
+              onChange={(event) => setStartDate(event.target.value)}
+            />
+            <label htmlFor="endDate">期間終了</label>
+            <input
+              id="endDate"
+              name="endDate"
+              type="date"
+              value={endDate}
+              onChange={(event) => setEndDate(event.target.value)}
+            />
+          </div>
+
+          {inventoryProjection ? (
+            <table>
+              <thead>
+                <tr>
+                  <th>花材</th>
+                  {inventoryProjection.dates.map((date) => (
+                    <th key={date}>{date}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {inventoryProjection.items.map((item) => (
+                  <tr key={item.materialName}>
+                    <td>{item.materialName}</td>
+                    {item.projections.map((projection) => {
+                      const alertLabel = getInventoryAlertLabel(projection.projectedQuantity);
+
+                      return (
+                        <td key={projection.date}>
+                          <span>{projection.projectedQuantity}</span>
+                          {alertLabel ? <span>{alertLabel}</span> : null}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : null}
+        </section>
       </div>
     </main>
   );
