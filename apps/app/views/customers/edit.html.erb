@@ -1,0 +1,9 @@
+<h1>得意先編集</h1>
+
+<%= link_to "得意先一覧に戻る", customers_path, class: "btn btn-secondary mb-3" %>
+
+<div class="card">
+  <div class="card-body">
+    <%= render "form", customer: @customer %>
+  </div>
+</div>

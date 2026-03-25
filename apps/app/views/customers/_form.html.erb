@@ -1,0 +1,23 @@
+<%= form_with model: customer, local: true do |form| %>
+  <% if customer.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% customer.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :name, "氏名", class: "form-label" %>
+    <%= form.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :phone, "電話番号", class: "form-label" %>
+    <%= form.text_field :phone, class: "form-control" %>
+  </div>
+
+  <%= form.submit "更新する", class: "btn btn-primary" %>
+<% end %>

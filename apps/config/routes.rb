@@ -16,6 +16,7 @@ Rails.application.routes.draw do
     resources :arrivals, only: [ :new, :create ]
   end
   resources :shipments, only: [ :index, :create ]
+  resources :customers, only: [ :index, :edit, :update ]
 
   # 得意先向けショップ
   get "shop", to: "shop#index", as: :shop
