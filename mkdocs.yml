@@ -69,6 +69,10 @@ nav:
       - インセプションデッキ: analysis/inception_deck.md
   - 要件:
       - 概要: requirements/index.md
+      - 要件定義書: requirements/requirements_definition.md
+      - ビジネスユースケース: requirements/business_usecase.md
+      - システムユースケース: requirements/system_usecase.md
+      - ユーザーストーリー: requirements/user_story.md
   - 設計:
       - 概要: design/index.md
       - バックエンドアーキテクチャ: design/architecture_backend.md
@@ -118,6 +122,7 @@ nav:
       - Codex CLI MCP サーバー設定手順: reference/CodexCLIMCPサーバー設定手順.md
       - SonarQube ローカル環境セットアップ手順書: reference/SonarQubeローカル環境セットアップ手順書.md
       - Vim 操作マニュアル: reference/Vim操作マニュアル.md
+      - 運用スクリプト作成ガイド: reference/運用スクリプト作成ガイド.md
   - ADR:
       - 概要: adr/index.md
   - テンプレート:
@@ -137,4 +142,3 @@ nav:
       - 開発環境セットアップ手順書: template/開発環境セットアップ手順書.md
       - AWS ステージング環境セットアップ手順書: template/AWSステージング環境セットアップ手順書.md
       - AWS プロダクション環境セットアップ手順書: template/AWSプロダクション環境セットアップ手順書.md
-      - README: template/README.md
