@@ -1,6 +1,6 @@
 <h1>注文入力 - <%= @product.name %>（<%= number_to_currency(@product.price, unit: "¥", format: "%u%n") %>）</h1>
 
-<%= form_with url: confirm_shop_orders_path, method: :post, local: true do |form| %>
+<%= form_with url: confirm_shop_orders_path, method: :post, local: true, data: { turbo: false } do |form| %>
   <%= form.hidden_field :product_id, value: @product.id, name: "order[product_id]" %>
 
   <h2>届け日</h2>

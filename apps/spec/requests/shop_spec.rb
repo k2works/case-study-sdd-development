@@ -42,6 +42,11 @@ RSpec.describe "Shop (得意先向け)", type: :request do
         get new_shop_order_path(product_id: product.id)
         expect(response).to have_http_status(:ok)
       end
+
+      it "確認画面遷移フォームは turbo を無効化する" do
+        get new_shop_order_path(product_id: product.id)
+        expect(response.body).to include('data-turbo="false"')
+      end
     end
 
     describe "POST /shop/orders/confirm" do
