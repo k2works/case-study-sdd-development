@@ -10,7 +10,13 @@ class ApplicationController < ActionController::Base
 
   def require_staff!
     unless current_user&.staff?
-      redirect_to root_path, alert: "権限がありません"
+      redirect_to shop_path, alert: "権限がありません"
     end
+  end
+
+  def after_sign_in_path_for(resource)
+    return shop_path if resource.respond_to?(:customer?) && resource.customer?
+
+    super
   end
 end
