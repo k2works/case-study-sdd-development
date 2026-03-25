@@ -14,8 +14,8 @@ const APP_ROOT = path.resolve(process.cwd(), 'apps', 'webshop');
 /** Django 管理コマンドのプレフィックス */
 const MANAGE = 'uv run python manage.py';
 
-/** デフォルトのサーバーポート */
-const DEFAULT_PORT = 8000;
+/** デフォルトのサーバーポート（8000 は mkdocs が使用） */
+const DEFAULT_PORT = 8001;
 
 // ============================================
 // ヘルパー関数
@@ -304,7 +304,7 @@ export default function (gulp) {
     console.log(`
 === アプリケーション開発コマンド ===
 
-  サーバー:
+  サーバー（http://localhost:8001）:
     dev:server              Django 開発サーバー起動（SQLite）
     dev:server:product      Django 開発サーバー起動（PostgreSQL）
     dev:setup               依存関係インストール + マイグレーション
