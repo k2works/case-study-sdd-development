@@ -61,12 +61,13 @@ export class OrderService {
   createOrder(request: CreateOrderRequest): CreateOrderResponse {
     const orderId = `ORD-${String(this.sequence).padStart(4, "0")}`;
     this.sequence += 1;
+    const shippingDate = shiftDate(request.deliveryDate, -1);
     this.orders.push({
       orderId,
       customerName: request.customerName ?? "オンライン顧客",
       productName: request.productName,
       deliveryDate: request.deliveryDate,
-      shippingDate: request.deliveryDate,
+      shippingDate,
       status: "confirmed",
       deliveryAddress: request.deliveryAddress,
       message: request.message,
@@ -100,4 +101,11 @@ export class OrderService {
   getOrderDetail(orderId: string): OrderDetail | undefined {
     return this.orders.find((order) => order.orderId === orderId);
   }
+}
+
+function shiftDate(date: string, diffDays: number): string {
+  const value = new Date(`${date}T00:00:00Z`);
+  value.setUTCDate(value.getUTCDate() + diffDays);
+
+  return value.toISOString().slice(0, 10);
 }

@@ -49,4 +49,20 @@ describe("GET /admin/inventory-projections", () => {
       ],
     });
   });
+
+  it("開始日が終了日より後なら 400 を返す", async () => {
+    const response = await request(app.getHttpServer())
+      .get("/admin/inventory-projections")
+      .query({ startDate: "2026-04-12", endDate: "2026-04-10" });
+
+    expect(response.status).toBe(400);
+  });
+
+  it("対応範囲外の期間なら 400 を返す", async () => {
+    const response = await request(app.getHttpServer())
+      .get("/admin/inventory-projections")
+      .query({ startDate: "2026-04-01", endDate: "2026-04-03" });
+
+    expect(response.status).toBe(400);
+  });
 });

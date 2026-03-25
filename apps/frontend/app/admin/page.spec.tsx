@@ -87,6 +87,14 @@ describe("AdminPage", () => {
   it("受注一覧に主要項目を表示する", async () => {
     render(<AdminPage />);
 
+    expect(screen.getByRole("button", { name: "受注管理" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "在庫管理" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
     expect(
       await screen.findByRole("heading", { level: 1, name: "受注一覧" }),
     ).toBeInTheDocument();
@@ -102,6 +110,7 @@ describe("AdminPage", () => {
 
     fireEvent.click(await screen.findByRole("button", { name: "ORD-1001 の詳細を表示" }));
 
+    expect(await screen.findByTestId("admin-order-workbench")).toBeInTheDocument();
     expect(
       await screen.findByRole("heading", { level: 2, name: "受注詳細" }),
     ).toBeInTheDocument();
@@ -124,8 +133,10 @@ describe("AdminPage", () => {
   it("対象期間を指定して在庫推移を表示する", async () => {
     render(<AdminPage />);
 
+    fireEvent.click(screen.getByRole("button", { name: "在庫管理" }));
+
     expect(
-      await screen.findByRole("heading", { level: 2, name: "在庫推移" }),
+      await screen.findByRole("heading", { level: 1, name: "在庫推移" }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText("期間開始")).toHaveValue("2026-04-10");
     expect(screen.getByLabelText("期間終了")).toHaveValue("2026-04-12");
@@ -137,8 +148,101 @@ describe("AdminPage", () => {
   it("不足見込みと廃棄注意を識別表示する", async () => {
     render(<AdminPage />);
 
-    expect(await screen.findByText("不足見込み")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "在庫管理" }));
+
+    expect(await screen.findByText("不足見込み")).toHaveClass("status-badge");
     expect((await screen.findAllByText("廃棄注意")).length).toBeGreaterThan(0);
+  });
+
+  it("開始日が終了日より後ならエラーメッセージを表示して在庫取得しない", async () => {
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "在庫管理" }));
+
+    fireEvent.change(await screen.findByLabelText("期間開始"), {
+      target: { value: "2026-04-13" },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("開始日は終了日以前で指定してください。")).toBeInTheDocument();
+    });
+  });
+});
+
+describe("AdminPage inventory fetch error", () => {
+  beforeEach(() => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation((input: RequestInfo | URL) => {
+        const url = String(input);
+
+        if (url.includes("/admin/inventory-projections")) {
+          return Promise.resolve({
+            ok: false,
+            json: async () => ({}),
+          });
+        }
+
+        return Promise.resolve({
+          ok: true,
+          json: async () => [],
+        });
+      }),
+    );
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
+
+  it("在庫推移の取得失敗を画面で案内する", async () => {
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "在庫管理" }));
+
+    expect(
+      await screen.findByText("在庫推移を取得できませんでした。再試行してください。"),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "再試行" })).toBeInTheDocument();
+  });
+});
+
+describe("AdminPage network error", () => {
+  beforeEach(() => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation((input: RequestInfo | URL) => {
+        const url = String(input);
+
+        if (url.includes("/admin/inventory-projections")) {
+          return Promise.reject(new TypeError("Failed to fetch"));
+        }
+
+        return Promise.reject(new TypeError("Failed to fetch"));
+      }),
+    );
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
+
+  it("受注一覧の通信例外でも画面が落ちず空状態を維持する", async () => {
+    render(<AdminPage />);
+
+    expect(await screen.findByText("受注一覧を取得できませんでした。")).toBeInTheDocument();
+  });
+
+  it("在庫推移の通信例外を画面で案内する", async () => {
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "在庫管理" }));
+
+    expect(
+      await screen.findByText("在庫推移を取得できませんでした。再試行してください。"),
+    ).toBeInTheDocument();
   });
 });
 

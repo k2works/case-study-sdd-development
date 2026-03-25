@@ -90,4 +90,21 @@ describe("GET /admin/orders/:orderId", () => {
       message: "開店祝いのお花です。",
     });
   });
+
+  it("新規受注は届け日の前日を出荷日として詳細表示できる", async () => {
+    const createResponse = await request(app.getHttpServer()).post("/customer/orders").send({
+      productId: "rose-garden",
+      productName: "ローズガーデン",
+      deliveryDate: "2026-04-15",
+      deliveryAddress: "東京都港区南青山 1-2-3",
+      message: "開店祝いのお花です。",
+    });
+
+    const response = await request(app.getHttpServer()).get(
+      `/admin/orders/${createResponse.body.orderId}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.shippingDate).toBe("2026-04-14");
+  });
 });

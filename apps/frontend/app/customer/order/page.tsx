@@ -102,27 +102,30 @@ export default function OrderPage() {
 
   const handleConfirm = async () => {
     setSubmitError(null);
+    try {
+      const response = await fetch(`${apiBaseUrl}/customer/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId,
+          productName,
+          ...values,
+        }),
+      });
 
-    const response = await fetch(`${apiBaseUrl}/customer/orders`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        productId,
-        productName,
-        ...values,
-      }),
-    });
+      if (!response.ok) {
+        setSubmitError("注文の確定に失敗しました。時間をおいて再度お試しください。");
+        return;
+      }
 
-    if (!response.ok) {
+      const payload = (await response.json()) as OrderConfirmation;
+      setConfirmation(payload);
+      setStep("complete");
+    } catch {
       setSubmitError("注文の確定に失敗しました。時間をおいて再度お試しください。");
-      return;
     }
-
-    const payload = (await response.json()) as OrderConfirmation;
-    setConfirmation(payload);
-    setStep("complete");
   };
 
   if (step === "confirm") {

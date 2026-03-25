@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Inject, NotFoundException, Param, Post, Query } from "@nestjs/common";
 
 import {
   CreateOrderRequest,
@@ -10,7 +10,11 @@ import {
 
 @Controller()
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  private readonly orderService: OrderService;
+
+  constructor(@Inject(OrderService) orderService: OrderService) {
+    this.orderService = orderService;
+  }
 
   @Post("customer/orders")
   createOrder(@Body() request: CreateOrderRequest): CreateOrderResponse {

@@ -137,6 +137,39 @@ describe("OrderPage", () => {
   });
 });
 
+describe("OrderPage submit error", () => {
+  beforeEach(() => {
+    mockUseSearchParams.mockReturnValue(new URLSearchParams("product=rose-garden"));
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Failed to fetch")));
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
+
+  it("注文確定時の通信例外を画面で案内する", async () => {
+    render(<OrderPage />);
+
+    fireEvent.change(screen.getByLabelText("届け日"), {
+      target: { value: "2026-04-10" },
+    });
+    fireEvent.change(screen.getByLabelText("届け先"), {
+      target: { value: "東京都港区南青山 1-2-3" },
+    });
+    fireEvent.change(screen.getByLabelText("メッセージ"), {
+      target: { value: "開店祝いのお花です。" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "入力内容を確認する" }));
+    fireEvent.click(screen.getByRole("button", { name: "注文を確定する" }));
+
+    expect(
+      await screen.findByText("注文の確定に失敗しました。時間をおいて再度お試しください。"),
+    ).toBeInTheDocument();
+  });
+});
+
 describe("validateOrderForm", () => {
   it("必須項目の未入力を検出する", () => {
     expect(
