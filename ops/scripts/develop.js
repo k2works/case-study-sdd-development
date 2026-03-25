@@ -147,7 +147,10 @@ function setupRubyEnvironment() {
     execSync(`nix-shell ${NIX_RUBY_SHELL} --run "ruby --version"`, { stdio: 'inherit' });
     // nix 環境では vendor/bundle に gem を隔離（システム gem との .so 競合を防止）
     console.log('  gem をプロジェクトローカル（vendor/bundle）にインストールします');
-    execSync('bundle config set --local path vendor/bundle', { cwd: APPS_DIR, stdio: 'inherit' });
+    execSync(
+      `nix-shell ${NIX_RUBY_SHELL} --run "bundle config set --local path vendor/bundle"`,
+      { cwd: APPS_DIR, stdio: 'inherit' }
+    );
   }
 }
 
