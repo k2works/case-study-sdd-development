@@ -49,7 +49,9 @@
 | :--- | :--- |
 | [リリース計画](./development/release_plan.md) | 作成済み |
 | [イテレーション 1 計画](./development/iteration_plan-1.md) | 作成済み |
-| ふりかえり / 完了報告書 | 未着手 |
+| [イテレーション 1 ふりかえり](./development/retrospective-1.md) | 作成済み |
+| [イテレーション 1 完了報告書](./development/iteration_report-1.md) | 作成済み |
+| [イテレーション 2 計画](./development/iteration_plan-2.md) | 作成済み |
 
 ### 運用 (`operation/`)
 
