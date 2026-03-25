@@ -2,6 +2,8 @@ import { BadRequestException, Injectable, Inject } from "@nestjs/common";
 
 import { InventoryService } from "./inventory.service";
 import { OrderDetail, OrderService } from "./order.service";
+import { MaterialService } from "./material.service";
+import { ProductService } from "./product.service";
 
 export type ShippingTargetMaterial = {
   materialId: string;
@@ -20,45 +22,49 @@ export type ShippingTarget = {
   hasShortage: boolean;
 };
 
-const PRODUCT_RECIPES: Record<
-  string,
-  Array<{
-    materialId: string;
-    materialName: string;
-    requiredQuantity: number;
-  }>
-> = {
-  "ホワイトリリー": [
-    { materialId: "MAT-001", materialName: "バラ赤", requiredQuantity: 8 },
-    { materialId: "MAT-002", materialName: "カスミソウ", requiredQuantity: 4 },
-  ],
-  "ローズガーデン": [
-    { materialId: "MAT-001", materialName: "バラ赤", requiredQuantity: 10 },
-    { materialId: "MAT-002", materialName: "カスミソウ", requiredQuantity: 2 },
-  ],
+export type ShipmentTarget = {
+  orderId: string;
+  customerName: string;
+  productName: string;
+  shippingDate: string;
+  status: "shipping-ready";
+};
+
+export type ShipmentResult = {
+  orderId: string;
+  status: "shipped";
 };
 
 @Injectable()
 export class ShippingService {
   private readonly inventoryService: InventoryService;
+  private readonly materialService: MaterialService;
   private readonly orderService: OrderService;
+  private readonly productService: ProductService;
 
   constructor(
     @Inject(InventoryService) inventoryService: InventoryService,
+    @Inject(MaterialService) materialService: MaterialService,
     @Inject(OrderService) orderService: OrderService,
+    @Inject(ProductService) productService: ProductService,
   ) {
     this.inventoryService = inventoryService;
+    this.materialService = materialService;
     this.orderService = orderService;
+    this.productService = productService;
   }
 
   listShippingTargets(shippingDate: string): ShippingTarget[] {
-    return this.orderService.listOrdersByShippingDate(shippingDate).map((order) =>
+    return this.orderService
+      .listOrdersByShippingDate(shippingDate)
+      .filter((order) => order.status !== "shipped")
+      .map((order) =>
       this.toShippingTarget(order),
-    );
+      );
   }
 
   completeBundle(orderId: string): { orderId: string; status: "shipping-ready" } {
-    const order = this.orderService.getOrderDetail(orderId);
+    const order = this.orderService.getOrderRecord(orderId);
 
     if (!order) {
       throw new BadRequestException("対象受注が存在しません。");
@@ -74,6 +80,10 @@ export class ShippingService {
       throw new BadRequestException("在庫不足のため結束完了を登録できません。");
     }
 
+    if (order.status === "shipped") {
+      throw new BadRequestException("すでに出荷済みです。");
+    }
+
     this.orderService.updateOrderStatus(orderId, "shipping-ready");
 
     return {
@@ -82,12 +92,49 @@ export class ShippingService {
     };
   }
 
+  listShipmentTargets(shippingDate: string): ShipmentTarget[] {
+    return this.orderService.listOrdersByStatus("shipping-ready", shippingDate).map((order) => ({
+      orderId: order.orderId,
+      customerName: order.customerName,
+      productName: order.productName,
+      shippingDate: order.shippingDate,
+      status: "shipping-ready",
+    }));
+  }
+
+  confirmShipment(orderId: string): ShipmentResult {
+    const order = this.orderService.getOrderRecord(orderId);
+
+    if (!order) {
+      throw new BadRequestException("対象受注が存在しません。");
+    }
+
+    if (order.status === "shipped") {
+      throw new BadRequestException("すでに出荷済みです。");
+    }
+
+    if (order.status !== "shipping-ready") {
+      throw new BadRequestException("出荷準備完了の対象だけを出荷確定できます。");
+    }
+
+    this.orderService.updateOrderStatus(orderId, "shipped");
+
+    return {
+      orderId,
+      status: "shipped",
+    };
+  }
+
   private toShippingTarget(order: OrderDetail): ShippingTarget {
-    const recipe = PRODUCT_RECIPES[order.productName] ?? [];
+    const record = this.orderService.getOrderRecord(order.orderId);
+    const recipe = record?.productId
+      ? this.productService.findProduct(record.productId)?.materials ?? []
+      : [];
     const materials = recipe.map((material) => ({
       materialId: material.materialId,
-      materialName: material.materialName,
-      requiredQuantity: material.requiredQuantity,
+      materialName:
+        this.materialService.findMaterial(material.materialId)?.materialName ?? material.materialId,
+      requiredQuantity: material.quantity,
       projectedQuantity: this.inventoryService.getProjectedQuantity(material.materialId, order.shippingDate),
     }));
 

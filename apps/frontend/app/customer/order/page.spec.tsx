@@ -16,12 +16,37 @@ describe("OrderPage", () => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams("product=rose-garden"));
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          orderId: "ORD-0001",
-          status: "confirmed",
-        }),
+      vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+
+        if (url.endsWith("/customer/products")) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              {
+                productId: "rose-garden",
+                productName: "ローズガーデン プレミアム",
+                description: "赤バラを増量した上位版ブーケです。",
+                price: 6800,
+              },
+            ],
+          });
+        }
+
+        if (url.endsWith("/customer/orders") && init?.method === "POST") {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              orderId: "ORD-0001",
+              status: "confirmed",
+            }),
+          });
+        }
+
+        return Promise.resolve({
+          ok: true,
+          json: async () => [],
+        });
       }),
     );
   });
@@ -31,14 +56,14 @@ describe("OrderPage", () => {
     vi.unstubAllGlobals();
   });
 
-  it("選択した商品を注文入力画面で確認できる", () => {
+  it("選択した商品を注文入力画面で確認できる", async () => {
     render(<OrderPage />);
 
     expect(
       screen.getByRole("heading", { level: 1, name: "注文入力" }),
     ).toBeInTheDocument();
     expect(screen.getByText("選択中の商品")).toBeInTheDocument();
-    expect(screen.getByText("ローズガーデン")).toBeInTheDocument();
+    expect(await screen.findByText("ローズガーデン プレミアム")).toBeInTheDocument();
   });
 
   it("届け日、届け先、メッセージを入力できる", () => {
@@ -140,7 +165,32 @@ describe("OrderPage", () => {
 describe("OrderPage submit error", () => {
   beforeEach(() => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams("product=rose-garden"));
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Failed to fetch")));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+
+        if (url.endsWith("/customer/products")) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              {
+                productId: "rose-garden",
+                productName: "ローズガーデン",
+                description: "赤バラとグリーンを束ねた、記念日向けの定番ブーケです。",
+                price: 5500,
+              },
+            ],
+          });
+        }
+
+        if (url.endsWith("/customer/orders") && init?.method === "POST") {
+          return Promise.reject(new TypeError("Failed to fetch"));
+        }
+
+        return Promise.reject(new TypeError("Failed to fetch"));
+      }),
+    );
   });
 
   afterEach(() => {

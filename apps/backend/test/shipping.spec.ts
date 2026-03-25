@@ -52,6 +52,43 @@ describe("GET /admin/shipping-targets", () => {
   });
 });
 
+describe("GET /admin/shipments", () => {
+  let app: Awaited<ReturnType<typeof NestFactory.create>>;
+
+  beforeAll(async () => {
+    app = await NestFactory.create(AppModule, new FastifyAdapter());
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it("出荷準備完了の対象だけを返す", async () => {
+    await request(app.getHttpServer()).post("/admin/purchase-orders/PO-9001/receipts").send({
+      receiptDate: "2026-04-11",
+      items: [{ materialId: "MAT-001", quantity: 10 }],
+    });
+    await request(app.getHttpServer()).post("/admin/orders/ORD-1002/bundle-completions").send({});
+
+    const response = await request(app.getHttpServer())
+      .get("/admin/shipments")
+      .query({ shippingDate: "2026-04-11" });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([
+      {
+        orderId: "ORD-1002",
+        customerName: "表参道ギャラリー",
+        productName: "ホワイトリリー",
+        shippingDate: "2026-04-11",
+        status: "shipping-ready",
+      },
+    ]);
+  });
+});
+
 describe("POST /admin/orders/:orderId/bundle-completions", () => {
   let app: Awaited<ReturnType<typeof NestFactory.create>>;
 
@@ -89,5 +126,53 @@ describe("POST /admin/orders/:orderId/bundle-completions", () => {
 
     expect(response.status).toBe(400);
     expect(response.body.message).toContain("在庫不足");
+  });
+});
+
+describe("POST /admin/orders/:orderId/shipments", () => {
+  let app: Awaited<ReturnType<typeof NestFactory.create>>;
+
+  beforeEach(async () => {
+    app = await NestFactory.create(AppModule, new FastifyAdapter());
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+  });
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  it("出荷準備完了の対象を出荷済みにできる", async () => {
+    await request(app.getHttpServer()).post("/admin/purchase-orders/PO-9001/receipts").send({
+      receiptDate: "2026-04-11",
+      items: [{ materialId: "MAT-001", quantity: 10 }],
+    });
+    await request(app.getHttpServer()).post("/admin/orders/ORD-1002/bundle-completions").send({});
+
+    const response = await request(app.getHttpServer())
+      .post("/admin/orders/ORD-1002/shipments")
+      .send({});
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual({
+      orderId: "ORD-1002",
+      status: "shipped",
+    });
+  });
+
+  it("出荷済みの対象は二重確定できない", async () => {
+    await request(app.getHttpServer()).post("/admin/purchase-orders/PO-9001/receipts").send({
+      receiptDate: "2026-04-11",
+      items: [{ materialId: "MAT-001", quantity: 10 }],
+    });
+    await request(app.getHttpServer()).post("/admin/orders/ORD-1002/bundle-completions").send({});
+    await request(app.getHttpServer()).post("/admin/orders/ORD-1002/shipments").send({});
+
+    const response = await request(app.getHttpServer())
+      .post("/admin/orders/ORD-1002/shipments")
+      .send({});
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain("すでに出荷済み");
   });
 });

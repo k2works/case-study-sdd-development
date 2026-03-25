@@ -94,6 +94,53 @@ describe("AdminPage", () => {
           });
         }
 
+        if (url.endsWith("/admin/products") && init?.method === "POST") {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              productId: "rose-garden",
+              productName: "ローズガーデン プレミアム",
+              description: "赤バラを増量した上位版ブーケです。",
+              price: 6800,
+              isActive: true,
+              materials: [
+                { materialId: "MAT-001", quantity: 12 },
+                { materialId: "MAT-002", quantity: 3 },
+              ],
+            }),
+          });
+        }
+
+        if (url.endsWith("/admin/products")) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              {
+                productId: "rose-garden",
+                productName: "ローズガーデン",
+                description: "赤バラとグリーンを束ねた、記念日向けの定番ブーケです。",
+                price: 5500,
+                isActive: true,
+                materials: [
+                  { materialId: "MAT-001", quantity: 10 },
+                  { materialId: "MAT-002", quantity: 2 },
+                ],
+              },
+              {
+                productId: "white-lily",
+                productName: "ホワイトリリー",
+                description: "白を基調にまとめた、上品で落ち着いたアレンジです。",
+                price: 6200,
+                isActive: true,
+                materials: [
+                  { materialId: "MAT-001", quantity: 8 },
+                  { materialId: "MAT-002", quantity: 4 },
+                ],
+              },
+            ],
+          });
+        }
+
         if (url.includes("/admin/purchase-orders/candidates")) {
           return Promise.resolve({
             ok: true,
@@ -155,6 +202,16 @@ describe("AdminPage", () => {
           });
         }
 
+        if (url.endsWith("/admin/orders/ORD-1002/shipments") && init?.method === "POST") {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              orderId: "ORD-1002",
+              status: "shipped",
+            }),
+          });
+        }
+
         if (url.includes("/admin/shipping-targets")) {
           return Promise.resolve({
             ok: true,
@@ -174,6 +231,21 @@ describe("AdminPage", () => {
                   },
                 ],
                 hasShortage: false,
+              },
+            ],
+          });
+        }
+
+        if (url.includes("/admin/shipments")) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              {
+                orderId: "ORD-1002",
+                customerName: "表参道ギャラリー",
+                productName: "ホワイトリリー",
+                shippingDate: "2026-04-11",
+                status: "shipping-ready",
               },
             ],
           });
@@ -320,6 +392,24 @@ describe("AdminPage", () => {
     expect(await screen.findByText("花材を保存しました。")).toBeInTheDocument();
   });
 
+  it("商品一覧から編集内容を保存できる", async () => {
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "商品管理" }));
+
+    expect(await screen.findByRole("heading", { level: 1, name: "商品管理" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "ローズガーデン を編集" }));
+    fireEvent.change(screen.getByLabelText("商品名"), {
+      target: { value: "ローズガーデン プレミアム" },
+    });
+    fireEvent.change(screen.getByLabelText("価格"), {
+      target: { value: "6800" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "商品を保存する" }));
+
+    expect(await screen.findByText("商品を保存しました。")).toBeInTheDocument();
+  });
+
   it("仕入先別の発注候補を確認して確定できる", async () => {
     const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
@@ -412,10 +502,21 @@ describe("AdminPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "出荷管理" }));
 
     expect(await screen.findByRole("heading", { level: 1, name: "出荷管理" })).toBeInTheDocument();
-    expect(screen.getByText("ORD-1002 / 表参道ギャラリー")).toBeInTheDocument();
+    expect((await screen.findAllByText("ORD-1002 / 表参道ギャラリー")).length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole("button", { name: "結束完了を登録する" }));
 
     expect(await screen.findByText("結束完了を登録しました。")).toBeInTheDocument();
+  });
+
+  it("出荷準備完了の対象を出荷済みに確定できる", async () => {
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "出荷管理" }));
+
+    expect(await screen.findByText("出荷確定対象")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "出荷実績を確定する" }));
+
+    expect(await screen.findByText("出荷実績を確定しました。")).toBeInTheDocument();
   });
 
   it("花材保存の通信例外を画面で案内する", async () => {
@@ -424,6 +525,24 @@ describe("AdminPage", () => {
 
       if (url.endsWith("/admin/materials") && init?.method === "POST") {
         return Promise.reject(new TypeError("Failed to fetch"));
+      }
+
+      if (url.endsWith("/admin/products")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [
+            {
+              productId: "rose-garden",
+              productName: "ローズガーデン",
+              description: "赤バラとグリーンを束ねた、記念日向けの定番ブーケです。",
+              price: 5500,
+              isActive: true,
+              materials: [
+                { materialId: "MAT-001", quantity: 10 },
+              ],
+            },
+          ],
+        });
       }
 
       if (url.endsWith("/admin/materials")) {
@@ -527,6 +646,49 @@ describe("AdminPage", () => {
     expect((await screen.findAllByText("発注を登録できませんでした。")).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "再試行" })).toBeInTheDocument();
   });
+
+  it("商品保存の通信例外を画面で案内する", async () => {
+    const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+
+      if (url.endsWith("/admin/products") && init?.method === "POST") {
+        return Promise.reject(new TypeError("Failed to fetch"));
+      }
+
+      if (url.endsWith("/admin/products")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [
+            {
+              productId: "rose-garden",
+              productName: "ローズガーデン",
+              description: "赤バラとグリーンを束ねた、記念日向けの定番ブーケです。",
+              price: 5500,
+              isActive: true,
+              materials: [
+                { materialId: "MAT-001", quantity: 10 },
+              ],
+            },
+          ],
+        });
+      }
+
+      return Promise.resolve({
+        ok: true,
+        json: async () => [],
+      });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "商品管理" }));
+    fireEvent.click(await screen.findByRole("button", { name: "ローズガーデン を編集" }));
+    fireEvent.click(screen.getByRole("button", { name: "商品を保存する" }));
+
+    expect(await screen.findByText("商品を保存できませんでした。")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "再試行" })).toBeInTheDocument();
+  });
 });
 
 describe("AdminPage loading state", () => {
@@ -589,6 +751,14 @@ describe("AdminPage loading state", () => {
               return;
             }
 
+            if (url.includes("/admin/shipments")) {
+              resolve({
+                ok: true,
+                json: async () => [],
+              });
+              return;
+            }
+
             resolve({
               ok: true,
               json: async () => [],
@@ -605,6 +775,9 @@ describe("AdminPage loading state", () => {
     fireEvent.click(screen.getByRole("button", { name: "在庫管理" }));
     expect(screen.getByText("在庫推移を読み込んでいます。")).toBeInTheDocument();
 
+    fireEvent.click(screen.getByRole("button", { name: "商品管理" }));
+    expect(screen.getByText("商品一覧を読み込んでいます。")).toBeInTheDocument();
+
     fireEvent.click(screen.getByRole("button", { name: "花材管理" }));
     expect(screen.getByText("花材一覧を読み込んでいます。")).toBeInTheDocument();
 
@@ -616,6 +789,7 @@ describe("AdminPage loading state", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "出荷管理" }));
     expect(screen.getByText("出荷対象を読み込んでいます。")).toBeInTheDocument();
+    expect(screen.getByText("出荷確定対象を読み込んでいます。")).toBeInTheDocument();
 
     await vi.runAllTimersAsync();
     vi.useRealTimers();

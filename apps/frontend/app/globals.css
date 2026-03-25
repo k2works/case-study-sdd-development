@@ -396,6 +396,22 @@ main {
   gap: 16px;
 }
 
+.admin-subsection {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-subsection h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
 .inventory-filters {
   display: grid;
   grid-template-columns: repeat(2, minmax(180px, 1fr));
@@ -492,7 +508,8 @@ main {
   }
 
   .inventory-filters,
-  .admin-workbench {
+  .admin-workbench,
+  .recipe-grid {
     grid-template-columns: 1fr;
   }
 

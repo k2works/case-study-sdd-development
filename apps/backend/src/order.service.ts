@@ -1,4 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
+
+import { ProductService } from "./product.service";
 
 export type CreateOrderRequest = {
   productId?: string | null;
@@ -20,7 +22,7 @@ export type OrderSummary = {
   productName: string;
   deliveryDate: string;
   shippingDate: string;
-  status: "confirmed" | "shipping-prep" | "shipping-ready";
+  status: "confirmed" | "shipping-prep" | "shipping-ready" | "shipped";
 };
 
 export type OrderDetail = OrderSummary & {
@@ -35,8 +37,10 @@ export type OrderFilter = {
 @Injectable()
 export class OrderService {
   private sequence = 1;
-  private readonly orders: OrderDetail[] = [
+  private readonly productService: ProductService;
+  private readonly orders: Array<OrderDetail & { productId: string | null }> = [
     {
+      productId: "rose-garden",
       orderId: "ORD-1001",
       customerName: "青山フラワー",
       productName: "ローズガーデン",
@@ -47,6 +51,7 @@ export class OrderService {
       message: "開店祝いのお花です。",
     },
     {
+      productId: "white-lily",
       orderId: "ORD-1002",
       customerName: "表参道ギャラリー",
       productName: "ホワイトリリー",
@@ -58,14 +63,20 @@ export class OrderService {
     },
   ];
 
+  constructor(@Inject(ProductService) productService: ProductService) {
+    this.productService = productService;
+  }
+
   createOrder(request: CreateOrderRequest): CreateOrderResponse {
     const orderId = `ORD-${String(this.sequence).padStart(4, "0")}`;
     this.sequence += 1;
     const shippingDate = shiftDate(request.deliveryDate, -1);
+    const product = request.productId ? this.productService.findProduct(request.productId) : undefined;
     this.orders.push({
+      productId: request.productId ?? null,
       orderId,
       customerName: request.customerName ?? "オンライン顧客",
-      productName: request.productName,
+      productName: product?.productName ?? request.productName,
       deliveryDate: request.deliveryDate,
       shippingDate,
       status: "confirmed",
@@ -99,11 +110,19 @@ export class OrderService {
   }
 
   getOrderDetail(orderId: string): OrderDetail | undefined {
-    return this.orders.find((order) => order.orderId === orderId);
+    const order = this.orders.find((candidate) => candidate.orderId === orderId);
+
+    if (!order) {
+      return undefined;
+    }
+
+    return this.toOrderDetail(order);
   }
 
   listOrdersByShippingDate(shippingDate: string): OrderDetail[] {
-    return this.orders.filter((order) => order.shippingDate === shippingDate);
+    return this.orders
+      .filter((order) => order.shippingDate === shippingDate)
+      .map((order) => this.toOrderDetail(order));
   }
 
   updateOrderStatus(orderId: string, status: OrderSummary["status"]): OrderDetail | undefined {
@@ -114,7 +133,25 @@ export class OrderService {
     }
 
     target.status = status;
-    return target;
+    return this.toOrderDetail(target);
+  }
+
+  getOrderRecord(
+    orderId: string,
+  ): (OrderDetail & { productId: string | null }) | undefined {
+    return this.orders.find((order) => order.orderId === orderId);
+  }
+
+  listOrdersByStatus(status: OrderSummary["status"], shippingDate?: string): OrderDetail[] {
+    return this.orders
+      .filter((order) => order.status === status)
+      .filter((order) => (shippingDate ? order.shippingDate === shippingDate : true))
+      .map((order) => this.toOrderDetail(order));
+  }
+
+  private toOrderDetail(order: OrderDetail & { productId: string | null }): OrderDetail {
+    const { productId: _productId, ...detail } = order;
+    return detail;
   }
 }
 

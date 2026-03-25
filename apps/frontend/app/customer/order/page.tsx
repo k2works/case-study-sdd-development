@@ -1,15 +1,14 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-const productNames = {
-  "rose-garden": "ローズガーデン",
-  "seasonal-mimosa": "季節のミモザブーケ",
-  "white-memories": "ホワイトメモリーズ",
-} as const;
-
-type ProductId = keyof typeof productNames;
+type Product = {
+  productId: string;
+  productName: string;
+  description: string;
+  price: number;
+};
 
 export type OrderFormValues = {
   deliveryDate: string;
@@ -33,18 +32,26 @@ type OrderConfirmation = {
 };
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
-
-function resolveProductName(productId?: string | null) {
-  if (!productId) {
-    return "未選択";
-  }
-
-  if (productId in productNames) {
-    return productNames[productId as ProductId];
-  }
-
-  return "対象外の商品です";
-}
+const fallbackProducts: Product[] = [
+  {
+    productId: "rose-garden",
+    productName: "ローズガーデン",
+    description: "赤バラとグリーンを束ねた、記念日向けの定番ブーケです。",
+    price: 5500,
+  },
+  {
+    productId: "seasonal-mimosa",
+    productName: "季節のミモザブーケ",
+    description: "旬のミモザを主役にした、春の贈り物向けの花束です。",
+    price: 4800,
+  },
+  {
+    productId: "white-lily",
+    productName: "ホワイトリリー",
+    description: "白を基調にまとめた、上品で落ち着いたアレンジです。",
+    price: 6200,
+  },
+];
 
 export function validateOrderForm(values: OrderFormValues): OrderFormErrors {
   const errors: OrderFormErrors = {};
@@ -67,12 +74,61 @@ export function validateOrderForm(values: OrderFormValues): OrderFormErrors {
 export default function OrderPage() {
   const searchParams = useSearchParams();
   const productId = searchParams.get("product");
-  const productName = resolveProductName(productId);
+  const [products, setProducts] = useState<Product[]>(fallbackProducts);
+  const [productsLoading, setProductsLoading] = useState(false);
   const [values, setValues] = useState<OrderFormValues>(initialFormValues);
   const [errors, setErrors] = useState<OrderFormErrors>({});
   const [step, setStep] = useState<OrderStep>("input");
   const [confirmation, setConfirmation] = useState<OrderConfirmation | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const selectedProduct = products.find((product) => product.productId === productId);
+  const productName = selectedProduct?.productName ?? (productId ? "対象外の商品です" : "未選択");
+
+  useEffect(() => {
+    let active = true;
+
+    const loadProducts = async () => {
+      if (active && products.length === 0) {
+        setProductsLoading(true);
+      }
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = window.setTimeout(() => controller.abort(), 1000);
+        const response = await fetch(`${apiBaseUrl}/customer/products`, {
+          signal: controller.signal,
+        });
+        window.clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          if (active) {
+            setProducts(fallbackProducts);
+            setProductsLoading(false);
+          }
+
+          return;
+        }
+
+        const data = (await response.json()) as Product[];
+
+        if (active) {
+          setProducts(data);
+          setProductsLoading(false);
+        }
+      } catch {
+        if (active) {
+          setProducts(fallbackProducts);
+          setProductsLoading(false);
+        }
+      }
+    };
+
+    void loadProducts();
+
+    return () => {
+      active = false;
+    };
+  }, [products.length]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -201,6 +257,7 @@ export default function OrderPage() {
 
         <section className="order-summary" aria-label="注文入力サマリー">
           <h2>選択中の商品</h2>
+          {productsLoading ? <p>商品情報を読み込んでいます。</p> : null}
           <p className="order-product-name">{productName}</p>
           <p>内容を入力後、確認画面へ進む前に必須項目の不足をこの画面で確認できます。</p>
         </section>

@@ -4,6 +4,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 
 type AdminWorkbench =
   | "orders"
+  | "products"
   | "inventory"
   | "materials"
   | "purchaseOrders"
@@ -48,6 +49,20 @@ type Material = {
   purchaseUnit: number;
   leadTimeDays: number;
   supplierName: string;
+};
+
+type ProductMaterial = {
+  materialId: string;
+  quantity: number;
+};
+
+type Product = {
+  productId: string;
+  productName: string;
+  description: string;
+  price: number;
+  isActive: boolean;
+  materials: ProductMaterial[];
 };
 
 type PurchaseOrderCandidateItem = {
@@ -100,6 +115,14 @@ type ShippingTarget = {
   hasShortage: boolean;
 };
 
+type ShipmentTarget = {
+  orderId: string;
+  customerName: string;
+  productName: string;
+  shippingDate: string;
+  status: string;
+};
+
 export function getInventoryAlertLabel(projectedQuantity: number): string | null {
   if (projectedQuantity < 0) {
     return "不足見込み";
@@ -128,6 +151,12 @@ export default function AdminPage() {
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [customerName, setCustomerName] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productsError, setProductsError] = useState<string | null>(null);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productForm, setProductForm] = useState<Product | null>(null);
+  const [productFeedback, setProductFeedback] = useState<string | null>(null);
+  const [productsReloadKey, setProductsReloadKey] = useState(0);
   const [startDate, setStartDate] = useState("2026-04-10");
   const [endDate, setEndDate] = useState("2026-04-12");
   const [inventoryProjection, setInventoryProjection] = useState<InventoryProjectionResponse | null>(
@@ -160,6 +189,11 @@ export default function AdminPage() {
   const [shippingError, setShippingError] = useState<string | null>(null);
   const [shippingFeedback, setShippingFeedback] = useState<string | null>(null);
   const [shippingReloadKey, setShippingReloadKey] = useState(0);
+  const [shipmentTargets, setShipmentTargets] = useState<ShipmentTarget[]>([]);
+  const [shipmentError, setShipmentError] = useState<string | null>(null);
+  const [shipmentLoading, setShipmentLoading] = useState(true);
+  const [shipmentFeedback, setShipmentFeedback] = useState<string | null>(null);
+  const [shipmentReloadKey, setShipmentReloadKey] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -204,6 +238,53 @@ export default function AdminPage() {
       active = false;
     };
   }, [apiBaseUrl]);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadProducts = async () => {
+      if (active) {
+        setProductsLoading(true);
+      }
+
+      try {
+        const response = await fetch(`${apiBaseUrl}/admin/products`);
+
+        if (!response.ok) {
+          if (active) {
+            setProducts([]);
+            setProductsError("商品一覧を取得できませんでした。");
+            setProductsLoading(false);
+          }
+
+          return;
+        }
+
+        const data = (await response.json()) as Product[];
+
+        if (active) {
+          setProducts(data);
+          setProductsError(null);
+          setProductsLoading(false);
+          if (!productForm && data.length > 0) {
+            setProductForm(data[0]);
+          }
+        }
+      } catch {
+        if (active) {
+          setProducts([]);
+          setProductsError("商品一覧を取得できませんでした。");
+          setProductsLoading(false);
+        }
+      }
+    };
+
+    void loadProducts();
+
+    return () => {
+      active = false;
+    };
+  }, [apiBaseUrl, productsReloadKey]);
 
   useEffect(() => {
     let active = true;
@@ -457,6 +538,51 @@ export default function AdminPage() {
     };
   }, [apiBaseUrl, shippingDate, shippingReloadKey]);
 
+  useEffect(() => {
+    let active = true;
+
+    const loadShipmentTargets = async () => {
+      if (active) {
+        setShipmentLoading(true);
+      }
+
+      try {
+        const query = new URLSearchParams({ shippingDate });
+        const response = await fetch(`${apiBaseUrl}/admin/shipments?${query.toString()}`);
+
+        if (!response.ok) {
+          if (active) {
+            setShipmentTargets([]);
+            setShipmentError("出荷確定対象を取得できませんでした。");
+            setShipmentLoading(false);
+          }
+
+          return;
+        }
+
+        const data = (await response.json()) as ShipmentTarget[];
+
+        if (active) {
+          setShipmentTargets(data);
+          setShipmentError(null);
+          setShipmentLoading(false);
+        }
+      } catch {
+        if (active) {
+          setShipmentTargets([]);
+          setShipmentError("出荷確定対象を取得できませんでした。");
+          setShipmentLoading(false);
+        }
+      }
+    };
+
+    void loadShipmentTargets();
+
+    return () => {
+      active = false;
+    };
+  }, [apiBaseUrl, shippingDate, shipmentReloadKey]);
+
   const filteredOrders = orders.filter((order) =>
     order.customerName.includes(customerName.trim()),
   );
@@ -482,6 +608,17 @@ export default function AdminPage() {
     setMaterialForm(target);
   };
 
+  const handleEditProduct = (productId: string) => {
+    const target = products.find((product) => product.productId === productId);
+
+    if (!target) {
+      return;
+    }
+
+    setProductFeedback(null);
+    setProductForm(target);
+  };
+
   const handleMaterialFormChange =
     (field: keyof Material) => (event: ChangeEvent<HTMLInputElement>) => {
       const nextValue = field === "materialName" || field === "supplierName"
@@ -493,6 +630,45 @@ export default function AdminPage() {
           ? {
               ...current,
               [field]: nextValue,
+            }
+          : current,
+      );
+    };
+
+  const handleProductFormChange =
+    (field: "productName" | "description" | "price" | "isActive") =>
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const nextValue = field === "price"
+        ? Number(event.target.value)
+        : field === "isActive"
+          ? event.target.value === "true"
+          : event.target.value;
+
+      setProductForm((current) =>
+        current
+          ? {
+              ...current,
+              [field]: nextValue,
+            }
+          : current,
+      );
+    };
+
+  const handleProductMaterialChange =
+    (materialId: string) => (event: ChangeEvent<HTMLInputElement>) => {
+      const quantity = Number(event.target.value);
+
+      setProductForm((current) =>
+        current
+          ? {
+              ...current,
+              materials: materials.map((material) => ({
+                materialId: material.materialId,
+                quantity:
+                  material.materialId === materialId
+                    ? quantity
+                    : current.materials.find((item) => item.materialId === material.materialId)?.quantity ?? 0,
+              })),
             }
           : current,
       );
@@ -532,6 +708,43 @@ export default function AdminPage() {
       setMaterialsReloadKey((current) => current + 1);
     } catch {
       setMaterialFeedback("花材を保存できませんでした。");
+    }
+  };
+
+  const handleSaveProduct = async () => {
+    if (!productForm) {
+      return;
+    }
+
+    setProductFeedback(null);
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/admin/products`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(productForm),
+      });
+
+      if (!response.ok) {
+        setProductFeedback("商品を保存できませんでした。");
+        return;
+      }
+
+      const savedProduct = (await response.json()) as Product;
+      setProducts((current) =>
+        current.some((product) => product.productId === savedProduct.productId)
+          ? current.map((product) =>
+              product.productId === savedProduct.productId ? savedProduct : product,
+            )
+          : [...current, savedProduct],
+      );
+      setProductForm(savedProduct);
+      setProductFeedback("商品を保存しました。");
+      setProductsReloadKey((current) => current + 1);
+    } catch {
+      setProductFeedback("商品を保存できませんでした。");
     }
   };
 
@@ -648,9 +861,35 @@ export default function AdminPage() {
 
       setShippingFeedback("結束完了を登録しました。");
       setShippingReloadKey((current) => current + 1);
-      setOrdersLoading(true);
+      setShipmentReloadKey((current) => current + 1);
     } catch {
       setShippingFeedback("結束完了を登録できませんでした。");
+    }
+  };
+
+  const handleConfirmShipment = async (orderId: string) => {
+    setShipmentFeedback(null);
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/admin/orders/${orderId}/shipments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json()) as { message?: string };
+        setShipmentFeedback(payload.message ?? "出荷実績を確定できませんでした。");
+        return;
+      }
+
+      setShipmentFeedback("出荷実績を確定しました。");
+      setShipmentReloadKey((current) => current + 1);
+      setShippingReloadKey((current) => current + 1);
+    } catch {
+      setShipmentFeedback("出荷実績を確定できませんでした。");
     }
   };
 
@@ -662,6 +901,8 @@ export default function AdminPage() {
           <h1>
             {activeWorkbench === "orders"
               ? "受注一覧"
+              : activeWorkbench === "products"
+                ? "商品管理"
               : activeWorkbench === "inventory"
                 ? "在庫推移"
                 : activeWorkbench === "materials"
@@ -675,6 +916,8 @@ export default function AdminPage() {
           <p>
             {activeWorkbench === "orders"
               ? "受注の確認、詳細照会、後続業務への引き継ぎをここで行います。"
+              : activeWorkbench === "products"
+                ? "販売する花束商品と花束構成を管理し、受注画面へ反映します。"
               : activeWorkbench === "inventory"
                 ? "仕入判断のために、対象期間の在庫推移と不足見込みを確認します。"
                 : activeWorkbench === "materials"
@@ -695,6 +938,14 @@ export default function AdminPage() {
             onClick={() => setActiveWorkbench("orders")}
           >
             受注管理
+          </button>
+          <button
+            type="button"
+            className={activeWorkbench === "products" ? "switch-chip is-active" : "switch-chip"}
+            aria-pressed={activeWorkbench === "products"}
+            onClick={() => setActiveWorkbench("products")}
+          >
+            商品管理
           </button>
           <button
             type="button"
@@ -829,6 +1080,149 @@ export default function AdminPage() {
                   </dl>
                 ) : (
                   <p className="admin-empty">一覧から受注を選択すると詳細を表示します。</p>
+                )}
+              </section>
+            </div>
+          </section>
+        ) : activeWorkbench === "products" ? (
+          <section className="admin-workbench">
+            <div className="admin-pane admin-pane--primary">
+              <section className="admin-panel">
+                <div className="admin-panel-header">
+                  <div>
+                    <p className="eyebrow">Product Master</p>
+                    <h2>商品一覧</h2>
+                  </div>
+                </div>
+                {productsLoading ? (
+                  <p className="admin-empty">商品一覧を読み込んでいます。</p>
+                ) : products.length === 0 ? (
+                  <p className="admin-empty">{productsError ?? "商品が登録されていません。"}</p>
+                ) : (
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>商品名</th>
+                        <th>価格</th>
+                        <th>販売状態</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products.map((product) => (
+                        <tr key={product.productId}>
+                          <td>{product.productName}</td>
+                          <td>{product.price}</td>
+                          <td>{product.isActive ? "販売中" : "停止中"}</td>
+                          <td>
+                            <button
+                              type="button"
+                              className="table-link"
+                              aria-label={`${product.productName} を編集`}
+                              onClick={() => handleEditProduct(product.productId)}
+                            >
+                              編集
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+                {productsError || productFeedback === "商品を保存できませんでした。" ? (
+                  <div className="admin-feedback admin-feedback--error">
+                    <p>{productsError ?? productFeedback}</p>
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      onClick={() => setProductsReloadKey((current) => current + 1)}
+                    >
+                      再試行
+                    </button>
+                  </div>
+                ) : null}
+              </section>
+            </div>
+
+            <div className="admin-pane">
+              <section className="admin-panel">
+                <div className="admin-panel-header">
+                  <div>
+                    <p className="eyebrow">Product Editor</p>
+                    <h2>商品編集</h2>
+                  </div>
+                </div>
+                {productForm ? (
+                  <div className="admin-form-grid">
+                    <label className="field" htmlFor="productName">
+                      <span>商品名</span>
+                      <input
+                        id="productName"
+                        type="text"
+                        value={productForm.productName}
+                        onChange={handleProductFormChange("productName")}
+                      />
+                    </label>
+                    <label className="field" htmlFor="productDescription">
+                      <span>説明</span>
+                      <textarea
+                        id="productDescription"
+                        value={productForm.description}
+                        rows={4}
+                        onChange={handleProductFormChange("description")}
+                      />
+                    </label>
+                    <label className="field" htmlFor="productPrice">
+                      <span>価格</span>
+                      <input
+                        id="productPrice"
+                        type="number"
+                        value={productForm.price}
+                        onChange={handleProductFormChange("price")}
+                      />
+                    </label>
+                    <label className="field" htmlFor="productStatus">
+                      <span>販売状態</span>
+                      <select
+                        id="productStatus"
+                        value={String(productForm.isActive)}
+                        onChange={handleProductFormChange("isActive")}
+                      >
+                        <option value="true">販売中</option>
+                        <option value="false">停止中</option>
+                      </select>
+                    </label>
+                    <div className="admin-subsection">
+                      <h3>花束構成</h3>
+                      <div className="recipe-grid">
+                        {materials.map((material) => (
+                          <label className="field" key={material.materialId}>
+                            <span>{material.materialName}</span>
+                            <input
+                              type="number"
+                              value={
+                                productForm.materials.find((item) => item.materialId === material.materialId)
+                                  ?.quantity ?? 0
+                              }
+                              onChange={handleProductMaterialChange(material.materialId)}
+                            />
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="primary-button"
+                      onClick={() => void handleSaveProduct()}
+                    >
+                      商品を保存する
+                    </button>
+                    {productFeedback && productFeedback !== "商品を保存できませんでした。" ? (
+                      <p className="admin-inline-feedback">{productFeedback}</p>
+                    ) : null}
+                  </div>
+                ) : (
+                  <p className="admin-empty">一覧から商品を選択すると編集できます。</p>
                 )}
               </section>
             </div>
@@ -1248,6 +1642,7 @@ export default function AdminPage() {
                   <button
                     type="button"
                     className="primary-button"
+                    disabled={target.hasShortage || target.status !== "shipping-prep"}
                     onClick={() => void handleCompleteBundle(target.orderId)}
                   >
                     結束完了を登録する
@@ -1272,6 +1667,44 @@ export default function AdminPage() {
                 </button>
               </div>
             ) : null}
+
+            <section className="purchase-group">
+              <h3>出荷確定対象</h3>
+              {shipmentLoading ? <p className="admin-empty">出荷確定対象を読み込んでいます。</p> : null}
+              {!shipmentLoading &&
+                shipmentTargets.map((target) => (
+                  <section key={`shipment-${target.orderId}`} className="purchase-group">
+                    <h3>{target.orderId} / {target.customerName}</h3>
+                    <p className="admin-inline-feedback">状態: {target.status}</p>
+                    <p className="admin-inline-feedback">商品: {target.productName}</p>
+                    <button
+                      type="button"
+                      className="primary-button"
+                      onClick={() => void handleConfirmShipment(target.orderId)}
+                    >
+                      出荷実績を確定する
+                    </button>
+                  </section>
+                ))}
+              {!shipmentLoading && shipmentTargets.length === 0 ? (
+                <p className="admin-empty">{shipmentError ?? "出荷確定対象はありません。"}</p>
+              ) : null}
+              {shipmentFeedback && shipmentFeedback !== "出荷実績を確定できませんでした。" ? (
+                <p className="admin-inline-feedback">{shipmentFeedback}</p>
+              ) : null}
+              {shipmentFeedback === "出荷実績を確定できませんでした。" || shipmentError ? (
+                <div className="admin-feedback admin-feedback--error">
+                  <p>{shipmentError ?? shipmentFeedback}</p>
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={() => setShipmentReloadKey((current) => current + 1)}
+                  >
+                    再試行
+                  </button>
+                </div>
+              ) : null}
+            </section>
           </section>
         )}
       </div>
