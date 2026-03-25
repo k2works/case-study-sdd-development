@@ -58,6 +58,9 @@
 | [イテレーション 3 ふりかえり](./development/retrospective-3.md) | 作成済み |
 | [イテレーション 3 完了報告書](./development/iteration_report-3.md) | 作成済み |
 | [イテレーション 4 計画](./development/iteration_plan-4.md) | 作成済み |
+| [イテレーション 4 ふりかえり](./development/retrospective-4.md) | 作成済み |
+| [イテレーション 4 完了報告書](./development/iteration_report-4.md) | 作成済み |
+| [イテレーション 5 計画](./development/iteration_plan-5.md) | 作成済み |
 
 ### 運用 (`operation/`)
 

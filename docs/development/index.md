@@ -17,7 +17,8 @@
 | IT1 | [計画](iteration_plan-1.md) | [ふりかえり](retrospective-1.md) | [完了報告書](iteration_report-1.md) | 完了 |
 | IT2 | [計画](iteration_plan-2.md) | [ふりかえり](retrospective-2.md) | [完了報告書](iteration_report-2.md) | 完了 |
 | IT3 | [計画](iteration_plan-3.md) | [ふりかえり](retrospective-3.md) | [完了報告書](iteration_report-3.md) | 完了 |
-| IT4 | [計画](iteration_plan-4.md) | - | - | 計画済み |
+| IT4 | [計画](iteration_plan-4.md) | [ふりかえり](retrospective-4.md) | [完了報告書](iteration_report-4.md) | 完了 |
+| IT5 | [計画](iteration_plan-5.md) | - | - | 計画済み |
 
 イテレーション開始・終了時に行を更新します。
 
@@ -28,13 +29,14 @@
 | IT1 | 5 | 5 | 100% |
 | IT2 | 11 | 11 | 100% |
 | IT3 | 8 | 8 | 100% |
-| IT4 | 9 | - | - |
-| **累計** | **33** | **24** | **73%** |
+| IT4 | 9 | 9 | 100% |
+| IT5 | 6 | - | - |
+| **累計** | **39** | **33** | **85%** |
 
 ### フェーズ進捗
 
 | フェーズ | 内容 | SP | 完了 SP | 状態 |
 |---------|------|-----|---------|------|
 | Phase 1 | MVP 立ち上げ | 16 | 16 | 完了 |
-| Phase 2 | 業務拡張版 | 23 | 8 | 進行中 |
+| Phase 2 | 業務拡張版 | 23 | 17 | 進行中 |
 | Phase 3 | 体験改善版 | 10 | 0 | 未着手 |
