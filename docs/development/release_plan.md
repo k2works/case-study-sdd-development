@@ -118,6 +118,14 @@ dateCreated: 2026-03-19T00:00:00.000Z
 - 3 イテレーション終了後に平均ベロシティを再計算する
 - 計画値との差が 20% を超えた場合は、Phase 3 のスコープを次リリースへ送る
 
+### ベロシティ再計画（IT3 実績反映）
+
+| 項目 | 値 |
+|------|-----|
+| IT1-IT3 実績 | 5, 11, 8 |
+| 平均ベロシティ | 8 SP / イテレーション |
+| 再計画方針 | IT4 は `US-06`, `US-09`, `US-09B` を優先し、 `US-00` と `US-10` は次の調整枠へ送る |
+
 ## 段階的リリース戦略
 
 ### リリーススケジュール
@@ -134,11 +142,12 @@ gantt
     Release 1.0 MVP                    :milestone, r10, after it2, 0d
     section Phase 2
     IT3 マスタ保守と発注 / 入荷         :crit, it3, after it2, 14d
-    IT4 出荷機能と業務フロー統合        :crit, it4, after it3, 14d
-    Release 1.1 業務拡張版              :milestone, r11, after it4, 0d
+    IT4 入荷と出荷準備導線の実装        :crit, it4, after it3, 14d
+    IT5 商品マスタ / 出荷確定または調整  :it5, after it4, 14d
+    Release 1.1 業務拡張版              :milestone, r11, after it5, 0d
     section Buffer
-    IT5 再利用 / 変更または調整バッファ :it5, after it4, 14d
-    Release 1.2 体験改善版              :milestone, r12, after it5, 0d
+    Phase 3 再利用 / 変更               :r12scope, after r11, 14d
+    Release 1.2 体験改善版              :milestone, r12, after r12scope, 0d
 ```
 
 #### 実績スケジュール
@@ -153,11 +162,12 @@ gantt
     Release 1.0 MVP                    :milestone, m1, after a2, 0d
     section Phase 2
     IT3 マスタ保守と発注 / 入荷 (8SP 完了) :done, a3, after a2, 14d
-    IT4 出荷機能と業務フロー統合        :a4, after a3, 14d
-    Release 1.1 業務拡張版              :milestone, m2, after a4, 0d
+    IT4 入荷と出荷準備導線の実装        :a4, after a3, 14d
+    IT5 商品マスタ / 出荷確定または調整  :a5, after a4, 14d
+    Release 1.1 業務拡張版              :milestone, m2, after a5, 0d
     section Buffer
-    IT5 再利用 / 変更または調整バッファ :a5, after a4, 14d
-    Release 1.2 体験改善版              :milestone, m3, after a5, 0d
+    Phase 3 再利用 / 変更               :a6, after m2, 14d
+    Release 1.2 体験改善版              :milestone, m3, after a6, 0d
 ```
 
 ### リリース内容
@@ -285,6 +295,23 @@ gantt
 
 詳細は `iteration_plan-3.md` を参照する。
 
+### イテレーション 4（Week 7-8）
+
+**ゴール**: 入荷実績から出荷準備完了までの現場オペレーションを成立させる。
+
+**主なタスク**:
+
+- [ ] 入荷一覧 / 入荷登録 / 在庫反映
+- [ ] 出荷対象一覧と必要花材表示
+- [ ] 結束完了登録と状態遷移
+- [ ] 入荷から出荷準備までの統合テスト
+
+**目標 SP**: 9
+
+**状態**: 計画済み
+
+詳細は `iteration_plan-4.md` を参照する。
+
 ## リスク管理
 
 ### 技術リスク
@@ -320,8 +347,8 @@ gantt
 | IT1 | 5 | 5 | 100% | 完了 |
 | IT2 | 11 | 11 | 100% | 完了 |
 | IT3 | 8 | 8 | 100% | 完了 |
-| IT4 | 8 | - | - | 未着手 |
-| IT5 | 7 | - | - | バッファ |
+| IT4 | 9 | - | - | 計画済み |
+| IT5 | 6 | - | - | 調整枠 |
 
 ### バーンダウンチャート
 
@@ -330,6 +357,6 @@ xychart-beta
     title "リリースバーンダウン（計画 vs 実績）"
     x-axis [IT1, IT2, IT3, IT4, IT5]
     y-axis "残 SP" 0 --> 49
-    line "計画" [44, 33, 25, 17, 10]
+    line "計画" [44, 33, 25, 16, 10]
     line "実績" [44, 33, 25, 25, 25]
 ```
