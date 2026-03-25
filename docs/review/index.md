@@ -23,3 +23,4 @@
 | [IT3 開発前コードレビュー](it3_pre_code_review_20260324.md) | 2026-03-24 |
 | [IT3 開発前 UI/UX レビュー](it3_pre_uiux_review_20260324.md) | 2026-03-24 |
 | [IT4 コードレビュー](it4_code_review_20260324.md) | 2026-03-24 |
+| [IT5・IT6 コードレビュー / UI/UX レビュー](it5_it6_code_review_20260325.md) | 2026-03-25 |
