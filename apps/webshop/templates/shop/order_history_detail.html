@@ -19,6 +19,8 @@
       <h2 class="text-sm text-gray-500 mb-1">ステータス</h2>
       <span class="inline-block px-3 py-1 rounded text-sm
         {% if order.status.value == 'confirmed' %}bg-green-100 text-green-800
+        {% elif order.status.value == 'preparing' %}bg-blue-100 text-blue-800
+        {% elif order.status.value == 'shipped' %}bg-purple-100 text-purple-800
         {% elif order.status.value == 'cancelled' %}bg-red-100 text-red-800
         {% else %}bg-yellow-100 text-yellow-800{% endif %}">
         {{ order.status.label }}
@@ -76,11 +78,26 @@
   </div>
 
   {% if order.status.value == 'confirmed' %}
-  <div class="border-t pt-4 flex gap-4">
-    <a href="{% url 'shop:order_cancel' %}?order_number={{ order.order_number }}"
-       class="text-red-600 hover:underline text-sm">
-      注文をキャンセルする（届け日の 3 日前まで）
-    </a>
+  <div class="border-t pt-4">
+    <p class="text-xs text-gray-400 mb-2">変更・キャンセル期限: {{ order.delivery_date.change_deadline|date:"Y/m/d" }} まで</p>
+    <div class="flex gap-4">
+      <a href="{% url 'shop:change_delivery_date' order.order_number %}"
+         class="text-blue-600 hover:underline text-sm">
+        届け日を変更する
+      </a>
+      <a href="{% url 'shop:order_cancel' %}?order_number={{ order.order_number }}"
+         class="text-red-600 hover:underline text-sm">
+        注文をキャンセルする
+      </a>
+    </div>
+  </div>
+  {% elif order.status.value == 'preparing' %}
+  <div class="border-t pt-4">
+    <p class="text-sm text-gray-500">この注文は出荷準備中です。変更・キャンセルはできません。</p>
+  </div>
+  {% elif order.status.value == 'shipped' %}
+  <div class="border-t pt-4">
+    <p class="text-sm text-green-600">この注文は出荷済みです。</p>
   </div>
   {% elif order.status.value == 'cancelled' %}
   <div class="border-t pt-4">
