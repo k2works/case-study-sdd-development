@@ -9,7 +9,7 @@
       <tr><th>商品</th><td><%= @order.product.name %></td></tr>
       <tr><th>価格</th><td><%= number_to_currency(@order.price, unit: "¥", format: "%u%n") %></td></tr>
       <tr><th>届け日</th><td><%= @order.delivery_date %></td></tr>
-      <tr><th>状態</th><td><span class="badge bg-primary"><%= @order.status %></span></td></tr>
+      <tr><th>状態</th><td><span class="badge bg-<%= @order.ordered? ? 'primary' : @order.shipped? ? 'success' : 'secondary' %>"><%= @order.status %></span></td></tr>
       <tr><th>注文日時</th><td><%= @order.ordered_at&.strftime("%Y-%m-%d %H:%M") %></td></tr>
     </table>
   </div>
@@ -38,6 +38,30 @@
     <div class="card-body">
       <h5>お届けメッセージ</h5>
       <p><%= @order.message %></p>
+    </div>
+  </div>
+<% end %>
+
+<% if @order.ordered? %>
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5>届け日変更</h5>
+      <%= form_with url: order_path(@order), method: :patch, local: true, class: "row g-3" do |form| %>
+        <div class="col-auto">
+          <%= form.date_field :delivery_date, value: @order.delivery_date, min: Date.tomorrow, class: "form-control" %>
+        </div>
+        <div class="col-auto">
+          <%= form.submit "変更する", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <%= button_to "キャンセルする", cancel_order_path(@order), method: :post,
+          class: "btn btn-danger",
+          data: { turbo_confirm: "この注文をキャンセルしますか？" } %>
     </div>
   </div>
 <% end %>

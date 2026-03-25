@@ -8,27 +8,32 @@ class ShippingService
   end
 
   def ship(order)
-    validate_order_status(order)
-
     ActiveRecord::Base.transaction do
-      consume_stock(order)
-
-      shipment = Shipment.create!(
-        order: order,
-        shipped_at: Time.current
-      )
-
-      order.update!(status: "shipped")
-
-      shipment
+      ship_one(order)
     end
   end
 
   def ship_all(orders)
-    orders.map { |order| ship(order) }
+    ActiveRecord::Base.transaction do
+      orders.map { |order| ship_one(order) }
+    end
   end
 
   private
+
+  def ship_one(order)
+    validate_order_status(order)
+    consume_stock(order)
+
+    shipment = Shipment.create!(
+      order: order,
+      shipped_at: Time.current
+    )
+
+    order.update!(status: "shipped")
+
+    shipment
+  end
 
   def validate_order_status(order)
     raise AlreadyShippedError, "この受注は既に出荷済みです" if order.shipped?
@@ -46,6 +51,7 @@ class ShippingService
     stocks = Stock.where(item: item, status: "available")
                   .where("expiry_date >= ?", @current_date)
                   .order(expiry_date: :asc)
+                  .lock("FOR UPDATE")
 
     stocks.each do |stock|
       break if remaining <= 0

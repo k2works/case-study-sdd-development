@@ -12,6 +12,20 @@ RSpec.describe "Shop (得意先向け)", type: :request do
     end
   end
 
+  describe "ログイン時の遷移" do
+    let(:staff_user) { create(:user, role: "staff") }
+
+    it "得意先はショップ画面に遷移する" do
+      post user_session_path, params: { user: { email: customer_user.email, password: "password123" } }
+      expect(response).to redirect_to(shop_path)
+    end
+
+    it "スタッフは管理画面に遷移する" do
+      post user_session_path, params: { user: { email: staff_user.email, password: "password123" } }
+      expect(response).to redirect_to(root_path)
+    end
+  end
+
   describe "認証済み得意先の場合" do
     before { sign_in customer_user }
 

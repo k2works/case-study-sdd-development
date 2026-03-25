@@ -60,7 +60,13 @@
 | [IT4 計画](./development/iteration_plan-4.md) | 完了 |
 | [IT4 ふりかえり](./development/retrospective-4.md) | 完了 |
 | [IT4 完了報告書](./development/iteration_report-4.md) | 完了 |
-| [IT5 計画](./development/iteration_plan-5.md) | 進行中 |
+| [IT5 計画](./development/iteration_plan-5.md) | 完了 |
+| [IT5 ふりかえり](./development/retrospective-5.md) | 完了 |
+| [IT5 完了報告書](./development/iteration_report-5.md) | 完了 |
+| [IT6 計画](./development/iteration_plan-6.md) | 完了 |
+| [IT6 ふりかえり](./development/retrospective-6.md) | 完了 |
+| [IT6 完了報告書](./development/iteration_report-6.md) | 完了 |
+| [リリース完了報告書](./development/release_report.md) | 完了 |
 
 ### 運用 (`operation/`)
 
@@ -92,6 +98,7 @@
 | [IT3 S08 コードレビュー](./review/S08_stock_forecast_review_20260324.md) | 2026-03-24 |
 | [IT3 S08 UI/UX レビュー](./review/S08_stock_forecast_uiux_review_20260324.md) | 2026-03-24 |
 | [IT4 コードレビュー](./review/it4_code_review_20260324.md) | 2026-03-24 |
+| [IT5 出荷レビュー](./review/it5_shipment_review_20260325.md) | 2026-03-25 |
 
 ### リファレンス (`reference/`)
 

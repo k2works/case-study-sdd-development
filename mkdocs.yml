@@ -101,6 +101,12 @@ nav:
       - IT4 ふりかえり: development/retrospective-4.md
       - IT4 完了報告書: development/iteration_report-4.md
       - IT5 計画: development/iteration_plan-5.md
+      - IT5 ふりかえり: development/retrospective-5.md
+      - IT5 完了報告書: development/iteration_report-5.md
+      - IT6 計画: development/iteration_plan-6.md
+      - IT6 ふりかえり: development/retrospective-6.md
+      - IT6 完了報告書: development/iteration_report-6.md
+      - リリース完了報告書: development/release_report.md
   - 運用:
       - 概要: operation/index.md
       - アプリケーション開発環境セットアップ: operation/app-development-setup.md
@@ -116,6 +122,7 @@ nav:
       - IT3 S08 コードレビュー: review/S08_stock_forecast_review_20260324.md
       - IT3 S08 UI/UX レビュー: review/S08_stock_forecast_uiux_review_20260324.md
       - IT4 コードレビュー: review/it4_code_review_20260324.md
+      - IT5 出荷レビュー: review/it5_shipment_review_20260325.md
   - リファレンス:
       - 概要: reference/index.md
       - よいソフトウェアとは: reference/よいソフトウェアとは.md
@@ -137,6 +144,11 @@ nav:
       - リリース・イテレーション計画ガイド: reference/リリース・イテレーション計画ガイド.md
       - 環境変数管理ガイド: reference/環境変数管理ガイド.md
       - 言語別開発ガイド: reference/言語別開発ガイド.md
+      - 運用スクリプト作成ガイド: reference/運用スクリプト作成ガイド.md
+      - SonarQube セットアップ: reference/SonarQubeローカル環境セットアップ手順書.md
+      - Codex CLI MCP 開発フロー: reference/CodexCLIMCPアプリケーション開発フロー.md
+      - Codex CLI MCP サーバー設定: reference/CodexCLIMCPサーバー設定手順.md
+      - Vim 操作マニュアル: reference/Vim操作マニュアル.md
   - ADR:
       - 概要: adr/index.md
       - ADR-001 Rails モノリシック: adr/001-rails-monolithic-architecture.md
@@ -153,4 +165,9 @@ nav:
       - イテレーション計画: template/イテレーション計画.md
       - イテレーション完了報告書: template/イテレーション完了報告書.md
       - リリース計画: template/リリース計画.md
+      - リリース完了報告書: template/リリース完了報告書.md
+      - アプリケーション開発環境セットアップ: template/アプリケーション開発環境セットアップ手順書.md
+      - 開発環境セットアップ: template/開発環境セットアップ手順書.md
+      - AWS ステージング環境セットアップ: template/AWSステージング環境セットアップ手順書.md
+      - AWS プロダクション環境セットアップ: template/AWSプロダクション環境セットアップ手順書.md
       - README: template/README.md

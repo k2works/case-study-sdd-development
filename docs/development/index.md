@@ -18,7 +18,8 @@
 | IT2 | [計画](iteration_plan-2.md) | [ふりかえり](retrospective-2.md) | [報告書](iteration_report-2.md) | 完了 |
 | IT3 | [計画](iteration_plan-3.md) | [ふりかえり](retrospective-3.md) | [報告書](iteration_report-3.md) | 完了 |
 | IT4 | [計画](iteration_plan-4.md) | [ふりかえり](retrospective-4.md) | [報告書](iteration_report-4.md) | 完了 |
-| IT5 | [計画](iteration_plan-5.md) | - | - | 進行中 |
+| IT5 | [計画](iteration_plan-5.md) | [ふりかえり](retrospective-5.md) | [報告書](iteration_report-5.md) | 完了 |
+| IT6 | [計画](iteration_plan-6.md) | [ふりかえり](retrospective-6.md) | [報告書](iteration_report-6.md) | 完了 |
 
 イテレーション開始時に行を追加します。
 
@@ -30,12 +31,14 @@
 | IT2 | 11 | 11 | 100% |
 | IT3 | 8 | 8 | 100% |
 | IT4 | 8 | 8 | 100% |
-| **累計** | **36** | **36** | **100%** |
+| IT5 | 8 | 8 | 100% |
+| IT6 | 14 | 14 | 100% |
+| **累計** | **58** | **58** | **100%** |
 
 ### フェーズ進捗
 
 | フェーズ | 内容 | SP | 完了 SP | 状態 |
 |---------|------|-----|---------|------|
 | Phase 1（MVP） | 商品マスタ・受注・在庫推移 | 28 | 28 | 完了 |
-| Phase 2（仕入出荷） | 仕入・入荷・出荷管理 | 16 | 8 | IT4 完了 |
-| Phase 3（顧客体験） | 届け先コピー・届け日変更・キャンセル | 14 | 0 | 未着手 |
+| Phase 2（仕入出荷） | 仕入・入荷・出荷管理 | 16 | 16 | 完了 |
+| Phase 3（顧客体験） | 届け先コピー・届け日変更・キャンセル | 14 | 14 | 完了 |

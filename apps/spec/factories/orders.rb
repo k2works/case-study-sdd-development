@@ -6,7 +6,7 @@ FactoryBot.define do
     delivery_date { 3.days.from_now.to_date }
     message { "お誕生日おめでとうございます" }
     price { 5500 }
-    status { "ordered" }
+    status { :ordered }
     ordered_at { Time.current }
   end
 end

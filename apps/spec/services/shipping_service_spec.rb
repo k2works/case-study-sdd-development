@@ -101,6 +101,59 @@ RSpec.describe ShippingService, type: :service do
       end
     end
 
+    context "在庫消費の境界値" do
+      it "在庫がちょうど必要数量の場合は出荷できる" do
+        stock.update!(quantity: 3) # composition.quantity = 3
+        expect { service.ship(order) }.to change(Shipment, :count).by(1)
+        expect(stock.reload.quantity).to eq(0)
+      end
+
+      it "複数ロットにまたがって消費する（FEFO: 先期限先出）" do
+        stock.update!(quantity: 1)
+        stock2 = create(:stock, item: item, quantity: 5,
+                        arrived_date: base_date - 1.day,
+                        expiry_date: base_date + 6.days,
+                        status: "available")
+        service.ship(order)
+        # 先に期限が近い stock(qty:1) → stock2(qty:5) の順で消費
+        expect(stock.reload.quantity).to eq(0)
+        expect(stock2.reload.quantity).to eq(3)  # 5 - 2 = 3
+      end
+
+      it "期限切れの在庫はスキップする" do
+        expired_stock = create(:stock, item: item, quantity: 100,
+                               arrived_date: base_date - 10.days,
+                               expiry_date: base_date - 1.day,
+                               status: "available")
+        service.ship(order)
+        # 期限切れの在庫は消費されない
+        expect(expired_stock.reload.quantity).to eq(100)
+        expect(stock.reload.quantity).to eq(7)
+      end
+    end
+
+    context "ship_all の部分失敗" do
+      let!(:order2) do
+        create(:order,
+          customer: customer,
+          product: product,
+          delivery_address: delivery_address,
+          delivery_date: base_date + 1.day,
+          status: "ordered"
+        )
+      end
+
+      it "途中で在庫不足になった場合は全件ロールバックされる" do
+        stock.update!(quantity: 4) # 3 * 2 = 6 必要だが 4 しかない
+        expect {
+          service.ship_all([order, order2]) rescue nil
+        }.not_to change(Shipment, :count)
+        expect(order.reload.status).to eq("ordered")
+        expect(order2.reload.status).to eq("ordered")
+        expect(stock.reload.quantity).to eq(4)
+      end
+    end
+
     context "在庫不足の場合" do
       before { stock.update!(quantity: 1) }
 

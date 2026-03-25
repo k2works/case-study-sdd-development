@@ -6,12 +6,17 @@ Rails.application.routes.draw do
     resources :compositions, only: [ :index, :create, :destroy ]
   end
   resources :items, except: [ :show, :destroy ]
-  resources :orders, only: [ :index, :show ]
+  resources :orders, only: [ :index, :show, :update ] do
+    member do
+      post :cancel
+    end
+  end
   resources :stock_forecasts, only: [ :index ]
   resources :purchase_orders, only: [ :index, :new, :create, :show ] do
     resources :arrivals, only: [ :new, :create ]
   end
   resources :shipments, only: [ :index, :create ]
+  resources :customers, only: [ :index, :edit, :update ]
 
   # 得意先向けショップ
   get "shop", to: "shop#index", as: :shop

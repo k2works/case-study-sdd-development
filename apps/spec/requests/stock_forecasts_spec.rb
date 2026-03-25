@@ -16,7 +16,7 @@ RSpec.describe "StockForecasts (在庫推移)", type: :request do
 
     it "アクセスが拒否される" do
       get stock_forecasts_path
-      expect(response).to redirect_to(root_path)
+      expect(response).to redirect_to(shop_path)
     end
   end
 
