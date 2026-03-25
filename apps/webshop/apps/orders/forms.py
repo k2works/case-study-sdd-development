@@ -4,12 +4,26 @@ from datetime import date, timedelta
 
 from django import forms
 
-_INPUT_CSS = "w-full border rounded p-2"
+_INPUT_CSS = (
+    "w-full border rounded-lg p-2"
+    " focus:ring-2 focus:ring-pink-500 focus:border-pink-500 focus:outline-none"
+)
 
 
 class OrderForm(forms.Form):
-    """注文入力フォーム。"""
+    """注文入力フォーム。
 
+    フィールド順序は UI 設計書 C-05 に準拠:
+    1. 届け日 → 2. 届け先 → 3. メッセージカード → 4. 数量
+    """
+
+    # 1. 届け日
+    delivery_date = forms.DateField(
+        label="届け日",
+        widget=forms.DateInput(attrs={"type": "date", "class": _INPUT_CSS}),
+    )
+
+    # 2. 届け先
     recipient_name = forms.CharField(
         label="届け先氏名",
         max_length=100,
@@ -32,10 +46,8 @@ class OrderForm(forms.Form):
             attrs={"class": _INPUT_CSS, "placeholder": "03-1234-5678"}
         ),
     )
-    delivery_date = forms.DateField(
-        label="届け日",
-        widget=forms.DateInput(attrs={"type": "date", "class": _INPUT_CSS}),
-    )
+
+    # 3. メッセージカード
     message = forms.CharField(
         label="メッセージカード",
         max_length=200,
@@ -48,11 +60,21 @@ class OrderForm(forms.Form):
             }
         ),
     )
+
+    # 4. 数量
     quantity = forms.IntegerField(
         label="数量",
         min_value=1,
         initial=1,
-        widget=forms.NumberInput(attrs={"class": "w-20 border rounded p-2"}),
+        widget=forms.NumberInput(
+            attrs={
+                "class": (
+                    "w-20 border rounded-lg p-2"
+                    " focus:ring-2 focus:ring-pink-500"
+                    " focus:border-pink-500 focus:outline-none"
+                ),
+            }
+        ),
     )
 
     def clean_delivery_date(self):

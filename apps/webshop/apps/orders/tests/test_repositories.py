@@ -91,3 +91,65 @@ class TestDjangoOrderRepository:
         self.repo.save(saved)
         found = self.repo.find_by_id(saved.id)
         assert found.status == OrderStatus.CONFIRMED
+
+    def test_全注文を取得できる(self):
+        self.repo.save(self._make_order(order_number=OrderNumber("ORD-TEST-010")))
+        self.repo.save(self._make_order(order_number=OrderNumber("ORD-TEST-011")))
+        orders = self.repo.find_all()
+        assert len(orders) == 2
+
+    def test_ステータスでフィルタできる(self):
+        o1 = self._make_order(order_number=OrderNumber("ORD-TEST-020"))
+        o1.confirm()
+        self.repo.save(o1)
+
+        o2 = self._make_order(
+            order_number=OrderNumber("ORD-TEST-021"),
+            delivery_date=DeliveryDate(date.today() + timedelta(days=10)),
+        )
+        self.repo.save(o2)
+
+        confirmed = self.repo.find_all(status="confirmed")
+        assert len(confirmed) == 1
+        assert confirmed[0].status == OrderStatus.CONFIRMED
+
+        pending = self.repo.find_all(status="pending")
+        assert len(pending) == 1
+
+    def test_日付範囲でフィルタできる(self):
+        d1 = date.today() + timedelta(days=3)
+        d2 = date.today() + timedelta(days=10)
+        self.repo.save(
+            self._make_order(
+                order_number=OrderNumber("ORD-TEST-030"),
+                delivery_date=DeliveryDate(d1),
+            )
+        )
+        self.repo.save(
+            self._make_order(
+                order_number=OrderNumber("ORD-TEST-031"),
+                delivery_date=DeliveryDate(d2),
+            )
+        )
+
+        filtered = self.repo.find_all(date_from=d2, date_to=d2)
+        assert len(filtered) == 1
+
+    def test_過去の届け先を重複なしで取得できる(self):
+        self.repo.save(self._make_order(order_number=OrderNumber("ORD-TEST-040")))
+        self.repo.save(self._make_order(order_number=OrderNumber("ORD-TEST-041")))
+        self.repo.save(
+            self._make_order(
+                order_number=OrderNumber("ORD-TEST-042"),
+                delivery_address=DeliveryAddress(
+                    recipient_name="田中太郎",
+                    postal_code="530-0001",
+                    address="大阪府大阪市北区1-1",
+                    phone="06-1234-5678",
+                ),
+            )
+        )
+        addresses = self.repo.find_recent_addresses()
+        assert len(addresses) == 2
+        names = {a.recipient_name for a in addresses}
+        assert names == {"山田太郎", "田中太郎"}

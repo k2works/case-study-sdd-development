@@ -1,8 +1,13 @@
-"""受注ドメインのエンティティ。"""
+"""受注ドメインのエンティティ定義。
+
+DeliveryAddress, OrderLine, Order の各エンティティを定義する。
+Order が集約ルートとして注文のライフサイクルを管理する。
+"""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date
 from decimal import Decimal
 
 from apps.orders.domain.value_objects import (
@@ -71,3 +76,13 @@ class Order:
         if self.status != OrderStatus.PENDING:
             raise ValueError("保留中の注文のみ確定できます")
         self.status = OrderStatus.CONFIRMED
+
+    def cancel(self, current_date: date) -> None:
+        """注文をキャンセルする。届け日 3 日前まで可能。"""
+        if self.status == OrderStatus.CANCELLED:
+            raise ValueError("既にキャンセル済みです")
+        if self.status not in (OrderStatus.PENDING, OrderStatus.CONFIRMED):
+            raise ValueError("この注文はキャンセルできません")
+        if current_date > self.delivery_date.change_deadline():
+            raise ValueError("キャンセル期限を過ぎています")
+        self.status = OrderStatus.CANCELLED

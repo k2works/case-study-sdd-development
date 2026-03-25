@@ -1,0 +1,47 @@
+{% extends "shop/base.html" %}
+
+{% block title %}過去の届け先を選択 - フレール・メモワール{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{% url 'shop:order_form' product.pk %}" class="text-pink-600 hover:underline text-sm">&larr; 注文入力に戻る</a>
+</div>
+
+<div class="bg-white rounded-lg shadow p-6">
+  <h1 class="text-xl font-bold mb-4">過去の届け先を選択</h1>
+
+  {% if addresses %}
+  <table class="w-full text-sm">
+    <thead class="bg-gray-50">
+      <tr>
+        <th class="px-4 py-3 text-left">お名前</th>
+        <th class="px-4 py-3 text-left">住所</th>
+        <th class="px-4 py-3 text-left">電話番号</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y">
+      {% for addr in addresses %}
+      <tr class="hover:bg-gray-50">
+        <td class="px-4 py-3">{{ addr.recipient_name }}</td>
+        <td class="px-4 py-3">〒{{ addr.postal_code }} {{ addr.address }}</td>
+        <td class="px-4 py-3">{{ addr.phone }}</td>
+        <td class="px-4 py-3">
+          <form method="post" action="{% url 'shop:address_select' product.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="recipient_name" value="{{ addr.recipient_name }}">
+            <input type="hidden" name="postal_code" value="{{ addr.postal_code }}">
+            <input type="hidden" name="address" value="{{ addr.address }}">
+            <input type="hidden" name="phone" value="{{ addr.phone }}">
+            <button type="submit" class="bg-pink-600 text-white px-3 py-1 rounded text-xs hover:bg-pink-700 transition">選択</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-gray-500 text-center py-8">過去の届け先がありません。</p>
+  {% endif %}
+</div>
+{% endblock %}

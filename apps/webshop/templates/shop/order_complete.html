@@ -13,9 +13,9 @@
   </div>
 
   <div class="text-left space-y-2 text-sm text-gray-600 mb-8">
-    <p><span class="font-medium">届け先:</span> {{ order.recipient_name }}</p>
-    <p><span class="font-medium">届け日:</span> {{ order.delivery_date }}</p>
-    {% if order.message %}
+    <p><span class="font-medium">届け先:</span> {{ order.delivery_address.recipient_name }}</p>
+    <p><span class="font-medium">届け日:</span> {{ order.delivery_date.value|date:"Y年m月d日" }}</p>
+    {% if order.message.value %}
     <p><span class="font-medium">メッセージ:</span> {{ order.message }}</p>
     {% endif %}
   </div>

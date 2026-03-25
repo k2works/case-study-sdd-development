@@ -37,6 +37,11 @@ class Order(models.Model):
         verbose_name_plural = "注文"
         ordering = ["-created_at"]
 
+    @property
+    def total(self):
+        """合計金額を算出する。"""
+        return sum(line.subtotal for line in self.lines.all())
+
     def __str__(self):
         return self.order_number
 
@@ -51,6 +56,11 @@ class OrderLine(models.Model):
         "単価（注文時点）", max_digits=10, decimal_places=2
     )
     quantity = models.PositiveIntegerField("数量", default=1)
+
+    @property
+    def subtotal(self):
+        """小計を算出する。"""
+        return self.unit_price * self.quantity
 
     class Meta:
         db_table = "orders_order_line"

@@ -9,10 +9,21 @@
 <body class="bg-gray-50 min-h-screen">
   <header class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-4 py-4">
-      <a href="{% url 'shop:product_list' %}" class="text-2xl font-bold text-pink-600">
-        Fleur Mémoire
-      </a>
-      <p class="text-sm text-gray-500">フレール・メモワール — 花束のオンラインショップ</p>
+      <div class="flex items-center justify-between">
+        <div>
+          <a href="{% url 'shop:product_list' %}" class="text-2xl font-bold text-pink-600">
+            Fleur Mémoire
+          </a>
+          <p class="text-sm text-gray-500">フレール・メモワール — 花束のオンラインショップ</p>
+        </div>
+        <nav class="flex gap-4 text-sm">
+          <a href="{% url 'shop:product_list' %}" class="text-gray-600 hover:text-pink-600 transition">商品一覧</a>
+          <a href="{% url 'shop:order_history' %}" class="text-gray-600 hover:text-pink-600 transition">注文履歴</a>
+          <a href="{% url 'shop:order_cancel' %}" class="text-gray-600 hover:text-pink-600 transition">注文キャンセル</a>
+          <a href="{% url 'staff_orders:order_list' %}" class="text-gray-600 hover:text-pink-600 transition">受注管理</a>
+          <a href="{% url 'inventory:stock_forecast' %}" class="text-gray-600 hover:text-pink-600 transition">在庫推移</a>
+        </nav>
+      </div>
     </div>
   </header>
 

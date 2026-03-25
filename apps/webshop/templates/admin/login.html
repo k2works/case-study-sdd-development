@@ -1,0 +1,36 @@
+{% extends "admin/login.html" %}
+{% load i18n %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .dev-autofill-notice {
+      background: #ffc;
+      border: 1px solid #dda;
+      border-radius: 4px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      font-size: 0.85em;
+      color: #555;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  {% if debug %}
+    <div class="dev-autofill-notice">
+      開発環境: ユーザー名・パスワードは自動入力済みです。
+    </div>
+  {% endif %}
+  {{ block.super }}
+  {% if debug %}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var u = document.getElementById('id_username');
+        var p = document.getElementById('id_password');
+        if (u && !u.value) u.value = 'admin';
+        if (p && !p.value) p.value = 'admin';
+      });
+    </script>
+  {% endif %}
+{% endblock %}
