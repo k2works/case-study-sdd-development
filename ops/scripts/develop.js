@@ -245,6 +245,13 @@ export default function(gulp) {
     done();
   }));
 
+  gulp.task('dev:seed', (done) => {
+    console.log('シードデータを投入しています...');
+    execInApps('bin/rails db:seed');
+    console.log('シードデータの投入が完了しました');
+    done();
+  });
+
   // --- セットアップタスク ---
 
   gulp.task('dev:setup', gulp.series((done) => {
@@ -325,6 +332,7 @@ export default function(gulp) {
   dev:db:setup            DB 作成 + マイグレーション + シード
   dev:db:migrate          マイグレーション実行
   dev:db:reset            DB リセット（drop + create + migrate + seed）
+  dev:seed                シードデータ投入
 
   dev:test                全テスト実行（RSpec）
   dev:lint                RuboCop 実行
