@@ -4,6 +4,7 @@ from django.urls import path
 
 from apps.orders.views import (
     AddressSelectView,
+    ChangeDeliveryDateView,
     OrderCancelView,
     OrderCompleteView,
     OrderFormView,
@@ -34,5 +35,10 @@ urlpatterns = [
         "order/<str:order_number>/",
         OrderHistoryDetailView.as_view(),
         name="order_history_detail",
+    ),
+    path(
+        "order/<str:order_number>/change-date/",
+        ChangeDeliveryDateView.as_view(),
+        name="change_delivery_date",
     ),
 ]

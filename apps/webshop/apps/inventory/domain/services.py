@@ -13,38 +13,57 @@ from apps.inventory.domain.entities import DailyForecast, StockLot
 class StockForecastService:
     """在庫推移計算ドメインサービス。
 
-    IT3 では引当なし（outgoing_planned / incoming_planned は常に 0）。
-    在庫ロットの品質維持期限に基づく廃棄予定のみを計算する。
+    在庫ロットの品質維持期限に基づく廃棄予定と、
+    発注の入荷予定日に基づく入荷予定を計算する。
     """
 
     def calculate_forecast(
         self,
+        item_id: int,
         start_date: date,
         days: int,
         stock_lots: list[StockLot],
+        incoming_schedule: dict[date, int] | None = None,
     ) -> list[DailyForecast]:
-        """日別在庫推移を計算する。"""
+        """日別在庫推移を計算する。
+
+        Args:
+            item_id: 単品 ID
+            start_date: 開始日
+            days: 日数
+            stock_lots: 在庫ロット一覧
+            incoming_schedule: 入荷予定 {日付: 数量} の辞書
+        """
+        if incoming_schedule is None:
+            incoming_schedule = {}
+
         forecasts: list[DailyForecast] = []
         # ロットごとの残数量を追跡するためにコピー
         lot_remaining = {lot.id: lot.remaining_quantity for lot in stock_lots}
+        # 入荷予定による累積増分
+        cumulative_incoming = 0
 
         for i in range(days):
             current_date = start_date + timedelta(days=i)
             expiring = 0
+            incoming = incoming_schedule.get(current_date, 0)
+            cumulative_incoming += incoming
 
             # 当日に期限切れとなるロットの廃棄数量を計算
             for lot in stock_lots:
                 if lot.expiry_date.value == current_date and lot_remaining[lot.id] > 0:
                     expiring += lot_remaining[lot.id]
 
-            stock_remaining = sum(lot_remaining.values()) - expiring
+            # 在庫残 = 全ロットの残数量 - 当日廃棄分 + 入荷予定累積
+            lot_total = sum(lot_remaining.values())
+            stock_remaining = lot_total - expiring + cumulative_incoming
 
             forecasts.append(
                 DailyForecast(
                     date=current_date,
                     stock_remaining=stock_remaining,
                     outgoing_planned=0,
-                    incoming_planned=0,
+                    incoming_planned=incoming,
                     expiring=expiring,
                 )
             )

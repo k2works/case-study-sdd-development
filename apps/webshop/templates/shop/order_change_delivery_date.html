@@ -1,0 +1,35 @@
+{% extends "shop/base.html" %}
+
+{% block title %}届け日変更 - フレール・メモワール{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">届け日を変更する</h1>
+
+<div class="bg-white rounded-lg shadow p-6 max-w-lg">
+  <div class="mb-4 text-sm">
+    <p><strong>注文番号:</strong> {{ order.order_number }}</p>
+    <p><strong>現在の届け日:</strong> {{ order.delivery_date.value|date:"Y/m/d" }}</p>
+    <p><strong>変更期限:</strong> {{ order.delivery_date.change_deadline|date:"Y/m/d" }} まで</p>
+  </div>
+
+  {% if error %}
+  <div class="bg-red-50 border border-red-200 rounded p-3 mb-4 text-sm text-red-800">
+    {{ error }}
+  </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-6">
+      <label for="new_delivery_date" class="block text-sm font-medium text-gray-700 mb-1">新しい届け日</label>
+      <input type="date" id="new_delivery_date" name="new_delivery_date" required
+             class="w-full border rounded px-3 py-2 text-sm">
+    </div>
+
+    <div class="flex gap-3">
+      <button type="submit" class="bg-pink-600 text-white px-6 py-2 rounded hover:bg-pink-700 transition text-sm">届け日を変更する</button>
+      <a href="{% url 'shop:order_history_detail' order.order_number %}" class="text-gray-500 hover:text-gray-700 px-4 py-2 text-sm">キャンセル</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

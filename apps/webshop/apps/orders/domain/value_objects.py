@@ -25,14 +25,12 @@ class OrderNumber:
 
 
 class OrderStatus(enum.Enum):
-    """注文ステータス。
-
-    IT3 現在: PENDING → CONFIRMED → CANCELLED の 3 状態。
-    IT4 以降: PREPARING, SHIPPED を追加予定（ADR-001 参照）。
-    """
+    """注文ステータス。"""
 
     PENDING = "pending"
     CONFIRMED = "confirmed"
+    PREPARING = "preparing"
+    SHIPPED = "shipped"
     CANCELLED = "cancelled"
 
     @property
@@ -44,6 +42,8 @@ class OrderStatus(enum.Enum):
 _STATUS_LABELS = {
     OrderStatus.PENDING: "保留中",
     OrderStatus.CONFIRMED: "確定",
+    OrderStatus.PREPARING: "出荷準備中",
+    OrderStatus.SHIPPED: "出荷済み",
     OrderStatus.CANCELLED: "キャンセル",
 }
 

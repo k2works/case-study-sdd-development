@@ -18,4 +18,6 @@ urlpatterns = [
     path("shop/", include("apps.products.shop_urls")),
     path("staff/orders/", include("apps.orders.staff_urls")),
     path("inventory/", include("apps.inventory.urls")),
+    path("staff/purchasing/", include("apps.purchasing.urls")),
+    path("staff/shipping/", include("apps.shipping.urls")),
 ]
