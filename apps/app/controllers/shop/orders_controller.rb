@@ -5,6 +5,7 @@ class Shop::OrdersController < ApplicationController
   def new
     @product = Product.find(params[:product_id])
     @order = Order.new
+    @past_addresses = DeliveryAddress.for_customer(current_user.customer)
   end
 
   def confirm
@@ -42,7 +43,10 @@ class Shop::OrdersController < ApplicationController
       end
     end
 
-    render :new, status: :unprocessable_entity unless @order&.persisted?
+    unless @order&.persisted?
+      @past_addresses = DeliveryAddress.for_customer(current_user.customer)
+      render :new, status: :unprocessable_entity
+    end
   end
 
   def complete

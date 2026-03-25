@@ -10,6 +10,22 @@
   </div>
 
   <h2>届け先</h2>
+  <% if @past_addresses.any? %>
+    <div class="mb-3">
+      <label class="form-label">過去の届け先からコピー</label>
+      <select class="form-select" id="past_address_select" data-controller="address-copy" data-action="change->address-copy#copy">
+        <option value="">選択してください</option>
+        <% @past_addresses.each do |addr| %>
+          <option value="<%= addr.id %>"
+                  data-recipient-name="<%= addr.recipient_name %>"
+                  data-address="<%= addr.address %>"
+                  data-phone="<%= addr.phone %>">
+            <%= addr.recipient_name %> - <%= addr.address %>
+          </option>
+        <% end %>
+      </select>
+    </div>
+  <% end %>
   <div class="mb-3">
     <%= form.label :recipient_name, "氏名", class: "form-label", for: "order_recipient_name" %>
     <%= form.text_field :recipient_name, class: "form-control", name: "order[recipient_name]", id: "order_recipient_name" %>
