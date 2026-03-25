@@ -186,6 +186,50 @@ class OrderCompleteView(View):
         return render(request, "shop/order_complete.html", {"order": order})
 
 
+class ChangeDeliveryDateView(View):
+    """届け日変更画面（US-013）。"""
+
+    def get(self, request, order_number):
+        service = _get_order_service()
+        order = service.find_order_by_number(order_number)
+        if order is None:
+            raise Http404
+        return render(
+            request,
+            "shop/order_change_delivery_date.html",
+            {"order": order, "error": None},
+        )
+
+    def post(self, request, order_number):
+        service = _get_order_service()
+        order = service.find_order_by_number(order_number)
+        if order is None:
+            raise Http404
+        new_date_str = request.POST.get("new_delivery_date", "")
+        if not new_date_str:
+            return render(
+                request,
+                "shop/order_change_delivery_date.html",
+                {"order": order, "error": "届け日を入力してください"},
+            )
+        try:
+            new_date = _parse_date(new_date_str)
+            if new_date is None:
+                raise ValueError("日付の形式が正しくありません")
+            service.change_delivery_date(order.id, new_date)
+            return redirect(
+                "shop:order_history_detail",
+                order_number=order_number,
+            )
+        except ValueError as e:
+            order = service.find_order_by_number(order_number)
+            return render(
+                request,
+                "shop/order_change_delivery_date.html",
+                {"order": order, "error": str(e)},
+            )
+
+
 class OrderCancelView(View):
     """注文キャンセル画面。注文番号で検索しキャンセルする。"""
 

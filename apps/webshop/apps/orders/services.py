@@ -96,3 +96,16 @@ class OrderService:
             raise ValueError("注文が見つかりません")
         order.cancel(current_date=date.today())
         return self._order_repo.save(order)
+
+    def change_delivery_date(
+        self, order_id: int, new_date: date
+    ) -> Order:
+        """届け日を変更する。"""
+        order = self._order_repo.find_by_id(order_id)
+        if order is None:
+            raise ValueError("注文が見つかりません")
+        order.change_delivery_date(
+            new_date=DeliveryDate(new_date),
+            current_date=date.today(),
+        )
+        return self._order_repo.save(order)

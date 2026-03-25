@@ -46,6 +46,16 @@ class TestOrderStatus:
     def test_確定状態はCONFIRMED(self):
         assert OrderStatus.CONFIRMED.value == "confirmed"
 
+    def test_出荷準備中ステータス(self):
+        assert OrderStatus.PREPARING.value == "preparing"
+
+    def test_出荷済みステータス(self):
+        assert OrderStatus.SHIPPED.value == "shipped"
+
+    def test_ラベルが正しい(self):
+        assert OrderStatus.PREPARING.label == "出荷準備中"
+        assert OrderStatus.SHIPPED.label == "出荷済み"
+
 
 # --- DeliveryDate ---
 
@@ -283,3 +293,96 @@ class TestOrder:
         order.confirm()
         with pytest.raises(ValueError, match="キャンセル期限"):
             order.cancel(current_date=date.today() + timedelta(days=1))
+
+    def test_出荷準備中の注文はキャンセルできない(self):
+        order = self._make_order(
+            delivery_date=DeliveryDate(date.today() + timedelta(days=10))
+        )
+        order.confirm()
+        order.start_preparing()
+        with pytest.raises(ValueError, match="キャンセルできません"):
+            order.cancel(current_date=date.today())
+
+    # --- start_preparing ---
+
+    def test_確定済み注文を出荷準備にできる(self):
+        order = self._make_order()
+        order.confirm()
+        order.start_preparing()
+        assert order.status == OrderStatus.PREPARING
+
+    def test_未確定の注文は出荷準備できない(self):
+        order = self._make_order()
+        with pytest.raises(ValueError, match="確定済みの注文のみ"):
+            order.start_preparing()
+
+    def test_出荷準備中の注文は再度出荷準備できない(self):
+        order = self._make_order()
+        order.confirm()
+        order.start_preparing()
+        with pytest.raises(ValueError, match="確定済みの注文のみ"):
+            order.start_preparing()
+
+    # --- ship ---
+
+    def test_出荷準備中の注文を出荷できる(self):
+        order = self._make_order()
+        order.confirm()
+        order.start_preparing()
+        order.ship()
+        assert order.status == OrderStatus.SHIPPED
+
+    def test_確定済みの注文は直接出荷できない(self):
+        order = self._make_order()
+        order.confirm()
+        with pytest.raises(ValueError, match="出荷準備中の注文のみ"):
+            order.ship()
+
+    # --- change_delivery_date ---
+
+    def test_届け日を変更できる(self):
+        order = self._make_order(
+            delivery_date=DeliveryDate(date.today() + timedelta(days=10))
+        )
+        order.confirm()
+        new_date = DeliveryDate(date.today() + timedelta(days=14))
+        order.change_delivery_date(new_date, current_date=date.today())
+        assert order.delivery_date == new_date
+
+    def test_変更期限を過ぎると届け日変更できない(self):
+        order = self._make_order(
+            delivery_date=DeliveryDate(date.today() + timedelta(days=3))
+        )
+        order.confirm()
+        new_date = DeliveryDate(date.today() + timedelta(days=14))
+        with pytest.raises(ValueError, match="変更期限"):
+            order.change_delivery_date(
+                new_date,
+                current_date=date.today() + timedelta(days=1),
+            )
+
+    def test_キャンセル済み注文の届け日は変更できない(self):
+        order = self._make_order(
+            delivery_date=DeliveryDate(date.today() + timedelta(days=10))
+        )
+        order.cancel(current_date=date.today())
+        new_date = DeliveryDate(date.today() + timedelta(days=14))
+        with pytest.raises(ValueError, match="キャンセル済み"):
+            order.change_delivery_date(new_date, current_date=date.today())
+
+    def test_出荷準備中の注文の届け日は変更できない(self):
+        order = self._make_order(
+            delivery_date=DeliveryDate(date.today() + timedelta(days=10))
+        )
+        order.confirm()
+        order.start_preparing()
+        new_date = DeliveryDate(date.today() + timedelta(days=14))
+        with pytest.raises(ValueError, match="出荷準備以降"):
+            order.change_delivery_date(new_date, current_date=date.today())
+
+    # --- shipping_date ---
+
+    def test_出荷日は届け日の前日(self):
+        d = date.today() + timedelta(days=10)
+        order = self._make_order(delivery_date=DeliveryDate(d))
+        assert order.shipping_date == d - timedelta(days=1)

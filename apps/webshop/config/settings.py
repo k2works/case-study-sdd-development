@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "apps.orders",
     "apps.inventory",
     "apps.purchasing",
+    "apps.shipping",
 ]
 
 # DRF settings

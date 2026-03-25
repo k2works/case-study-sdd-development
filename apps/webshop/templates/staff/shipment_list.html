@@ -1,0 +1,52 @@
+{% extends "shop/base.html" %}
+
+{% block title %}出荷管理 - フレール・メモワール{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+  <h1 class="text-2xl font-bold">出荷管理</h1>
+  <a href="{% url 'shipping:bundling_list' %}" class="text-sm text-gray-500 hover:text-gray-700 underline">結束一覧へ</a>
+</div>
+
+{% if orders %}
+<p class="text-sm text-gray-500 mb-2">{{ order_count }} 件の出荷対象</p>
+<div class="overflow-x-auto">
+  <table class="w-full bg-white rounded-lg shadow text-sm">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-4 py-3 text-left">注文番号</th>
+        <th class="px-4 py-3 text-left">届け先</th>
+        <th class="px-4 py-3 text-left">届け日</th>
+        <th class="px-4 py-3 text-left">商品</th>
+        <th class="px-4 py-3 text-right">合計</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y">
+      {% for order in orders %}
+      <tr class="hover:bg-gray-50">
+        <td class="px-4 py-3 font-mono">{{ order.order_number }}</td>
+        <td class="px-4 py-3">{{ order.delivery_address.recipient_name }}</td>
+        <td class="px-4 py-3">{{ order.delivery_date.value|date:"Y/m/d" }}</td>
+        <td class="px-4 py-3">
+          {% for line in order.lines %}{{ line.product_name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+        </td>
+        <td class="px-4 py-3 text-right">¥{{ order.total_amount|floatformat:0 }}</td>
+        <td class="px-4 py-3">
+          <form method="post" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="order_id" value="{{ order.id }}">
+            <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition" onclick="return confirm('この注文を出荷処理しますか？')">出荷処理</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="bg-green-50 border border-green-200 rounded-lg p-8 text-center">
+  <p class="text-green-800">本日の出荷対象はありません。</p>
+</div>
+{% endif %}
+{% endblock %}

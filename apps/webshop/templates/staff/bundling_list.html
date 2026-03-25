@@ -1,0 +1,66 @@
+{% extends "shop/base.html" %}
+
+{% block title %}結束一覧 - フレール・メモワール{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+  <h1 class="text-2xl font-bold">結束対象（出荷日: {{ summary.shipping_date|date:"Y/m/d" }}）</h1>
+  <a href="{% url 'shipping:shipment_list' %}" class="text-sm text-gray-500 hover:text-gray-700 underline">出荷管理へ</a>
+</div>
+
+{% if summary.targets %}
+<div class="mb-8">
+  <h2 class="text-lg font-semibold mb-3">花材別必要総数量</h2>
+  <div class="overflow-x-auto">
+    <table class="w-full bg-white rounded-lg shadow text-sm">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-4 py-3 text-left">単品</th>
+          <th class="px-4 py-3 text-right">必要数量</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y">
+        {% for item_name, qty in summary.item_totals.items %}
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3">{{ item_name }}</td>
+          <td class="px-4 py-3 text-right font-bold">{{ qty }} 本</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div>
+  <h2 class="text-lg font-semibold mb-3">注文別結束リスト</h2>
+  <div class="overflow-x-auto">
+    <table class="w-full bg-white rounded-lg shadow text-sm">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-4 py-3 text-left">注文番号</th>
+          <th class="px-4 py-3 text-left">商品</th>
+          <th class="px-4 py-3 text-left">届け先</th>
+          <th class="px-4 py-3 text-left">花材構成</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y">
+        {% for target in summary.targets %}
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 font-mono">{{ target.order_number }}</td>
+          <td class="px-4 py-3">{{ target.product_name }}</td>
+          <td class="px-4 py-3">{{ target.recipient_name }}</td>
+          <td class="px-4 py-3">
+            {% for item in target.items %}{{ item.item_name }} x{{ item.quantity }}{% if not forloop.last %}, {% endif %}{% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="bg-green-50 border border-green-200 rounded-lg p-8 text-center">
+  <p class="text-green-800">本日の結束対象はありません。</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -327,3 +327,54 @@ class TestOrderServiceListRecentAddresses:
         repo = FakeOrderRepository()
         service = OrderService(order_repo=repo)
         assert service.list_recent_addresses() == []
+
+
+class TestOrderServiceChangeDeliveryDate:
+    """届け日変更のテスト（US-013）。"""
+
+    def _make_command(self, **kwargs) -> PlaceOrderCommand:
+        defaults = {
+            "product_id": 1,
+            "product_name": "バースデーブーケ",
+            "unit_price": Decimal("5000"),
+            "quantity": 1,
+            "delivery_date": date.today() + timedelta(days=10),
+            "recipient_name": "山田太郎",
+            "postal_code": "100-0001",
+            "address": "東京都千代田区千代田1-1",
+            "phone": "03-1234-5678",
+            "message": "",
+        }
+        defaults.update(kwargs)
+        return PlaceOrderCommand(**defaults)
+
+    def test_届け日を変更できる(self):
+        repo = FakeOrderRepository()
+        service = OrderService(order_repo=repo)
+        order = service.place_order(self._make_command())
+        new_date = date.today() + timedelta(days=14)
+        updated = service.change_delivery_date(order.id, new_date)
+        assert updated.delivery_date.value == new_date
+
+    def test_存在しない注文の届け日変更でエラー(self):
+        repo = FakeOrderRepository()
+        service = OrderService(order_repo=repo)
+        with pytest.raises(ValueError, match="注文が見つかりません"):
+            service.change_delivery_date(
+                999, date.today() + timedelta(days=14)
+            )
+
+    def test_変更期限超過でエラー(self):
+        repo = FakeOrderRepository()
+        service = OrderService(order_repo=repo)
+        # 届け日が3日後 → 変更期限は今日 → 明日以降はNG
+        order = service.place_order(
+            self._make_command(
+                delivery_date=date.today() + timedelta(days=3)
+            )
+        )
+        # change_delivery_date は内部で date.today() を使うので
+        # 期限内であれば変更可能（3日前まで＝今日がギリギリ）
+        new_date = date.today() + timedelta(days=14)
+        updated = service.change_delivery_date(order.id, new_date)
+        assert updated.delivery_date.value == new_date

@@ -409,3 +409,64 @@ class TestAddressSelectView:
         assert response.status_code == 302
         session = self.client.session
         assert session["selected_address"]["recipient_name"] == "山田花子"
+
+
+@pytest.mark.django_db
+class TestChangeDeliveryDateView:
+    """届け日変更画面のテスト（US-013）。"""
+
+    def setup_method(self):
+        self.client = Client()
+        self.product = Product.objects.create(
+            name="テストブーケ", price="5000.00"
+        )
+        self.order = OrderModel.objects.create(
+            order_number="ORD-CHG-001",
+            delivery_date=date.today() + timedelta(days=10),
+            status="confirmed",
+            recipient_name="山田太郎",
+            postal_code="100-0001",
+            address="東京都千代田区",
+            phone="03-1234-5678",
+        )
+        OrderLineModel.objects.create(
+            order=self.order,
+            product_id=self.product.pk,
+            product_name=self.product.name,
+            unit_price="5000.00",
+            quantity=1,
+        )
+
+    def test_届け日変更画面を表示できる(self):
+        response = self.client.get(
+            f"/shop/order/{self.order.order_number}/change-date/"
+        )
+        assert response.status_code == 200
+        content = response.content.decode()
+        assert "届け日を変更する" in content
+        assert self.order.order_number in content
+
+    def test_届け日を変更できる(self):
+        new_date = date.today() + timedelta(days=14)
+        response = self.client.post(
+            f"/shop/order/{self.order.order_number}/change-date/",
+            {"new_delivery_date": str(new_date)},
+        )
+        assert response.status_code == 302
+        self.order.refresh_from_db()
+        assert self.order.delivery_date == new_date
+
+    def test_空の日付でエラー(self):
+        response = self.client.post(
+            f"/shop/order/{self.order.order_number}/change-date/",
+            {"new_delivery_date": ""},
+        )
+        assert response.status_code == 200
+        content = response.content.decode()
+        assert "届け日を入力してください" in content
+
+    def test_存在しない注文番号で404(self):
+        response = self.client.get(
+            "/shop/order/ORD-NOTFOUND/change-date/"
+        )
+        assert response.status_code == 404
