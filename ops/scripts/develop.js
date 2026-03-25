@@ -111,9 +111,10 @@ function rubyCommand(command) {
   if (env === 'rbenv' || env === 'system') {
     return command;
   }
-  // nix: GEM_HOME/GEM_PATH をクリアし vendor/bundle に隔離してからコマンド実行
-  const wrappedCmd = `unset GEM_HOME GEM_PATH && export BUNDLE_PATH=vendor/bundle && ${command}`;
-  return `nix-shell ${NIX_RUBY_SHELL} --command '${wrappedCmd.replace(/'/g, "'\\''")}'`;
+  // nix: shell.nix の shellHook で GEM_HOME/GEM_PATH をクリア済み
+  // BUNDLE_PATH で vendor/bundle に gem を隔離
+  const escapedCmd = command.replace(/"/g, '\\"');
+  return `nix-shell ${NIX_RUBY_SHELL} --run "export BUNDLE_PATH=vendor/bundle && ${escapedCmd}"`;
 }
 
 /**
@@ -143,7 +144,7 @@ function setupRubyEnvironment() {
   } else {
     console.log('Ruby 環境: nix を使用します');
     console.log('  nix-shell で Ruby 環境を確認しています...');
-    execSync(`nix-shell ${NIX_RUBY_SHELL} --command 'ruby --version'`, { stdio: 'inherit' });
+    execSync(`nix-shell ${NIX_RUBY_SHELL} --run "ruby --version"`, { stdio: 'inherit' });
     // nix 環境では vendor/bundle に gem を隔離（システム gem との .so 競合を防止）
     console.log('  gem をプロジェクトローカル（vendor/bundle）にインストールします');
     execSync('bundle config set --local path vendor/bundle', { cwd: APPS_DIR, stdio: 'inherit' });
