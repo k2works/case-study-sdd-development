@@ -82,6 +82,10 @@ export default function (gulp) {
 
   gulp.task('dev:server', (done) => {
     try {
+      console.log('Applying migrations...');
+      appExec(`${MANAGE} migrate --run-syncdb`);
+      console.log('Loading seed data...');
+      appExec(`${MANAGE} seed`);
       console.log('Starting Django development server...');
       appExec(`${MANAGE} runserver ${DEFAULT_PORT}`);
       done();
@@ -95,20 +99,22 @@ export default function (gulp) {
     try {
       console.log('Starting PostgreSQL...');
       dockerCompose('up -d db');
+      const productEnv = {
+        ...process.env,
+        DB_ENGINE: 'django.db.backends.postgresql',
+        DB_NAME: 'fleur_memoire',
+        DB_USER: 'user',
+        DB_PASSWORD: 'pass',
+        DB_HOST: 'localhost',
+        DB_PORT: '5432',
+      };
+      const productExecOpts = { cwd: APP_ROOT, stdio: 'inherit', env: productEnv };
+      console.log('Applying migrations...');
+      execSync(`${MANAGE} migrate --run-syncdb`, productExecOpts);
+      console.log('Loading seed data...');
+      execSync(`${MANAGE} seed`, productExecOpts);
       console.log('Starting Django development server (product profile)...');
-      execSync(`${MANAGE} runserver ${DEFAULT_PORT}`, {
-        cwd: APP_ROOT,
-        stdio: 'inherit',
-        env: {
-          ...process.env,
-          DB_ENGINE: 'django.db.backends.postgresql',
-          DB_NAME: 'fleur_memoire',
-          DB_USER: 'user',
-          DB_PASSWORD: 'pass',
-          DB_HOST: 'localhost',
-          DB_PORT: '5432',
-        },
-      });
+      execSync(`${MANAGE} runserver ${DEFAULT_PORT}`, productExecOpts);
       done();
     } catch (error) {
       done(error);
