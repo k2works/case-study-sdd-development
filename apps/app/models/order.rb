@@ -4,6 +4,7 @@ class Order < ApplicationRecord
   belongs_to :customer
   belongs_to :product
   belongs_to :delivery_address
+  has_one :shipment
 
   validates :delivery_date, presence: true
   validates :price, presence: true, numericality: { greater_than: 0 }
@@ -15,6 +16,18 @@ class Order < ApplicationRecord
 
   def shipping_date
     delivery_date - 1.day
+  end
+
+  def shippable?
+    ordered? && shipping_date <= Date.current
+  end
+
+  def shipped?
+    status == "shipped"
+  end
+
+  def ordered?
+    status == "ordered"
   end
 
   private

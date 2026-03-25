@@ -1,0 +1,79 @@
+<div class="py-3">
+  <h1 class="h3 mb-4">在庫推移</h1>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <%= form_tag stock_forecasts_path, method: :get, class: "row g-3 align-items-end" do %>
+        <div class="col-md-4">
+          <%= label_tag :item_id, "単品", class: "form-label" %>
+          <%= select_tag :item_id,
+                options_from_collection_for_select(@items, :id, :name, params[:item_id]&.to_i),
+                prompt: "単品を選択", class: "form-select" %>
+        </div>
+        <div class="col-md-3">
+          <%= label_tag :start_date, "開始日", class: "form-label" %>
+          <%= date_field_tag :start_date, @start_date || Date.current, class: "form-control" %>
+        </div>
+        <div class="col-md-3">
+          <%= label_tag :end_date, "終了日", class: "form-label" %>
+          <%= date_field_tag :end_date, @end_date || Date.current + 13.days, class: "form-control" %>
+        </div>
+        <div class="col-md-2">
+          <%= submit_tag "表示", class: "btn btn-outline-primary w-100" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @selected_item && @forecast %>
+    <div class="card">
+      <div class="card-header">
+        <strong><%= @selected_item.name %></strong>
+        — 品質維持日数: <%= @selected_item.quality_retention_days %> 日
+        / 購入単位: <%= @selected_item.purchase_unit %> 本
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th>日付</th>
+                <th class="text-end">良品在庫</th>
+                <th class="text-end">入荷予定</th>
+                <th class="text-end">引当済み</th>
+                <th class="text-end">廃棄対象</th>
+                <th class="text-end"><strong>有効在庫</strong></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @forecast.each do |daily| %>
+                <tr class="<%= 'table-danger' if daily[:effective_stock] < 0 %>">
+                  <td><%= daily[:date].strftime("%m/%d (%a)") %></td>
+                  <td class="text-end"><%= daily[:available_stock] %></td>
+                  <td class="text-end"><%= daily[:incoming] > 0 ? "+#{daily[:incoming]}" : daily[:incoming] %></td>
+                  <td class="text-end"><%= daily[:allocated] > 0 ? "-#{daily[:allocated]}" : daily[:allocated] %></td>
+                  <td class="text-end text-danger"><%= daily[:expired] > 0 ? "#{daily[:expired]}" : daily[:expired] %></td>
+                  <td class="text-end">
+                    <strong><%= daily[:effective_stock] %></strong>
+                    <% if daily[:effective_stock] < 0 %>
+                      <span class="badge bg-danger ms-1">不足</span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer text-muted small">
+        有効在庫 = 良品在庫 + 入荷予定 - 引当済み（廃棄対象は良品在庫から既に除外済み）
+      </div>
+    </div>
+  <% else %>
+    <div class="card">
+      <div class="card-body text-center text-muted py-5">
+        <p class="mb-0">単品を選択して「表示」を押すと、日別の在庫推移が表示されます。</p>
+      </div>
+    </div>
+  <% end %>
+</div>

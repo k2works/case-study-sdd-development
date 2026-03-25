@@ -95,6 +95,12 @@ nav:
       - IT2 ふりかえり: development/retrospective-2.md
       - IT2 完了報告書: development/iteration_report-2.md
       - IT3 計画: development/iteration_plan-3.md
+      - IT3 ふりかえり: development/retrospective-3.md
+      - IT3 完了報告書: development/iteration_report-3.md
+      - IT4 計画: development/iteration_plan-4.md
+      - IT4 ふりかえり: development/retrospective-4.md
+      - IT4 完了報告書: development/iteration_report-4.md
+      - IT5 計画: development/iteration_plan-5.md
   - 運用:
       - 概要: operation/index.md
       - アプリケーション開発環境セットアップ: operation/app-development-setup.md
@@ -105,6 +111,11 @@ nav:
       - UI/UX レビュー: review/ui_design_uiux_review_20260324.md
       - 初期構築レビュー: review/webshop_initial_setup_review_20260324.md
       - IT1 コードレビュー: review/it1_code_review_20260324.md
+      - IT1 UI/UX レビュー: review/it1_uiux_review_20260324.md
+      - IT2 コードレビュー: review/it2_code_review_20260324.md
+      - IT3 S08 コードレビュー: review/S08_stock_forecast_review_20260324.md
+      - IT3 S08 UI/UX レビュー: review/S08_stock_forecast_uiux_review_20260324.md
+      - IT4 コードレビュー: review/it4_code_review_20260324.md
   - リファレンス:
       - 概要: reference/index.md
       - よいソフトウェアとは: reference/よいソフトウェアとは.md

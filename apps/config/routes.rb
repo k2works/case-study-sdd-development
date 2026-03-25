@@ -7,6 +7,11 @@ Rails.application.routes.draw do
   end
   resources :items, except: [ :show, :destroy ]
   resources :orders, only: [ :index, :show ]
+  resources :stock_forecasts, only: [ :index ]
+  resources :purchase_orders, only: [ :index, :new, :create, :show ] do
+    resources :arrivals, only: [ :new, :create ]
+  end
+  resources :shipments, only: [ :index, :create ]
 
   # 得意先向けショップ
   get "shop", to: "shop#index", as: :shop

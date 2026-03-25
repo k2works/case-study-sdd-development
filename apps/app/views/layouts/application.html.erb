@@ -36,6 +36,15 @@
               <li class="nav-item">
                 <%= link_to "受注管理", orders_path, class: "nav-link #{request.path.start_with?('/orders') ? 'active' : ''}" %>
               </li>
+              <li class="nav-item">
+                <%= link_to "在庫推移", stock_forecasts_path, class: "nav-link #{request.path.start_with?('/stock_forecasts') ? 'active' : ''}" %>
+              </li>
+              <li class="nav-item">
+                <%= link_to "発注管理", purchase_orders_path, class: "nav-link #{request.path.start_with?('/purchase_orders') ? 'active' : ''}" %>
+              </li>
+              <li class="nav-item">
+                <%= link_to "出荷管理", shipments_path, class: "nav-link #{request.path.start_with?('/shipments') ? 'active' : ''}" %>
+              </li>
             </ul>
             <ul class="navbar-nav">
               <li class="nav-item">

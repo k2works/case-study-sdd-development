@@ -1,0 +1,72 @@
+<div class="py-3">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">発注管理</h1>
+    <%= link_to "新規発注", new_purchase_order_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <%= form_tag purchase_orders_path, method: :get, class: "row g-3 align-items-end" do %>
+        <div class="col-md-4">
+          <%= label_tag :status, "ステータス", class: "form-label" %>
+          <%= select_tag :status,
+                options_for_select([["全件", ""], ["発注済み", "ordered"], ["入荷済み", "arrived"], ["キャンセル", "cancelled"]], params[:status]),
+                class: "form-select" %>
+        </div>
+        <div class="col-md-2">
+          <%= submit_tag "検索", class: "btn btn-outline-primary w-100" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card">
+    <% if @purchase_orders.any? %>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th>発注日</th>
+                <th>単品</th>
+                <th>仕入先</th>
+                <th class="text-end">数量</th>
+                <th>希望納品日</th>
+                <th>ステータス</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @purchase_orders.each do |po| %>
+                <tr>
+                  <td><%= po.ordered_at.strftime("%Y-%m-%d") %></td>
+                  <td><%= po.item.name %></td>
+                  <td><%= po.supplier.name %></td>
+                  <td class="text-end"><%= po.quantity %></td>
+                  <td><%= po.desired_delivery_date %></td>
+                  <td>
+                    <% case po.status %>
+                    <% when "ordered" %>
+                      <span class="badge bg-primary">発注済み</span>
+                    <% when "arrived" %>
+                      <span class="badge bg-success">入荷済み</span>
+                    <% when "cancelled" %>
+                      <span class="badge bg-secondary">キャンセル</span>
+                    <% end %>
+                  </td>
+                  <td>
+                    <%= link_to "詳細", purchase_order_path(po), class: "btn btn-sm btn-outline-secondary" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% else %>
+      <div class="card-body text-center text-muted py-5">
+        <p class="mb-0">発注はまだありません。「新規発注」ボタンから発注を作成してください。</p>
+      </div>
+    <% end %>
+  </div>
+</div>

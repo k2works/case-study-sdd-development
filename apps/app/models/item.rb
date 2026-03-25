@@ -1,5 +1,7 @@
 class Item < ApplicationRecord
   belongs_to :supplier
+  has_many :stocks, dependent: :restrict_with_error
+  has_many :compositions, dependent: :restrict_with_error
 
   validates :name, presence: true
   validates :quality_retention_days, presence: true, numericality: { greater_than: 0 }

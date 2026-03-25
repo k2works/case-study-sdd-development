@@ -1,0 +1,53 @@
+<h1>出荷一覧</h1>
+
+<%= form_with url: shipments_path, method: :get, local: true, class: "row g-3 mb-4" do |form| %>
+  <div class="col-auto">
+    <%= form.label :shipping_date, "出荷日", class: "form-label" %>
+    <%= form.date_field :shipping_date, value: @shipping_date, class: "form-control" %>
+  </div>
+  <div class="col-auto align-self-end">
+    <%= form.submit "表示", class: "btn btn-outline-primary" %>
+  </div>
+<% end %>
+
+<h5 class="mb-3"><%= @shipping_date.strftime("%Y年%-m月%-d日") %>の出荷対象（届け日: <%= (@shipping_date + 1.day).strftime("%-m/%-d") %>）</h5>
+
+<% if @orders.any? %>
+  <%= form_with url: shipments_path, method: :post, local: true do |form| %>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>選択</th>
+            <th>受注ID</th>
+            <th>得意先</th>
+            <th>商品</th>
+            <th>構成</th>
+            <th>状態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @orders.each do |order| %>
+            <tr>
+              <td><%= check_box_tag "order_ids[]", order.id, true, class: "form-check-input" %></td>
+              <td><%= order.id %></td>
+              <td><%= order.customer.name %></td>
+              <td><%= order.product.name %></td>
+              <td>
+                <% order.product.compositions.each do |comp| %>
+                  <%= comp.item.name %>&times;<%= comp.quantity %><%= ", " unless comp == order.product.compositions.last %>
+                <% end %>
+              </td>
+              <td><span class="badge bg-primary">受注済み</span></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <div class="mb-3">
+      <%= form.submit "出荷処理を実行", class: "btn btn-success" %>
+    </div>
+  <% end %>
+<% else %>
+  <div class="alert alert-info">出荷対象はありません</div>
+<% end %>
