@@ -1,24 +1,14 @@
-server:
-  port: 8080
-
 spring:
-  application:
-    name: webshop
   datasource:
-    url: jdbc:h2:mem:webshop
+    url: jdbc:h2:mem:testdb
     username: sa
     password:
     driver-class-name: org.h2.Driver
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
   jpa:
     hibernate:
-      ddl-auto: validate
-    show-sql: false
+      ddl-auto: create-drop
   flyway:
-    enabled: true
+    enabled: false
 
 management:
   endpoints:
@@ -30,12 +20,8 @@ management:
     health:
       show-details: never
 
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-
 jwt:
-  secret: dev-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm
+  secret: test-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm
   expiration: 86400000
 
 cors:
