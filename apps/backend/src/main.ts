@@ -9,6 +9,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, new FastifyAdapter());
   const port = Number(process.env.PORT ?? 3000);
 
+  app.enableCors({
+    origin: true,
+  });
+
   await app.listen(port, "0.0.0.0");
   Logger.log(`Backend listening on http://localhost:${port}`, "Bootstrap");
 }
