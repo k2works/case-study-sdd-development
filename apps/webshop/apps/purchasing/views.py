@@ -134,9 +134,7 @@ class ExpiryAlertView(View):
 
         near_expiry_lots = []
         for item in all_items:
-            lots = stock_lot_repo.find_active_by_item_id(
-                item.pk, as_of=date.today()
-            )
+            lots = stock_lot_repo.find_active_by_item_id(item.pk, as_of=date.today())
             for lot in lots:
                 if lot.is_near_expiry(date.today()):
                     near_expiry_lots.append(

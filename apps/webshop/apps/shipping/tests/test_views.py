@@ -30,9 +30,7 @@ class TestBundlingListView:
             name="バースデーブーケ",
             price=Decimal("5000"),
         )
-        Composition.objects.create(
-            product=self.product, item=self.item, quantity=5
-        )
+        Composition.objects.create(product=self.product, item=self.item, quantity=5)
 
     def test_結束一覧画面を表示できる(self):
         response = self.client.get("/staff/shipping/bundling/")

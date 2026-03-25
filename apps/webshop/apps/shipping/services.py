@@ -31,9 +31,7 @@ class ShippingService:
         self._order_repo = order_repo
         self._shipment_repo = shipment_repo
 
-    def get_bundling_summary(
-        self, shipping_date: date
-    ) -> BundlingSummary:
+    def get_bundling_summary(self, shipping_date: date) -> BundlingSummary:
         """結束対象のサマリーを取得する。
 
         出荷日 = 届け日 - 1 なので、delivery_date = shipping_date + 1
@@ -49,6 +47,8 @@ class ShippingService:
         item_totals: dict[str, int] = {}
 
         for order in orders:
+            if order.id is None:
+                continue
             order_items: list[BundlingItem] = []
             for line in order.lines:
                 compositions = Composition.objects.filter(
@@ -68,12 +68,8 @@ class ShippingService:
                 BundlingTarget(
                     order_id=order.id,
                     order_number=str(order.order_number),
-                    product_name=order.lines[0].product_name
-                    if order.lines
-                    else "",
-                    recipient_name=(
-                        order.delivery_address.recipient_name
-                    ),
+                    product_name=order.lines[0].product_name if order.lines else "",
+                    recipient_name=(order.delivery_address.recipient_name),
                     items=order_items,
                 )
             )
@@ -97,6 +93,8 @@ class ShippingService:
 
         # 出荷記録を作成
         now = timezone.now()
+        if order.id is None:
+            raise ValueError("注文 ID が不正です")
         shipment = Shipment(
             id=None,
             order_id=order.id,

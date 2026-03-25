@@ -70,7 +70,7 @@ class Order:
 
     @property
     def total_amount(self) -> Decimal:
-        return sum(line.subtotal for line in self.lines)
+        return sum((line.subtotal for line in self.lines), Decimal("0"))
 
     def confirm(self) -> None:
         if self.status != OrderStatus.PENDING:
@@ -99,9 +99,7 @@ class Order:
             raise ValueError("出荷準備中の注文のみ出荷できます")
         self.status = OrderStatus.SHIPPED
 
-    def change_delivery_date(
-        self, new_date: DeliveryDate, current_date: date
-    ) -> None:
+    def change_delivery_date(self, new_date: DeliveryDate, current_date: date) -> None:
         """届け日を変更する。届け日 3 日前まで可能。"""
         if self.status == OrderStatus.CANCELLED:
             raise ValueError("キャンセル済みの注文は変更できません")

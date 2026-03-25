@@ -417,9 +417,7 @@ class TestChangeDeliveryDateView:
 
     def setup_method(self):
         self.client = Client()
-        self.product = Product.objects.create(
-            name="テストブーケ", price="5000.00"
-        )
+        self.product = Product.objects.create(name="テストブーケ", price="5000.00")
         self.order = OrderModel.objects.create(
             order_number="ORD-CHG-001",
             delivery_date=date.today() + timedelta(days=10),
@@ -466,7 +464,5 @@ class TestChangeDeliveryDateView:
         assert "届け日を入力してください" in content
 
     def test_存在しない注文番号で404(self):
-        response = self.client.get(
-            "/shop/order/ORD-NOTFOUND/change-date/"
-        )
+        response = self.client.get("/shop/order/ORD-NOTFOUND/change-date/")
         assert response.status_code == 404

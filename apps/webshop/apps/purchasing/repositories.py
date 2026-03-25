@@ -26,9 +26,7 @@ class DjangoPurchaseOrderRepository(PurchaseOrderRepository):
             return None
 
     def find_by_status(self, status: str) -> list[PurchaseOrder]:
-        objs = PurchaseOrderModel.objects.filter(status=status).order_by(
-            "-ordered_at"
-        )
+        objs = PurchaseOrderModel.objects.filter(status=status).order_by("-ordered_at")
         return [self._to_entity(obj) for obj in objs]
 
     def find_ordered(self) -> list[PurchaseOrder]:
@@ -81,9 +79,7 @@ class DjangoArrivalRepository(ArrivalRepository):
         except ArrivalModel.DoesNotExist:
             return None
 
-    def find_by_purchase_order_id(
-        self, purchase_order_id: int
-    ) -> list[Arrival]:
+    def find_by_purchase_order_id(self, purchase_order_id: int) -> list[Arrival]:
         objs = ArrivalModel.objects.filter(
             purchase_order_id=purchase_order_id
         ).order_by("-arrived_at")

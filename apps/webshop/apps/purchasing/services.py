@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from django.db import transaction
+from django.utils import timezone
 
 from apps.inventory.domain.entities import StockLot
 from apps.inventory.domain.interfaces import StockLotRepository
@@ -60,7 +61,7 @@ class PurchasingService:
             quantity=command.quantity,
             expected_arrival_date=command.expected_arrival_date,
             status=PurchaseOrderStatus.ORDERED,
-            ordered_at=None,
+            ordered_at=timezone.now(),
         )
         return self._po_repo.save(po)
 
@@ -70,6 +71,8 @@ class PurchasingService:
         po = self._po_repo.find_by_id(command.purchase_order_id)
         if po is None:
             raise ValueError("発注が見つかりません")
+        if po.id is None:
+            raise ValueError("発注 ID が不正です")
 
         # 入荷を記録
         arrival = Arrival(
@@ -107,9 +110,7 @@ class PurchasingService:
         """発注済みの一覧を取得する。"""
         return self._po_repo.find_ordered()
 
-    def find_purchase_order(
-        self, purchase_order_id: int
-    ) -> PurchaseOrder | None:
+    def find_purchase_order(self, purchase_order_id: int) -> PurchaseOrder | None:
         """発注を取得する。"""
         return self._po_repo.find_by_id(purchase_order_id)
 

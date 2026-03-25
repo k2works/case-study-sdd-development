@@ -39,9 +39,7 @@ class ArrivalRepository(ABC):
         """ID で入荷を取得する。"""
 
     @abstractmethod
-    def find_by_purchase_order_id(
-        self, purchase_order_id: int
-    ) -> list[Arrival]:
+    def find_by_purchase_order_id(self, purchase_order_id: int) -> list[Arrival]:
         """発注 ID で入荷を検索する。"""
 
     @abstractmethod

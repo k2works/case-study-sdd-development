@@ -22,9 +22,7 @@ class BundlingListView(View):
 
     def get(self, request):
         service = _get_service()
-        summary = service.get_bundling_summary(
-            shipping_date=date.today()
-        )
+        summary = service.get_bundling_summary(shipping_date=date.today())
         return render(
             request,
             "staff/bundling_list.html",
@@ -37,9 +35,7 @@ class ShipmentListView(View):
 
     def get(self, request):
         service = _get_service()
-        orders = service.list_shippable_orders(
-            shipping_date=date.today()
-        )
+        orders = service.list_shippable_orders(shipping_date=date.today())
         return render(
             request,
             "staff/shipment_list.html",

@@ -37,12 +37,8 @@ class TestShippingServiceBundling:
             name="バースデーブーケ",
             price=Decimal("5000"),
         )
-        Composition.objects.create(
-            product=self.product, item=self.item1, quantity=5
-        )
-        Composition.objects.create(
-            product=self.product, item=self.item2, quantity=3
-        )
+        Composition.objects.create(product=self.product, item=self.item1, quantity=5)
+        Composition.objects.create(product=self.product, item=self.item2, quantity=3)
         self.service = ShippingService(
             order_repo=DjangoOrderRepository(),
             shipment_repo=DjangoShipmentRepository(),
@@ -73,9 +69,7 @@ class TestShippingServiceBundling:
         tomorrow = date.today() + timedelta(days=1)
         self._create_order(delivery_date=tomorrow)
 
-        summary = self.service.get_bundling_summary(
-            shipping_date=date.today()
-        )
+        summary = self.service.get_bundling_summary(shipping_date=date.today())
         assert len(summary.targets) == 1
         assert summary.item_totals["バラ（赤）"] == 5
         assert summary.item_totals["カスミソウ"] == 3
@@ -85,9 +79,7 @@ class TestShippingServiceBundling:
         self._create_order(delivery_date=tomorrow)
         self._create_order(delivery_date=tomorrow)
 
-        summary = self.service.get_bundling_summary(
-            shipping_date=date.today()
-        )
+        summary = self.service.get_bundling_summary(shipping_date=date.today())
         assert len(summary.targets) == 2
         assert summary.item_totals["バラ（赤）"] == 10
         assert summary.item_totals["カスミソウ"] == 6
@@ -98,24 +90,18 @@ class TestShippingServiceBundling:
         self._create_order(delivery_date=tomorrow)
         self._create_order(delivery_date=day_after)
 
-        summary = self.service.get_bundling_summary(
-            shipping_date=date.today()
-        )
+        summary = self.service.get_bundling_summary(shipping_date=date.today())
         assert len(summary.targets) == 1
 
     def test_キャンセル済み注文は含まれない(self):
         tomorrow = date.today() + timedelta(days=1)
         self._create_order(delivery_date=tomorrow, status="cancelled")
 
-        summary = self.service.get_bundling_summary(
-            shipping_date=date.today()
-        )
+        summary = self.service.get_bundling_summary(shipping_date=date.today())
         assert len(summary.targets) == 0
 
     def test_結束対象なしの場合(self):
-        summary = self.service.get_bundling_summary(
-            shipping_date=date.today()
-        )
+        summary = self.service.get_bundling_summary(shipping_date=date.today())
         assert len(summary.targets) == 0
         assert len(summary.item_totals) == 0
 
@@ -222,7 +208,5 @@ class TestShippingServiceShipOrder:
 
     def test_出荷対象一覧を取得できる(self):
         self._create_confirmed_order()
-        orders = self.service.list_shippable_orders(
-            shipping_date=date.today()
-        )
+        orders = self.service.list_shippable_orders(shipping_date=date.today())
         assert len(orders) == 1

@@ -84,6 +84,9 @@ class Product:
 
     def add_composition(self, item_id: int, quantity: int) -> None:
         """構成に単品を追加する。同じ単品の重複は不可。"""
+        if self.id is None:
+            msg = "保存前の商品には構成を追加できません"
+            raise ValueError(msg)
         if any(c.item_id == item_id for c in self.compositions):
             msg = f"単品 {item_id} は既に構成に含まれています"
             raise ValueError(msg)
