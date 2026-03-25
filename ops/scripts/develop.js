@@ -48,6 +48,28 @@ function isCommandAvailable(cmd) {
 }
 
 /**
+ * apps/.ruby-version から必要な Ruby バージョンを取得する
+ * @returns {string}
+ */
+function getRequiredRubyVersion() {
+  return execSync('cat .ruby-version', { cwd: APPS_DIR, stdio: 'pipe' }).toString().trim();
+}
+
+/**
+ * Gemfile.lock の BUNDLED WITH から必要な bundler バージョンを取得する
+ * @returns {string|null}
+ */
+function getRequiredBundlerVersion() {
+  try {
+    const lock = execSync('cat Gemfile.lock', { cwd: APPS_DIR, stdio: 'pipe' }).toString();
+    const match = lock.match(/BUNDLED WITH\s*\n\s*([0-9.]+)/m);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * システム Ruby のバージョンと bundler の有無を確認する
  * @returns {{ version: string, hasBundler: boolean } | null}
  */
@@ -75,7 +97,7 @@ function detectRubyEnv() {
   const sysRuby = checkSystemRuby();
   if (sysRuby) {
     try {
-      const requiredVersion = execSync('cat .ruby-version', { cwd: APPS_DIR, stdio: 'pipe' }).toString().trim();
+      const requiredVersion = getRequiredRubyVersion();
       if (sysRuby.version === requiredVersion && sysRuby.hasBundler) {
         return 'system';
       }
@@ -108,7 +130,11 @@ function detectRubyEnv() {
  */
 function rubyCommand(command) {
   const env = detectRubyEnv();
-  if (env === 'rbenv' || env === 'system') {
+  if (env === 'rbenv') {
+    const requiredVersion = getRequiredRubyVersion();
+    return `export RBENV_VERSION=${requiredVersion} && eval "$(rbenv init -)" && ${command}`;
+  }
+  if (env === 'system') {
     return command;
   }
   // nix: shell.nix の shellHook で GEM_HOME/GEM_PATH をクリア済み
@@ -122,7 +148,7 @@ function rubyCommand(command) {
  */
 function setupRubyEnvironment() {
   const env = detectRubyEnv();
-  const requiredVersion = execSync('cat .ruby-version', { cwd: APPS_DIR, stdio: 'pipe' }).toString().trim();
+  const requiredVersion = getRequiredRubyVersion();
   console.log(`  必要な Ruby バージョン: ${requiredVersion}`);
 
   if (env === 'rbenv') {
@@ -151,6 +177,25 @@ function setupRubyEnvironment() {
       `nix-shell ${NIX_RUBY_SHELL} --run "bundle config set --local path vendor/bundle"`,
       { cwd: APPS_DIR, stdio: 'inherit' }
     );
+  }
+}
+
+/**
+ * Gemfile.lock で要求される bundler バージョンを満たす
+ */
+function ensureBundlerVersion() {
+  const requiredBundler = getRequiredBundlerVersion();
+  if (!requiredBundler) {
+    console.log('  bundler の必要バージョンを Gemfile.lock から取得できませんでした');
+    return;
+  }
+
+  try {
+    execInApps(`bundle _${requiredBundler}_ -v`, { stdio: 'pipe' });
+    console.log(`  bundler ${requiredBundler} は利用可能です`);
+  } catch {
+    console.log(`  bundler ${requiredBundler} をインストールしています...`);
+    execInApps(`gem install bundler -v ${requiredBundler}`);
   }
 }
 
@@ -263,7 +308,13 @@ export default function(gulp) {
 
     // 2. Bundle install
     console.log('\n-- 依存パッケージ --');
-    execInApps('bundle install');
+    ensureBundlerVersion();
+    const requiredBundler = getRequiredBundlerVersion();
+    if (requiredBundler) {
+      execInApps(`bundle _${requiredBundler}_ install`);
+    } else {
+      execInApps('bundle install');
+    }
 
     done();
   }, 'dev:db:setup', (done) => {
