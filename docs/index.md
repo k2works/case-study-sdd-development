@@ -40,8 +40,7 @@
 ### 開発 (`development/`)
 
 - [概要](./development/index.md)
-
-現時点では、個別の開発計画ドキュメントは未作成です。
+- [リリース計画](./development/release_plan.md)
 
 ### 運用 (`operation/`)
 
