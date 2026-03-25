@@ -19,7 +19,6 @@ class StockForecastService:
 
     def calculate_forecast(
         self,
-        item_id: int,
         start_date: date,
         days: int,
         stock_lots: list[StockLot],
@@ -38,7 +37,6 @@ class StockForecastService:
                 if lot.expiry_date.value == current_date and lot_remaining[lot.id] > 0:
                     expiring += lot_remaining[lot.id]
 
-            # 在庫残 = 全ロットの残数量 - 当日廃棄分
             stock_remaining = sum(lot_remaining.values()) - expiring
 
             forecasts.append(

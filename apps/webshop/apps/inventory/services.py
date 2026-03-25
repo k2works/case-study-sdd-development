@@ -36,7 +36,6 @@ class InventoryService:
         """単品の在庫推移を取得する。"""
         lots = self._stock_lot_repo.find_active_by_item_id(item_id, as_of=start_date)
         forecasts = self._forecast_service.calculate_forecast(
-            item_id=item_id,
             start_date=start_date,
             days=days,
             stock_lots=lots,

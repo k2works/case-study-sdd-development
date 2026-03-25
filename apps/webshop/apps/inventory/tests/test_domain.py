@@ -167,7 +167,7 @@ class TestStockForecastService:
         lot = self._make_lot()
         service = StockForecastService()
         forecasts = service.calculate_forecast(
-            item_id=1, start_date=date(2026, 4, 1), days=1, stock_lots=[lot]
+            start_date=date(2026, 4, 1), days=1, stock_lots=[lot]
         )
         assert len(forecasts) == 1
         assert forecasts[0].date == date(2026, 4, 1)
@@ -180,7 +180,7 @@ class TestStockForecastService:
         )
         service = StockForecastService()
         forecasts = service.calculate_forecast(
-            item_id=1, start_date=date(2026, 4, 1), days=5, stock_lots=[lot]
+            start_date=date(2026, 4, 1), days=5, stock_lots=[lot]
         )
         # 4/3 に期限切れ → 4/4 以降は在庫ゼロ
         assert forecasts[2].date == date(2026, 4, 3)
@@ -200,7 +200,7 @@ class TestStockForecastService:
         )
         service = StockForecastService()
         forecasts = service.calculate_forecast(
-            item_id=1, start_date=date(2026, 4, 1), days=7, stock_lots=[lot1, lot2]
+            start_date=date(2026, 4, 1), days=7, stock_lots=[lot1, lot2]
         )
         # 4/1: 30+50=80
         assert forecasts[0].stock_remaining == 80
@@ -216,7 +216,7 @@ class TestStockForecastService:
     def test_在庫ロットなしの場合すべてゼロ(self):
         service = StockForecastService()
         forecasts = service.calculate_forecast(
-            item_id=1, start_date=date(2026, 4, 1), days=3, stock_lots=[]
+            start_date=date(2026, 4, 1), days=3, stock_lots=[]
         )
         assert len(forecasts) == 3
         assert all(f.stock_remaining == 0 for f in forecasts)
@@ -226,7 +226,7 @@ class TestStockForecastService:
         lot = self._make_lot()
         service = StockForecastService()
         forecasts = service.calculate_forecast(
-            item_id=1, start_date=date(2026, 4, 1), days=3, stock_lots=[lot]
+            start_date=date(2026, 4, 1), days=3, stock_lots=[lot]
         )
         assert all(f.outgoing_planned == 0 for f in forecasts)
         assert all(f.incoming_planned == 0 for f in forecasts)

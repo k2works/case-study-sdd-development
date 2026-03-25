@@ -13,6 +13,8 @@ from apps.orders.repositories import DjangoOrderRepository
 from apps.orders.services import OrderService, PlaceOrderCommand
 from apps.products.models import Product
 
+ORDER_CANCEL_TEMPLATE = "shop/order_cancel.html"
+
 
 def _get_order_service() -> OrderService:
     """OrderService のファクトリ。DI コンテナの代替。"""
@@ -190,7 +192,7 @@ class OrderCancelView(View):
     """注文キャンセル画面。注文番号で検索しキャンセルする。"""
 
     def get(self, request):
-        return render(request, "shop/order_cancel.html", {"order": None, "error": None})
+        return render(request, ORDER_CANCEL_TEMPLATE, {"order": None, "error": None})
 
     def post(self, request):
         action = request.POST.get("action", "search")
@@ -201,19 +203,19 @@ class OrderCancelView(View):
             if not order_number:
                 return render(
                     request,
-                    "shop/order_cancel.html",
+                    ORDER_CANCEL_TEMPLATE,
                     {"order": None, "error": "注文番号を入力してください"},
                 )
             order = service.find_order_by_number(order_number)
             if order is None:
                 return render(
                     request,
-                    "shop/order_cancel.html",
+                    ORDER_CANCEL_TEMPLATE,
                     {"order": None, "error": "注文が見つかりません"},
                 )
             return render(
                 request,
-                "shop/order_cancel.html",
+                ORDER_CANCEL_TEMPLATE,
                 {"order": order, "error": None},
             )
 
@@ -223,7 +225,7 @@ class OrderCancelView(View):
             except (TypeError, ValueError):
                 return render(
                     request,
-                    "shop/order_cancel.html",
+                    ORDER_CANCEL_TEMPLATE,
                     {"order": None, "error": "無効な注文IDです"},
                 )
             try:
@@ -237,8 +239,8 @@ class OrderCancelView(View):
                 order = service.find_order(order_id)
                 return render(
                     request,
-                    "shop/order_cancel.html",
+                    ORDER_CANCEL_TEMPLATE,
                     {"order": order, "error": str(e)},
                 )
 
-        return render(request, "shop/order_cancel.html", {"order": None, "error": None})
+        return render(request, ORDER_CANCEL_TEMPLATE, {"order": None, "error": None})

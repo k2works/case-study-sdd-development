@@ -1,9 +1,7 @@
-"""シードデータを作成する管理コマンド。
+"""シードデータを作成する管理コマンド。"""
 
-開発環境での動作確認用に、仕入先・単品・商品・構成・在庫ロットのサンプルデータを登録する。
-既にデータが存在する場合はスキップする。
-"""
-
+import os
+import secrets
 from datetime import date, timedelta
 from decimal import Decimal
 
@@ -14,11 +12,18 @@ from apps.inventory.models import StockLot
 from apps.products.models import Composition, Item, Product, Supplier
 
 ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "admin"
+SEED_ADMIN_PASSWORD_ENV = "SEED_ADMIN_PASSWORD"
 
 
 class Command(BaseCommand):
     help = "開発用シードデータを作成する"
+
+    @staticmethod
+    def _resolve_admin_password() -> tuple[str, bool]:
+        value = os.getenv(SEED_ADMIN_PASSWORD_ENV, "").strip()
+        if value:
+            return value, False
+        return secrets.token_urlsafe(24), True
 
     def handle(self, *args, **options):
         if Supplier.objects.exists():
@@ -30,14 +35,24 @@ class Command(BaseCommand):
         self.stdout.write("シードデータを作成中...")
 
         # ── 管理ユーザー ──
-        User = get_user_model()
-        if not User.objects.filter(username=ADMIN_USERNAME).exists():
-            User.objects.create_superuser(
+        user_model = get_user_model()
+        if not user_model.objects.filter(username=ADMIN_USERNAME).exists():
+            admin_password, generated = self._resolve_admin_password()
+            user_model.objects.create_superuser(
                 username=ADMIN_USERNAME,
                 email="admin@example.com",
-                password=ADMIN_PASSWORD,
+                password=admin_password,
             )
-            self.stdout.write(f"管理ユーザー作成: {ADMIN_USERNAME} / {ADMIN_PASSWORD}")
+            if generated:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"管理ユーザー作成: {ADMIN_USERNAME} / "
+                        f"{SEED_ADMIN_PASSWORD_ENV} 未設定のため "
+                        "ランダムパスワードを生成しました。"
+                    )
+                )
+            else:
+                self.stdout.write(f"管理ユーザー作成: {ADMIN_USERNAME}")
 
         # ── 仕入先 ──
         supplier_a = Supplier.objects.create(
