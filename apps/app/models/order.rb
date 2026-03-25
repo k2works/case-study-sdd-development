@@ -13,6 +13,7 @@ class Order < ApplicationRecord
 
   scope :by_delivery_date, ->(date) { where(delivery_date: date) }
   scope :by_status, ->(status) { where(status: status) }
+  scope :for_shipping_date, ->(shipping_date) { where(delivery_date: shipping_date + 1.day, status: "ordered") }
 
   def shipping_date
     delivery_date - 1.day
