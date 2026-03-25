@@ -123,6 +123,25 @@ type ShipmentTarget = {
   status: string;
 };
 
+const createEmptyProductForm = (): Product => ({
+  productId: "draft-product",
+  productName: "",
+  description: "",
+  price: 0,
+  isActive: true,
+  materials: [],
+});
+
+function toProductIdSeed(productName: string): string {
+  const normalized = productName
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return normalized || "new-product";
+}
+
 export function getInventoryAlertLabel(projectedQuantity: number): string | null {
   if (projectedQuantity < 0) {
     return "不足見込み";
@@ -619,6 +638,11 @@ export default function AdminPage() {
     setProductForm(target);
   };
 
+  const handleCreateProduct = () => {
+    setProductFeedback(null);
+    setProductForm(createEmptyProductForm());
+  };
+
   const handleMaterialFormChange =
     (field: keyof Material) => (event: ChangeEvent<HTMLInputElement>) => {
       const nextValue = field === "materialName" || field === "supplierName"
@@ -717,6 +741,14 @@ export default function AdminPage() {
     }
 
     setProductFeedback(null);
+    const productId =
+      productForm.productId === "draft-product"
+        ? toProductIdSeed(productForm.productName)
+        : productForm.productId;
+    const productToSave: Product = {
+      ...productForm,
+      productId,
+    };
 
     try {
       const response = await fetch(`${apiBaseUrl}/admin/products`, {
@@ -724,7 +756,7 @@ export default function AdminPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(productForm),
+        body: JSON.stringify(productToSave),
       });
 
       if (!response.ok) {
@@ -1093,6 +1125,13 @@ export default function AdminPage() {
                     <p className="eyebrow">Product Master</p>
                     <h2>商品一覧</h2>
                   </div>
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={handleCreateProduct}
+                  >
+                    新規登録
+                  </button>
                 </div>
                 {productsLoading ? (
                   <p className="admin-empty">商品一覧を読み込んでいます。</p>
@@ -1149,11 +1188,24 @@ export default function AdminPage() {
                 <div className="admin-panel-header">
                   <div>
                     <p className="eyebrow">Product Editor</p>
-                    <h2>商品編集</h2>
+                    <h2>{productForm?.productId === "draft-product" ? "商品新規登録" : "商品編集"}</h2>
                   </div>
                 </div>
                 {productForm ? (
                   <div className="admin-form-grid">
+                    <label className="field" htmlFor="productId">
+                      <span>商品 ID</span>
+                      <input
+                        id="productId"
+                        type="text"
+                        value={
+                          productForm.productId === "draft-product"
+                            ? toProductIdSeed(productForm.productName)
+                            : productForm.productId
+                        }
+                        readOnly
+                      />
+                    </label>
                     <label className="field" htmlFor="productName">
                       <span>商品名</span>
                       <input
@@ -1222,7 +1274,7 @@ export default function AdminPage() {
                     ) : null}
                   </div>
                 ) : (
-                  <p className="admin-empty">一覧から商品を選択すると編集できます。</p>
+                  <p className="admin-empty">新規登録または一覧から商品を選択すると編集できます。</p>
                 )}
               </section>
             </div>

@@ -32,17 +32,22 @@ const fallbackProducts: Product[] = [
   },
 ];
 
+const customerProductsFallbackMessage =
+  "商品情報の取得に失敗したため、既定の商品一覧を表示しています。時間をおいて再度お試しください。";
+
 export default function CustomerPage() {
   const [products, setProducts] = useState<Product[]>(fallbackProducts);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let active = true;
 
     const loadProducts = async () => {
-      if (active && products.length === 0) {
+      if (active) {
         setLoading(true);
+        setError(null);
       }
 
       try {
@@ -56,7 +61,7 @@ export default function CustomerPage() {
         if (!response.ok) {
           if (active) {
             setProducts(fallbackProducts);
-            setError(null);
+            setError(customerProductsFallbackMessage);
             setLoading(false);
           }
 
@@ -73,7 +78,7 @@ export default function CustomerPage() {
       } catch {
         if (active) {
           setProducts(fallbackProducts);
-          setError(null);
+          setError(customerProductsFallbackMessage);
           setLoading(false);
         }
       }
@@ -84,7 +89,7 @@ export default function CustomerPage() {
     return () => {
       active = false;
     };
-  }, [products.length]);
+  }, [reloadKey]);
 
   return (
     <main>
@@ -104,7 +109,18 @@ export default function CustomerPage() {
           </div>
 
           {loading ? <p className="admin-empty">商品一覧を読み込んでいます。</p> : null}
-          {!loading && error ? <p className="admin-empty">{error}</p> : null}
+          {!loading && error ? (
+            <div className="admin-feedback admin-feedback--error">
+              <p>{error}</p>
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => setReloadKey((current) => current + 1)}
+              >
+                再試行
+              </button>
+            </div>
+          ) : null}
 
           {!loading && !error ? (
             <div className="product-grid">

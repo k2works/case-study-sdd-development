@@ -53,6 +53,9 @@ const fallbackProducts: Product[] = [
   },
 ];
 
+const customerProductsFallbackMessage =
+  "商品情報の取得に失敗したため、既定の商品情報を表示しています。時間をおいて再度お試しください。";
+
 export function validateOrderForm(values: OrderFormValues): OrderFormErrors {
   const errors: OrderFormErrors = {};
 
@@ -76,6 +79,8 @@ export default function OrderPage() {
   const productId = searchParams.get("product");
   const [products, setProducts] = useState<Product[]>(fallbackProducts);
   const [productsLoading, setProductsLoading] = useState(false);
+  const [productsError, setProductsError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [values, setValues] = useState<OrderFormValues>(initialFormValues);
   const [errors, setErrors] = useState<OrderFormErrors>({});
   const [step, setStep] = useState<OrderStep>("input");
@@ -88,8 +93,9 @@ export default function OrderPage() {
     let active = true;
 
     const loadProducts = async () => {
-      if (active && products.length === 0) {
+      if (active) {
         setProductsLoading(true);
+        setProductsError(null);
       }
 
       try {
@@ -103,6 +109,7 @@ export default function OrderPage() {
         if (!response.ok) {
           if (active) {
             setProducts(fallbackProducts);
+            setProductsError(customerProductsFallbackMessage);
             setProductsLoading(false);
           }
 
@@ -113,11 +120,13 @@ export default function OrderPage() {
 
         if (active) {
           setProducts(data);
+          setProductsError(null);
           setProductsLoading(false);
         }
       } catch {
         if (active) {
           setProducts(fallbackProducts);
+          setProductsError(customerProductsFallbackMessage);
           setProductsLoading(false);
         }
       }
@@ -128,7 +137,7 @@ export default function OrderPage() {
     return () => {
       active = false;
     };
-  }, [products.length]);
+  }, [reloadKey]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -258,6 +267,18 @@ export default function OrderPage() {
         <section className="order-summary" aria-label="注文入力サマリー">
           <h2>選択中の商品</h2>
           {productsLoading ? <p>商品情報を読み込んでいます。</p> : null}
+          {!productsLoading && productsError ? (
+            <div className="admin-feedback admin-feedback--error">
+              <p>{productsError}</p>
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => setReloadKey((current) => current + 1)}
+              >
+                再試行
+              </button>
+            </div>
+          ) : null}
           <p className="order-product-name">{productName}</p>
           <p>内容を入力後、確認画面へ進む前に必須項目の不足をこの画面で確認できます。</p>
         </section>

@@ -410,6 +410,113 @@ describe("AdminPage", () => {
     expect(await screen.findByText("商品を保存しました。")).toBeInTheDocument();
   });
 
+  it("商品を新規登録できる", async () => {
+    const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+
+      if (url.endsWith("/admin/products") && init?.method === "POST") {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            productId: "new-bouquet",
+            productName: "新作ブーケ",
+            description: "新作の季節商品です。",
+            price: 7000,
+            isActive: true,
+            materials: [
+              { materialId: "MAT-001", quantity: 5 },
+              { materialId: "MAT-002", quantity: 2 },
+            ],
+          }),
+        });
+      }
+
+      if (url.endsWith("/admin/products")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [
+            {
+              productId: "rose-garden",
+              productName: "ローズガーデン",
+              description: "赤バラとグリーンを束ねた、記念日向けの定番ブーケです。",
+              price: 5500,
+              isActive: true,
+              materials: [
+                { materialId: "MAT-001", quantity: 10 },
+                { materialId: "MAT-002", quantity: 2 },
+              ],
+            },
+          ],
+        });
+      }
+
+      if (url.endsWith("/admin/materials")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [
+            {
+              materialId: "MAT-001",
+              materialName: "バラ赤",
+              shelfLifeDays: 5,
+              purchaseUnit: 10,
+              leadTimeDays: 2,
+              supplierName: "東京フラワー商事",
+            },
+            {
+              materialId: "MAT-002",
+              materialName: "カスミソウ",
+              shelfLifeDays: 4,
+              purchaseUnit: 6,
+              leadTimeDays: 1,
+              supplierName: "関東グリーンサプライ",
+            },
+          ],
+        });
+      }
+
+      if (url.includes("/admin/inventory-projections")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            startDate: "2026-04-10",
+            endDate: "2026-04-12",
+            dates: ["2026-04-10"],
+            items: [],
+          }),
+        });
+      }
+
+      return Promise.resolve({
+        ok: true,
+        json: async () => [],
+      });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "商品管理" }));
+    fireEvent.click(await screen.findByRole("button", { name: "新規登録" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "商品新規登録" })).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("商品名"), {
+      target: { value: "新作ブーケ" },
+    });
+    fireEvent.change(screen.getByLabelText("説明"), {
+      target: { value: "新作の季節商品です。" },
+    });
+    fireEvent.change(screen.getByLabelText("価格"), {
+      target: { value: "7000" },
+    });
+    fireEvent.change(screen.getByLabelText("バラ赤"), {
+      target: { value: "5" },
+    });
+    expect(screen.getByLabelText("商品 ID")).toHaveValue("new-product");
+    fireEvent.click(screen.getByRole("button", { name: "商品を保存する" }));
+
+    expect(await screen.findByText("商品を保存しました。")).toBeInTheDocument();
+  });
+
   it("仕入先別の発注候補を確認して確定できる", async () => {
     const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
