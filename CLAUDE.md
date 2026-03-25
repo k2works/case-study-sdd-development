@@ -57,6 +57,7 @@
 | :--- | :--- |
 | `analyzing-review` | 分析成果物のマルチパースペクティブレビュー |
 | `developing-review` | 開発成果物のマルチパースペクティブレビュー |
+| `developing-uiux-review` | UI/UX 成果物のマルチパースペクティブレビュー |
 | `operating-review` | 運用成果物のマルチパースペクティブレビュー |
 
 ### 計画・進捗
