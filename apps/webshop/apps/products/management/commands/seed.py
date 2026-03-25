@@ -7,10 +7,15 @@
 from datetime import date, timedelta
 from decimal import Decimal
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
 from apps.inventory.models import StockLot
 from apps.products.models import Composition, Item, Product, Supplier
+
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "admin"
 
 
 class Command(BaseCommand):
@@ -22,6 +27,18 @@ class Command(BaseCommand):
             return
 
         self.stdout.write("シードデータを作成中...")
+
+        # ── 管理ユーザー ──
+        User = get_user_model()
+        if not User.objects.filter(username=ADMIN_USERNAME).exists():
+            User.objects.create_superuser(
+                username=ADMIN_USERNAME,
+                email="admin@example.com",
+                password=ADMIN_PASSWORD,
+            )
+            self.stdout.write(
+                f"管理ユーザー作成: {ADMIN_USERNAME} / {ADMIN_PASSWORD}"
+            )
 
         # ── 仕入先 ──
         supplier_a = Supplier.objects.create(
