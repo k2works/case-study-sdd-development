@@ -14,10 +14,21 @@ import OrderPage, { validateOrderForm } from "./page";
 describe("OrderPage", () => {
   beforeEach(() => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams("product=rose-garden"));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          orderId: "ORD-0001",
+          status: "confirmed",
+        }),
+      }),
+    );
   });
 
   afterEach(() => {
     cleanup();
+    vi.unstubAllGlobals();
   });
 
   it("選択した商品を注文入力画面で確認できる", () => {
@@ -54,6 +65,75 @@ describe("OrderPage", () => {
     expect(screen.getByText("届け日は必須です。")).toBeInTheDocument();
     expect(screen.getByText("届け先は必須です。")).toBeInTheDocument();
     expect(screen.getByText("メッセージは必須です。")).toBeInTheDocument();
+  });
+
+  it("入力内容を確認画面に表示できる", () => {
+    render(<OrderPage />);
+
+    fireEvent.change(screen.getByLabelText("届け日"), {
+      target: { value: "2026-04-10" },
+    });
+    fireEvent.change(screen.getByLabelText("届け先"), {
+      target: { value: "東京都港区南青山 1-2-3" },
+    });
+    fireEvent.change(screen.getByLabelText("メッセージ"), {
+      target: { value: "開店祝いのお花です。" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "入力内容を確認する" }));
+
+    expect(
+      screen.getByRole("heading", { level: 2, name: "注文内容の確認" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("2026-04-10")).toBeInTheDocument();
+    expect(screen.getByText("東京都港区南青山 1-2-3")).toBeInTheDocument();
+    expect(screen.getByText("開店祝いのお花です。")).toBeInTheDocument();
+  });
+
+  it("確認画面から入力画面へ戻って修正できる", () => {
+    render(<OrderPage />);
+
+    fireEvent.change(screen.getByLabelText("届け日"), {
+      target: { value: "2026-04-10" },
+    });
+    fireEvent.change(screen.getByLabelText("届け先"), {
+      target: { value: "東京都港区南青山 1-2-3" },
+    });
+    fireEvent.change(screen.getByLabelText("メッセージ"), {
+      target: { value: "開店祝いのお花です。" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "入力内容を確認する" }));
+    fireEvent.click(screen.getByRole("button", { name: "入力画面に戻る" }));
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "注文入力" }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("届け日")).toHaveValue("2026-04-10");
+    expect(screen.getByLabelText("届け先")).toHaveValue("東京都港区南青山 1-2-3");
+    expect(screen.getByLabelText("メッセージ")).toHaveValue("開店祝いのお花です。");
+  });
+
+  it("確認画面で確定すると完了画面を表示する", async () => {
+    render(<OrderPage />);
+
+    fireEvent.change(screen.getByLabelText("届け日"), {
+      target: { value: "2026-04-10" },
+    });
+    fireEvent.change(screen.getByLabelText("届け先"), {
+      target: { value: "東京都港区南青山 1-2-3" },
+    });
+    fireEvent.change(screen.getByLabelText("メッセージ"), {
+      target: { value: "開店祝いのお花です。" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "入力内容を確認する" }));
+    fireEvent.click(screen.getByRole("button", { name: "注文を確定する" }));
+
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "注文が完了しました" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("注文番号: ORD-0001")).toBeInTheDocument();
   });
 });
 
