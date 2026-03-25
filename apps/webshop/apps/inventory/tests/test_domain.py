@@ -222,7 +222,7 @@ class TestStockForecastService:
         assert all(f.stock_remaining == 0 for f in forecasts)
         assert all(f.expiring == 0 for f in forecasts)
 
-    def test_outgoing_とincoming_はIT3では常に0(self):
+    def test_incoming_scheduleなしの場合incoming_plannedは0(self):
         lot = self._make_lot()
         service = StockForecastService()
         forecasts = service.calculate_forecast(
@@ -230,6 +230,52 @@ class TestStockForecastService:
         )
         assert all(f.outgoing_planned == 0 for f in forecasts)
         assert all(f.incoming_planned == 0 for f in forecasts)
+
+    def test_入荷予定が在庫推移に反映される(self):
+        lot = self._make_lot(remaining_quantity=50)
+        service = StockForecastService()
+        incoming_schedule = {date(2026, 4, 3): 30}
+        forecasts = service.calculate_forecast(
+            item_id=1,
+            start_date=date(2026, 4, 1),
+            days=5,
+            stock_lots=[lot],
+            incoming_schedule=incoming_schedule,
+        )
+        # 4/1, 4/2: 在庫50、入荷予定0
+        assert forecasts[0].stock_remaining == 50
+        assert forecasts[0].incoming_planned == 0
+        assert forecasts[1].stock_remaining == 50
+        # 4/3: 入荷予定30 → 在庫50+30=80
+        assert forecasts[2].incoming_planned == 30
+        assert forecasts[2].stock_remaining == 80
+        # 4/4, 4/5: 入荷予定0、在庫80維持
+        assert forecasts[3].stock_remaining == 80
+        assert forecasts[3].incoming_planned == 0
+
+    def test_複数日に入荷予定がある場合(self):
+        service = StockForecastService()
+        incoming_schedule = {
+            date(2026, 4, 2): 20,
+            date(2026, 4, 4): 30,
+        }
+        forecasts = service.calculate_forecast(
+            item_id=1,
+            start_date=date(2026, 4, 1),
+            days=5,
+            stock_lots=[],
+            incoming_schedule=incoming_schedule,
+        )
+        # 4/1: 0
+        assert forecasts[0].stock_remaining == 0
+        # 4/2: +20
+        assert forecasts[1].stock_remaining == 20
+        assert forecasts[1].incoming_planned == 20
+        # 4/3: 20 維持
+        assert forecasts[2].stock_remaining == 20
+        # 4/4: +30 → 50
+        assert forecasts[3].stock_remaining == 50
+        assert forecasts[3].incoming_planned == 30
 
 
 # --- DailyForecast ---

@@ -8,10 +8,14 @@ from django.views import View
 from apps.inventory.repositories import DjangoStockLotRepository
 from apps.inventory.services import InventoryService
 from apps.products.models import Item
+from apps.purchasing.repositories import DjangoPurchaseOrderRepository
 
 
 def _get_inventory_service() -> InventoryService:
-    return InventoryService(stock_lot_repo=DjangoStockLotRepository())
+    return InventoryService(
+        stock_lot_repo=DjangoStockLotRepository(),
+        po_repo=DjangoPurchaseOrderRepository(),
+    )
 
 
 class StockForecastView(View):

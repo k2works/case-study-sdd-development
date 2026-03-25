@@ -1,0 +1,50 @@
+{% extends "shop/base.html" %}
+
+{% block title %}発注一覧 - フレール・メモワール{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+  <h1 class="text-2xl font-bold">発注一覧</h1>
+  <div class="flex gap-2">
+    <a href="{% url 'purchasing:order_create' %}" class="bg-pink-600 text-white px-4 py-2 rounded text-sm hover:bg-pink-700 transition">新規発注</a>
+    <a href="{% url 'purchasing:arrival_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition">入荷登録</a>
+    <a href="{% url 'purchasing:expiry_alert' %}" class="bg-yellow-600 text-white px-4 py-2 rounded text-sm hover:bg-yellow-700 transition">品質期限アラート</a>
+  </div>
+</div>
+
+{% if orders %}
+<p class="text-sm text-gray-500 mb-2">{{ order_count }} 件の発注（未入荷）</p>
+<div class="overflow-x-auto">
+  <table class="w-full bg-white rounded-lg shadow text-sm">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-4 py-3 text-left">ID</th>
+        <th class="px-4 py-3 text-left">単品</th>
+        <th class="px-4 py-3 text-left">仕入先</th>
+        <th class="px-4 py-3 text-right">数量</th>
+        <th class="px-4 py-3 text-left">入荷予定日</th>
+        <th class="px-4 py-3 text-left">発注日時</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y">
+      {% for order in orders %}
+      <tr class="hover:bg-gray-50">
+        <td class="px-4 py-3 font-mono">PO-{{ order.id }}</td>
+        <td class="px-4 py-3">{{ order.item_name }}</td>
+        <td class="px-4 py-3">{{ order.supplier_name }}</td>
+        <td class="px-4 py-3 text-right">{{ order.quantity }}</td>
+        <td class="px-4 py-3">{{ order.expected_arrival_date|date:"Y/m/d" }}</td>
+        <td class="px-4 py-3">{{ order.ordered_at|date:"Y/m/d H:i" }}</td>
+        <td class="px-4 py-3">
+          <a href="{% url 'purchasing:arrival_create' %}?po_id={{ order.id }}" class="text-blue-600 hover:underline text-sm">入荷登録</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-gray-500 text-center py-8">未入荷の発注はありません。</p>
+{% endif %}
+{% endblock %}

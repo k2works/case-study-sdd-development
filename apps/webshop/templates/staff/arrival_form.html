@@ -1,0 +1,85 @@
+{% extends "shop/base.html" %}
+
+{% block title %}入荷登録 - フレール・メモワール{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">入荷登録</h1>
+
+<form method="post" class="bg-white rounded-lg shadow p-6 max-w-lg">
+  {% csrf_token %}
+
+  <div class="mb-4">
+    <label for="purchase_order_id" class="block text-sm font-medium text-gray-700 mb-1">発注番号</label>
+    <select id="purchase_order_id" name="purchase_order_id" required
+            class="w-full border rounded px-3 py-2 text-sm">
+      <option value="">-- 発注を選択してください --</option>
+      {% for order in orders %}
+      <option value="{{ order.id }}"
+              data-quantity="{{ order.quantity }}"
+              {% if selected_po and selected_po.id == order.id %}selected{% endif %}>
+        PO-{{ order.id }} / {{ order.item_name }} / {{ order.quantity }}本 / 予定日: {{ order.expected_arrival_date|date:"Y/m/d" }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  {% if selected_po %}
+  <div class="mb-4 bg-blue-50 border border-blue-200 rounded p-3 text-sm">
+    <p><strong>発注数量:</strong> {{ selected_po.quantity }}本</p>
+    <p><strong>入荷予定日:</strong> {{ selected_po.expected_arrival_date|date:"Y/m/d" }}</p>
+  </div>
+  {% endif %}
+
+  <div class="mb-4">
+    <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">入荷数量</label>
+    <input type="number" id="quantity" name="quantity" min="1" required
+           class="w-full border rounded px-3 py-2 text-sm"
+           {% if selected_po %}value="{{ selected_po.quantity }}"{% endif %}>
+    <p id="variance_display" class="text-sm mt-1 hidden"></p>
+  </div>
+
+  <div class="mb-6">
+    <label for="arrived_at" class="block text-sm font-medium text-gray-700 mb-1">入荷日</label>
+    <input type="date" id="arrived_at" name="arrived_at" required
+           class="w-full border rounded px-3 py-2 text-sm">
+  </div>
+
+  <div class="flex gap-3">
+    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition text-sm">入荷を登録する</button>
+    <a href="{% url 'purchasing:order_list' %}" class="text-gray-500 hover:text-gray-700 px-4 py-2 text-sm">キャンセル</a>
+  </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var today = new Date().toISOString().split('T')[0];
+  document.getElementById('arrived_at').value = today;
+
+  var quantityInput = document.getElementById('quantity');
+  var poSelect = document.getElementById('purchase_order_id');
+
+  function showVariance() {
+    var option = poSelect.options[poSelect.selectedIndex];
+    var ordered = parseInt(option.dataset.quantity || '0');
+    var actual = parseInt(quantityInput.value || '0');
+    var display = document.getElementById('variance_display');
+    if (ordered > 0 && actual > 0 && actual !== ordered) {
+      var diff = actual - ordered;
+      var cls = diff > 0 ? 'text-yellow-600' : 'text-red-600';
+      display.className = 'text-sm mt-1 ' + cls;
+      display.textContent = '差異: ' + (diff > 0 ? '+' : '') + diff + '本（発注: ' + ordered + '本）';
+      display.classList.remove('hidden');
+    } else {
+      display.classList.add('hidden');
+    }
+  }
+
+  quantityInput.addEventListener('input', showVariance);
+  poSelect.addEventListener('change', function() {
+    var option = this.options[this.selectedIndex];
+    quantityInput.value = option.dataset.quantity || '';
+    showVariance();
+  });
+});
+</script>
+{% endblock %}
