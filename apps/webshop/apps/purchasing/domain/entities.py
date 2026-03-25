@@ -1,7 +1,4 @@
-"""仕入ドメインのエンティティ定義。
-
-PurchaseOrder（発注集約ルート）と Arrival（入荷集約ルート）を定義する。
-"""
+"""仕入ドメインのエンティティ。"""
 
 from __future__ import annotations
 
@@ -67,5 +64,5 @@ class Arrival:
             raise ValueError("入荷数量は 1 以上にしてください")
 
     def quantity_variance(self, ordered_quantity: int) -> int:
-        """発注数量との差異を返す。正=超過、負=不足。"""
+        """発注数量との差異を返す。"""
         return self.quantity - ordered_quantity

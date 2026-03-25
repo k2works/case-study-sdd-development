@@ -14,6 +14,7 @@ from apps.orders.services import OrderService, PlaceOrderCommand
 from apps.products.models import Product
 
 ORDER_CANCEL_TEMPLATE = "shop/order_cancel.html"
+ORDER_CHANGE_DELIVERY_DATE_TEMPLATE = "shop/order_change_delivery_date.html"
 
 
 def _get_order_service() -> OrderService:
@@ -198,7 +199,7 @@ class ChangeDeliveryDateView(View):
             raise Http404
         return render(
             request,
-            "shop/order_change_delivery_date.html",
+            ORDER_CHANGE_DELIVERY_DATE_TEMPLATE,
             {"order": order, "error": None},
         )
 
@@ -211,7 +212,7 @@ class ChangeDeliveryDateView(View):
         if not new_date_str:
             return render(
                 request,
-                "shop/order_change_delivery_date.html",
+                ORDER_CHANGE_DELIVERY_DATE_TEMPLATE,
                 {"order": order, "error": "届け日を入力してください"},
             )
         try:
@@ -227,7 +228,7 @@ class ChangeDeliveryDateView(View):
             order = service.find_order_by_number(order_number)
             return render(
                 request,
-                "shop/order_change_delivery_date.html",
+                ORDER_CHANGE_DELIVERY_DATE_TEMPLATE,
                 {"order": order, "error": str(e)},
             )
 

@@ -236,7 +236,6 @@ class TestStockForecastService:
         service = StockForecastService()
         incoming_schedule = {date(2026, 4, 3): 30}
         forecasts = service.calculate_forecast(
-            item_id=1,
             start_date=date(2026, 4, 1),
             days=5,
             stock_lots=[lot],
@@ -260,7 +259,6 @@ class TestStockForecastService:
             date(2026, 4, 4): 30,
         }
         forecasts = service.calculate_forecast(
-            item_id=1,
             start_date=date(2026, 4, 1),
             days=5,
             stock_lots=[],
