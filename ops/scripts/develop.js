@@ -44,16 +44,53 @@ function isCommandAvailable(cmd) {
 }
 
 /**
+ * システム Ruby のバージョンと bundler の有無を確認する
+ * @returns {{ version: string, hasBundler: boolean } | null}
+ */
+function checkSystemRuby() {
+  if (!isCommandAvailable('ruby')) return null;
+  try {
+    const version = execSync('ruby -e "puts RUBY_VERSION"', { stdio: 'pipe' }).toString().trim();
+    const hasBundler = isCommandAvailable('bundle');
+    return { version, hasBundler };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Ruby 環境の種別を判定する
- * rbenv > システム Ruby > nix の優先順で判定
+ * 判定順: rbenv > システム Ruby（バージョン一致＋bundler あり） > nix > システム Ruby（フォールバック）
  * @returns {'rbenv'|'system'|'nix'}
  */
 function detectRubyEnv() {
+  // 1. rbenv があれば最優先
   if (isCommandAvailable('rbenv')) return 'rbenv';
-  if (isCommandAvailable('ruby')) return 'system';
+
+  // 2. システム Ruby がバージョン一致＋bundler ありなら使う
+  const sysRuby = checkSystemRuby();
+  if (sysRuby) {
+    try {
+      const requiredVersion = execSync('cat .ruby-version', { cwd: APPS_DIR, stdio: 'pipe' }).toString().trim();
+      if (sysRuby.version === requiredVersion && sysRuby.hasBundler) {
+        return 'system';
+      }
+    } catch {
+      // .ruby-version が読めない場合は bundler があればシステム Ruby を使う
+      if (sysRuby.hasBundler) return 'system';
+    }
+  }
+
+  // 3. nix があれば nix（正しいバージョン＋依存を提供）
   if (isCommandAvailable('nix-shell')) return 'nix';
-  console.error('エラー: rbenv、Ruby、nix のいずれも見つかりません。');
-  console.error('  rbenv または nix をインストールしてください。');
+
+  // 4. システム Ruby がある場合はフォールバック（バージョン不一致でも試行）
+  if (sysRuby && sysRuby.hasBundler) return 'system';
+
+  console.error('エラー: 利用可能な Ruby 環境が見つかりません。');
+  console.error('  以下のいずれかをインストールしてください:');
+  console.error('    - rbenv（推奨）');
+  console.error('    - nix');
   process.exit(1);
 }
 
@@ -90,16 +127,15 @@ function setupRubyEnvironment() {
     }
     execSync('rbenv rehash', { stdio: 'inherit' });
   } else if (env === 'system') {
-    const currentVersion = execSync('ruby -e "puts RUBY_VERSION"', { stdio: 'pipe' }).toString().trim();
-    console.log(`Ruby 環境: システム Ruby を使用します（${currentVersion}）`);
-    if (currentVersion !== requiredVersion) {
-      console.warn(`  警告: システム Ruby ${currentVersion} と .ruby-version ${requiredVersion} が異なります`);
+    const sysRuby = checkSystemRuby();
+    console.log(`Ruby 環境: システム Ruby を使用します（${sysRuby.version}）`);
+    if (sysRuby.version !== requiredVersion) {
+      console.warn(`  警告: システム Ruby ${sysRuby.version} と .ruby-version ${requiredVersion} が異なります`);
     }
   } else {
     console.log('Ruby 環境: nix を使用します');
     console.log('  nix-shell で Ruby 環境を確認しています...');
     execSync(`nix-shell ${NIX_RUBY_SHELL} --run "ruby --version"`, { stdio: 'inherit' });
-    console.log('  注意: ネイティブ gem ビルドに必要な依存（libyaml, pkg-config 等）は shell.nix に含まれています');
   }
 }
 
