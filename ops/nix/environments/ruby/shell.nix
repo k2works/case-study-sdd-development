@@ -8,6 +8,15 @@ packages.mkShell {
     ruby
     rubyPackages_3_3.solargraph
     bundler
+    # ネイティブ gem ビルドに必要な依存
+    libyaml
+    pkg-config
+    postgresql
+    libffi
+    zlib
+    openssl
+    gcc
+    gnumake
   ]);
   shellHook = ''
     ${baseShell.shellHook}

@@ -30,12 +30,13 @@ function execInApps(command, options = {}) {
 }
 
 /**
- * rbenv が利用可能か確認する
+ * コマンドが利用可能か確認する
+ * @param {string} cmd - 確認するコマンド
  * @returns {boolean}
  */
-function isRbenvAvailable() {
+function isCommandAvailable(cmd) {
   try {
-    execSync('rbenv --version', { stdio: 'pipe' });
+    execSync(`which ${cmd}`, { stdio: 'pipe' });
     return true;
   } catch {
     return false;
@@ -43,59 +44,62 @@ function isRbenvAvailable() {
 }
 
 /**
- * nix-shell が利用可能か確認する
- * @returns {boolean}
+ * Ruby 環境の種別を判定する
+ * rbenv > システム Ruby > nix の優先順で判定
+ * @returns {'rbenv'|'system'|'nix'}
  */
-function isNixAvailable() {
-  try {
-    execSync('nix-shell --version', { stdio: 'pipe' });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Ruby 環境に応じたコマンドラッパーを返す
- * rbenv があればそのまま実行、なければ nix-shell 経由で実行する
- * @param {string} command - 実行するコマンド
- * @param {object} [options] - execSync オプション
- * @returns {string} ラップされたコマンド
- */
-function rubyCommand(command) {
-  if (isRbenvAvailable()) {
-    return command;
-  }
-  if (isNixAvailable()) {
-    return `nix-shell ${NIX_RUBY_SHELL} --run "${command.replace(/"/g, '\\"')}"`;
-  }
-  console.error('エラー: rbenv も nix も見つかりません。いずれかをインストールしてください。');
+function detectRubyEnv() {
+  if (isCommandAvailable('rbenv')) return 'rbenv';
+  if (isCommandAvailable('ruby')) return 'system';
+  if (isCommandAvailable('nix-shell')) return 'nix';
+  console.error('エラー: rbenv、Ruby、nix のいずれも見つかりません。');
+  console.error('  rbenv または nix をインストールしてください。');
   process.exit(1);
 }
 
 /**
- * Ruby 環境をセットアップする（rbenv または nix）
+ * Ruby 環境に応じたコマンドラッパーを返す
+ * rbenv/システム Ruby があればそのまま実行、なければ nix-shell 経由で実行する
+ * @param {string} command - 実行するコマンド
+ * @returns {string} ラップされたコマンド
+ */
+function rubyCommand(command) {
+  const env = detectRubyEnv();
+  if (env === 'rbenv' || env === 'system') {
+    return command;
+  }
+  return `nix-shell ${NIX_RUBY_SHELL} --run "${command.replace(/"/g, '\\"')}"`;
+}
+
+/**
+ * Ruby 環境をセットアップする（rbenv、システム Ruby、または nix）
  */
 function setupRubyEnvironment() {
-  if (isRbenvAvailable()) {
+  const env = detectRubyEnv();
+  const requiredVersion = execSync('cat .ruby-version', { cwd: APPS_DIR, stdio: 'pipe' }).toString().trim();
+  console.log(`  必要な Ruby バージョン: ${requiredVersion}`);
+
+  if (env === 'rbenv') {
     console.log('Ruby 環境: rbenv を使用します');
-    const rubyVersion = execSync('cat .ruby-version', { cwd: APPS_DIR, stdio: 'pipe' }).toString().trim();
-    console.log(`  必要な Ruby バージョン: ${rubyVersion}`);
     try {
-      execSync(`rbenv versions --bare | grep -q "^${rubyVersion}$"`, { stdio: 'pipe' });
-      console.log(`  Ruby ${rubyVersion} はインストール済みです`);
+      execSync(`rbenv versions --bare | grep -q "^${requiredVersion}$"`, { stdio: 'pipe' });
+      console.log(`  Ruby ${requiredVersion} はインストール済みです`);
     } catch {
-      console.log(`  Ruby ${rubyVersion} をインストールしています...`);
-      execSync(`rbenv install ${rubyVersion}`, { stdio: 'inherit' });
+      console.log(`  Ruby ${requiredVersion} をインストールしています...`);
+      execSync(`rbenv install ${requiredVersion}`, { stdio: 'inherit' });
     }
     execSync('rbenv rehash', { stdio: 'inherit' });
-  } else if (isNixAvailable()) {
+  } else if (env === 'system') {
+    const currentVersion = execSync('ruby -e "puts RUBY_VERSION"', { stdio: 'pipe' }).toString().trim();
+    console.log(`Ruby 環境: システム Ruby を使用します（${currentVersion}）`);
+    if (currentVersion !== requiredVersion) {
+      console.warn(`  警告: システム Ruby ${currentVersion} と .ruby-version ${requiredVersion} が異なります`);
+    }
+  } else {
     console.log('Ruby 環境: nix を使用します');
     console.log('  nix-shell で Ruby 環境を確認しています...');
     execSync(`nix-shell ${NIX_RUBY_SHELL} --run "ruby --version"`, { stdio: 'inherit' });
-  } else {
-    console.error('エラー: rbenv も nix も見つかりません。いずれかをインストールしてください。');
-    process.exit(1);
+    console.log('  注意: ネイティブ gem ビルドに必要な依存（libyaml, pkg-config 等）は shell.nix に含まれています');
   }
 }
 
