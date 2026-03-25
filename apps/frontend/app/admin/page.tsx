@@ -2,7 +2,13 @@
 
 import { ChangeEvent, useEffect, useState } from "react";
 
-type AdminWorkbench = "orders" | "inventory" | "materials" | "purchaseOrders";
+type AdminWorkbench =
+  | "orders"
+  | "inventory"
+  | "materials"
+  | "purchaseOrders"
+  | "receipts"
+  | "shipping";
 
 type OrderSummary = {
   orderId: string;
@@ -63,6 +69,37 @@ type PurchaseOrderResult = {
   status: string;
 };
 
+type PurchaseOrderSummary = {
+  purchaseOrderId: string;
+  supplierName: string;
+  status: string;
+  items: Array<{
+    materialId: string;
+    quantity: number;
+    receivedQuantity: number;
+  }>;
+};
+
+type ReceiptResult = {
+  purchaseOrderId: string;
+  status: string;
+};
+
+type ShippingTarget = {
+  orderId: string;
+  customerName: string;
+  productName: string;
+  shippingDate: string;
+  status: string;
+  materials: Array<{
+    materialId: string;
+    materialName: string;
+    requiredQuantity: number;
+    projectedQuantity: number;
+  }>;
+  hasShortage: boolean;
+};
+
 export function getInventoryAlertLabel(projectedQuantity: number): string | null {
   if (projectedQuantity < 0) {
     return "不足見込み";
@@ -111,6 +148,18 @@ export default function AdminPage() {
   const [purchaseFeedback, setPurchaseFeedback] = useState<string | null>(null);
   const [purchaseQuantities, setPurchaseQuantities] = useState<Record<string, number>>({});
   const [purchaseReloadKey, setPurchaseReloadKey] = useState(0);
+  const [receiptOrders, setReceiptOrders] = useState<PurchaseOrderSummary[]>([]);
+  const [receiptLoading, setReceiptLoading] = useState(true);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
+  const [receiptFeedback, setReceiptFeedback] = useState<string | null>(null);
+  const [receiptQuantities, setReceiptQuantities] = useState<Record<string, number>>({});
+  const [receiptReloadKey, setReceiptReloadKey] = useState(0);
+  const [shippingDate, setShippingDate] = useState("2026-04-11");
+  const [shippingTargets, setShippingTargets] = useState<ShippingTarget[]>([]);
+  const [shippingLoading, setShippingLoading] = useState(true);
+  const [shippingError, setShippingError] = useState<string | null>(null);
+  const [shippingFeedback, setShippingFeedback] = useState<string | null>(null);
+  const [shippingReloadKey, setShippingReloadKey] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -312,6 +361,102 @@ export default function AdminPage() {
     };
   }, [apiBaseUrl, endDate, purchaseReloadKey, startDate]);
 
+  useEffect(() => {
+    let active = true;
+
+    const loadReceiptOrders = async () => {
+      if (active) {
+        setReceiptLoading(true);
+      }
+
+      try {
+        const response = await fetch(`${apiBaseUrl}/admin/purchase-orders`);
+
+        if (!response.ok) {
+          if (active) {
+            setReceiptOrders([]);
+            setReceiptError("入荷対象を取得できませんでした。");
+            setReceiptLoading(false);
+          }
+
+          return;
+        }
+
+        const data = (await response.json()) as PurchaseOrderSummary[];
+
+        if (active) {
+          setReceiptOrders(data);
+          setReceiptError(null);
+          setReceiptLoading(false);
+          setReceiptQuantities(
+            Object.fromEntries(
+              data.flatMap((order) =>
+                order.items.map((item) => [`${order.purchaseOrderId}:${item.materialId}`, item.quantity - item.receivedQuantity]),
+              ),
+            ),
+          );
+        }
+      } catch {
+        if (active) {
+          setReceiptOrders([]);
+          setReceiptError("入荷対象を取得できませんでした。");
+          setReceiptLoading(false);
+        }
+      }
+    };
+
+    void loadReceiptOrders();
+
+    return () => {
+      active = false;
+    };
+  }, [apiBaseUrl, receiptReloadKey]);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadShippingTargets = async () => {
+      if (active) {
+        setShippingLoading(true);
+      }
+
+      try {
+        const query = new URLSearchParams({ shippingDate });
+        const response = await fetch(`${apiBaseUrl}/admin/shipping-targets?${query.toString()}`);
+
+        if (!response.ok) {
+          if (active) {
+            setShippingTargets([]);
+            setShippingError("出荷対象を取得できませんでした。");
+            setShippingLoading(false);
+          }
+
+          return;
+        }
+
+        const data = (await response.json()) as ShippingTarget[];
+
+        if (active) {
+          setShippingTargets(data);
+          setShippingError(null);
+          setShippingLoading(false);
+        }
+      } catch {
+        if (active) {
+          setShippingTargets([]);
+          setShippingError("出荷対象を取得できませんでした。");
+          setShippingLoading(false);
+        }
+      }
+    };
+
+    void loadShippingTargets();
+
+    return () => {
+      active = false;
+    };
+  }, [apiBaseUrl, shippingDate, shippingReloadKey]);
+
   const filteredOrders = orders.filter((order) =>
     order.customerName.includes(customerName.trim()),
   );
@@ -435,6 +580,80 @@ export default function AdminPage() {
     }
   };
 
+  const handleReceiptQuantityChange =
+    (purchaseOrderId: string, materialId: string) => (event: ChangeEvent<HTMLInputElement>) => {
+      setReceiptQuantities((current) => ({
+        ...current,
+        [`${purchaseOrderId}:${materialId}`]: Number(event.target.value),
+      }));
+    };
+
+  const handleRegisterReceipt = async (purchaseOrderId: string) => {
+    const targetOrder = receiptOrders.find((order) => order.purchaseOrderId === purchaseOrderId);
+
+    if (!targetOrder) {
+      return;
+    }
+
+    setReceiptFeedback(null);
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/admin/purchase-orders/${purchaseOrderId}/receipts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          receiptDate: shippingDate,
+          items: targetOrder.items.map((item) => ({
+            materialId: item.materialId,
+            quantity: receiptQuantities[`${purchaseOrderId}:${item.materialId}`] ?? 0,
+          })),
+        }),
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json()) as { message?: string };
+        setReceiptFeedback(payload.message ?? "入荷実績を登録できませんでした。");
+        return;
+      }
+
+      const payload = (await response.json()) as ReceiptResult;
+      setReceiptFeedback(`入荷実績を登録しました。状態: ${payload.status}`);
+      setReceiptReloadKey((current) => current + 1);
+      setInventoryReloadKey((current) => current + 1);
+      setShippingReloadKey((current) => current + 1);
+    } catch {
+      setReceiptFeedback("入荷実績を登録できませんでした。");
+    }
+  };
+
+  const handleCompleteBundle = async (orderId: string) => {
+    setShippingFeedback(null);
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/admin/orders/${orderId}/bundle-completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json()) as { message?: string };
+        setShippingFeedback(payload.message ?? "結束完了を登録できませんでした。");
+        return;
+      }
+
+      setShippingFeedback("結束完了を登録しました。");
+      setShippingReloadKey((current) => current + 1);
+      setOrdersLoading(true);
+    } catch {
+      setShippingFeedback("結束完了を登録できませんでした。");
+    }
+  };
+
   return (
     <main>
       <div className="shell">
@@ -447,7 +666,11 @@ export default function AdminPage() {
                 ? "在庫推移"
                 : activeWorkbench === "materials"
                   ? "花材管理"
-                  : "発注管理"}
+                  : activeWorkbench === "purchaseOrders"
+                    ? "発注管理"
+                    : activeWorkbench === "receipts"
+                      ? "入荷管理"
+                      : "出荷管理"}
           </h1>
           <p>
             {activeWorkbench === "orders"
@@ -456,7 +679,11 @@ export default function AdminPage() {
                 ? "仕入判断のために、対象期間の在庫推移と不足見込みを確認します。"
                 : activeWorkbench === "materials"
                   ? "在庫推移と発注判断の前提になる花材情報と仕入条件を管理します。"
-                  : "不足見込みから仕入先別の発注候補を確認し、発注を確定します。"}
+                  : activeWorkbench === "purchaseOrders"
+                    ? "不足見込みから仕入先別の発注候補を確認し、発注を確定します。"
+                    : activeWorkbench === "receipts"
+                      ? "発注に対する入荷実績を登録し、在庫へ反映します。"
+                      : "当日の出荷対象と必要花材を確認し、結束完了を登録します。"}
           </p>
         </section>
 
@@ -492,6 +719,22 @@ export default function AdminPage() {
             onClick={() => setActiveWorkbench("purchaseOrders")}
           >
             発注管理
+          </button>
+          <button
+            type="button"
+            className={activeWorkbench === "receipts" ? "switch-chip is-active" : "switch-chip"}
+            aria-pressed={activeWorkbench === "receipts"}
+            onClick={() => setActiveWorkbench("receipts")}
+          >
+            入荷管理
+          </button>
+          <button
+            type="button"
+            className={activeWorkbench === "shipping" ? "switch-chip is-active" : "switch-chip"}
+            aria-pressed={activeWorkbench === "shipping"}
+            onClick={() => setActiveWorkbench("shipping")}
+          >
+            出荷管理
           </button>
         </nav>
 
@@ -817,7 +1060,7 @@ export default function AdminPage() {
               </section>
             </div>
           </section>
-        ) : (
+        ) : activeWorkbench === "purchaseOrders" ? (
           <section className="admin-panel">
             <div className="admin-panel-header">
               <div>
@@ -882,6 +1125,148 @@ export default function AdminPage() {
                   type="button"
                   className="secondary-button"
                   onClick={() => setPurchaseReloadKey((current) => current + 1)}
+                >
+                  再試行
+                </button>
+              </div>
+            ) : null}
+          </section>
+        ) : activeWorkbench === "receipts" ? (
+          <section className="admin-panel">
+            <div className="admin-panel-header">
+              <div>
+                <p className="eyebrow">Receiving</p>
+                <h2>入荷対象</h2>
+              </div>
+            </div>
+            {receiptLoading ? <p className="admin-empty">入荷対象を読み込んでいます。</p> : null}
+            {!receiptLoading &&
+              receiptOrders.map((order) => (
+                <section key={order.purchaseOrderId} className="purchase-group">
+                  <h3>{order.purchaseOrderId} / {order.supplierName}</h3>
+                  <p className="admin-inline-feedback">状態: {order.status}</p>
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>花材</th>
+                        <th>発注数</th>
+                        <th>入荷済み</th>
+                        <th>今回入荷</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {order.items.map((item) => (
+                        <tr key={item.materialId}>
+                          <td>{item.materialId}</td>
+                          <td>{item.quantity}</td>
+                          <td>{item.receivedQuantity}</td>
+                          <td>
+                            <input
+                              className="quantity-input"
+                              type="number"
+                              value={receiptQuantities[`${order.purchaseOrderId}:${item.materialId}`] ?? 0}
+                              onChange={handleReceiptQuantityChange(order.purchaseOrderId, item.materialId)}
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <button
+                    type="button"
+                    className="primary-button"
+                    onClick={() => void handleRegisterReceipt(order.purchaseOrderId)}
+                  >
+                    入荷を登録する
+                  </button>
+                </section>
+              ))}
+            {!receiptLoading && receiptOrders.length === 0 ? (
+              <p className="admin-empty">{receiptError ?? "入荷対象はありません。"}</p>
+            ) : null}
+            {receiptFeedback && receiptFeedback !== "入荷実績を登録できませんでした。" ? (
+              <p className="admin-inline-feedback">{receiptFeedback}</p>
+            ) : null}
+            {receiptFeedback === "入荷実績を登録できませんでした。" || receiptError ? (
+              <div className="admin-feedback admin-feedback--error">
+                <p>{receiptError ?? receiptFeedback}</p>
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => setReceiptReloadKey((current) => current + 1)}
+                >
+                  再試行
+                </button>
+              </div>
+            ) : null}
+          </section>
+        ) : (
+          <section className="admin-panel">
+            <div className="admin-panel-header">
+              <div>
+                <p className="eyebrow">Shipping</p>
+                <h2>出荷対象</h2>
+              </div>
+              <label className="field" htmlFor="shippingDate">
+                <span>出荷日</span>
+                <input
+                  id="shippingDate"
+                  name="shippingDate"
+                  type="date"
+                  value={shippingDate}
+                  onChange={(event) => setShippingDate(event.target.value)}
+                />
+              </label>
+            </div>
+            {shippingLoading ? <p className="admin-empty">出荷対象を読み込んでいます。</p> : null}
+            {!shippingLoading &&
+              shippingTargets.map((target) => (
+                <section key={target.orderId} className="purchase-group">
+                  <h3>{target.orderId} / {target.customerName}</h3>
+                  <p className="admin-inline-feedback">状態: {target.status}</p>
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>花材</th>
+                        <th>必要数</th>
+                        <th>在庫予定</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {target.materials.map((material) => (
+                        <tr key={material.materialId}>
+                          <td>{material.materialName}</td>
+                          <td>{material.requiredQuantity}</td>
+                          <td>{material.projectedQuantity}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {target.hasShortage ? (
+                    <p className="admin-feedback admin-feedback--error">在庫不足のため結束完了を登録できません。</p>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="primary-button"
+                    onClick={() => void handleCompleteBundle(target.orderId)}
+                  >
+                    結束完了を登録する
+                  </button>
+                </section>
+              ))}
+            {!shippingLoading && shippingTargets.length === 0 ? (
+              <p className="admin-empty">{shippingError ?? "出荷対象はありません。"}</p>
+            ) : null}
+            {shippingFeedback && shippingFeedback !== "結束完了を登録できませんでした。" ? (
+              <p className="admin-inline-feedback">{shippingFeedback}</p>
+            ) : null}
+            {shippingFeedback === "結束完了を登録できませんでした。" || shippingError ? (
+              <div className="admin-feedback admin-feedback--error">
+                <p>{shippingError ?? shippingFeedback}</p>
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => setShippingReloadKey((current) => current + 1)}
                 >
                   再試行
                 </button>

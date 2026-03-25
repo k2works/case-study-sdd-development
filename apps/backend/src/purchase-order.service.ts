@@ -30,12 +30,58 @@ export type ConfirmPurchaseOrderResponse = {
   status: "送信待ち";
 };
 
-type PurchaseOrderRecord = ConfirmPurchaseOrderResponse & ConfirmPurchaseOrderRequest;
+export type PurchaseOrderStatus = "送信待ち" | "一部入荷" | "入荷完了";
+
+export type PurchaseOrderItemRecord = {
+  materialId: string;
+  quantity: number;
+  receivedQuantity: number;
+};
+
+export type PurchaseOrderSummary = {
+  purchaseOrderId: string;
+  supplierName: string;
+  status: PurchaseOrderStatus;
+  items: PurchaseOrderItemRecord[];
+};
+
+export type RegisterReceiptRequest = {
+  receiptDate: string;
+  items: Array<{
+    materialId: string;
+    quantity: number;
+  }>;
+};
+
+export type RegisterReceiptResponse = {
+  purchaseOrderId: string;
+  status: Extract<PurchaseOrderStatus, "一部入荷" | "入荷完了">;
+};
+
+type PurchaseOrderRecord = {
+  purchaseOrderId: string;
+  supplierName: string;
+  status: PurchaseOrderStatus;
+  items: PurchaseOrderItemRecord[];
+};
 
 @Injectable()
 export class PurchaseOrderService {
   private sequence = 1;
-  private readonly orders: PurchaseOrderRecord[] = [];
+  private readonly orders: PurchaseOrderRecord[] = [
+    {
+      purchaseOrderId: "PO-9001",
+      supplierName: "東京フラワー物流",
+      status: "送信待ち",
+      items: [
+        {
+          materialId: "MAT-001",
+          quantity: 10,
+          receivedQuantity: 0,
+        },
+      ],
+    },
+  ];
   private readonly inventoryService: InventoryService;
   private readonly materialService: MaterialService;
 
@@ -103,7 +149,12 @@ export class PurchaseOrderService {
     const duplicated = this.orders.find(
       (order) =>
         order.supplierName === request.supplierName &&
-        JSON.stringify(order.items) === JSON.stringify(request.items),
+        JSON.stringify(
+          order.items.map((item) => ({
+            materialId: item.materialId,
+            quantity: item.quantity,
+          })),
+        ) === JSON.stringify(request.items),
     );
 
     if (duplicated) {
@@ -117,10 +168,72 @@ export class PurchaseOrderService {
     this.sequence += 1;
 
     this.orders.push({
-      ...request,
-      ...response,
+      purchaseOrderId: response.purchaseOrderId,
+      supplierName: request.supplierName,
+      status: response.status,
+      items: request.items.map((item) => ({
+        materialId: item.materialId,
+        quantity: item.quantity,
+        receivedQuantity: 0,
+      })),
     });
 
     return response;
+  }
+
+  listPurchaseOrders(): PurchaseOrderSummary[] {
+    return this.orders.map((order) => ({
+      purchaseOrderId: order.purchaseOrderId,
+      supplierName: order.supplierName,
+      status: order.status,
+      items: order.items.map((item) => ({ ...item })),
+    }));
+  }
+
+  registerReceipt(
+    purchaseOrderId: string,
+    request: RegisterReceiptRequest,
+  ): RegisterReceiptResponse {
+    const order = this.orders.find((candidate) => candidate.purchaseOrderId === purchaseOrderId);
+
+    if (!order) {
+      throw new BadRequestException("対象の発注が存在しません。");
+    }
+
+    if (request.items.some((item) => item.quantity <= 0)) {
+      throw new BadRequestException("入荷数量は 1 以上で入力してください。");
+    }
+
+    for (const receiptItem of request.items) {
+      const orderItem = order.items.find((candidate) => candidate.materialId === receiptItem.materialId);
+
+      if (!orderItem) {
+        throw new BadRequestException("発注明細に存在しない花材です。");
+      }
+
+      if (orderItem.receivedQuantity + receiptItem.quantity > orderItem.quantity) {
+        throw new BadRequestException("発注数量を超える入荷数量は登録できません。");
+      }
+    }
+
+    for (const receiptItem of request.items) {
+      const orderItem = order.items.find((candidate) => candidate.materialId === receiptItem.materialId);
+
+      if (!orderItem) {
+        continue;
+      }
+
+      orderItem.receivedQuantity += receiptItem.quantity;
+    }
+
+    this.inventoryService.applyReceipt(request.receiptDate, request.items);
+    order.status = order.items.every((item) => item.receivedQuantity === item.quantity)
+      ? "入荷完了"
+      : "一部入荷";
+
+    return {
+      purchaseOrderId: order.purchaseOrderId,
+      status: order.status,
+    };
   }
 }

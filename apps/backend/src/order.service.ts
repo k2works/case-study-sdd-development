@@ -20,7 +20,7 @@ export type OrderSummary = {
   productName: string;
   deliveryDate: string;
   shippingDate: string;
-  status: "confirmed" | "shipping-prep";
+  status: "confirmed" | "shipping-prep" | "shipping-ready";
 };
 
 export type OrderDetail = OrderSummary & {
@@ -100,6 +100,21 @@ export class OrderService {
 
   getOrderDetail(orderId: string): OrderDetail | undefined {
     return this.orders.find((order) => order.orderId === orderId);
+  }
+
+  listOrdersByShippingDate(shippingDate: string): OrderDetail[] {
+    return this.orders.filter((order) => order.shippingDate === shippingDate);
+  }
+
+  updateOrderStatus(orderId: string, status: OrderSummary["status"]): OrderDetail | undefined {
+    const target = this.orders.find((order) => order.orderId === orderId);
+
+    if (!target) {
+      return undefined;
+    }
+
+    target.status = status;
+    return target;
   }
 }
 

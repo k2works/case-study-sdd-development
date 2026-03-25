@@ -10,6 +10,8 @@ import { OrderController } from "./order.controller";
 import { OrderService } from "./order.service";
 import { PurchaseOrderController } from "./purchase-order.controller";
 import { PurchaseOrderService } from "./purchase-order.service";
+import { ShippingController } from "./shipping.controller";
+import { ShippingService } from "./shipping.service";
 
 @Module({
   controllers: [
@@ -18,6 +20,7 @@ import { PurchaseOrderService } from "./purchase-order.service";
     InventoryController,
     MaterialController,
     PurchaseOrderController,
+    ShippingController,
   ],
   providers: [
     HealthService,
@@ -25,6 +28,7 @@ import { PurchaseOrderService } from "./purchase-order.service";
     MaterialService,
     InventoryService,
     PurchaseOrderService,
+    ShippingService,
   ],
 })
 export class AppModule {}

@@ -115,6 +115,70 @@ describe("AdminPage", () => {
           });
         }
 
+        if (url.endsWith("/admin/purchase-orders/PO-9001/receipts") && init?.method === "POST") {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              purchaseOrderId: "PO-9001",
+              status: "一部入荷",
+            }),
+          });
+        }
+
+        if (url.endsWith("/admin/purchase-orders")) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              {
+                purchaseOrderId: "PO-9001",
+                supplierName: "東京フラワー物流",
+                status: "送信待ち",
+                items: [
+                  {
+                    materialId: "MAT-001",
+                    quantity: 10,
+                    receivedQuantity: 0,
+                  },
+                ],
+              },
+            ],
+          });
+        }
+
+        if (url.endsWith("/admin/orders/ORD-1002/bundle-completions") && init?.method === "POST") {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              orderId: "ORD-1002",
+              status: "shipping-ready",
+            }),
+          });
+        }
+
+        if (url.includes("/admin/shipping-targets")) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              {
+                orderId: "ORD-1002",
+                customerName: "表参道ギャラリー",
+                productName: "ホワイトリリー",
+                shippingDate: "2026-04-11",
+                status: "shipping-prep",
+                materials: [
+                  {
+                    materialId: "MAT-001",
+                    materialName: "バラ赤",
+                    requiredQuantity: 8,
+                    projectedQuantity: 8,
+                  },
+                ],
+                hasShortage: false,
+              },
+            ],
+          });
+        }
+
         return Promise.resolve({
           ok: true,
           json: async () => [
@@ -330,6 +394,30 @@ describe("AdminPage", () => {
     expect(await screen.findByText("発注を登録しました。状態: 送信待ち")).toBeInTheDocument();
   });
 
+  it("入荷対象を確認して入荷実績を登録できる", async () => {
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "入荷管理" }));
+
+    expect(await screen.findByRole("heading", { level: 1, name: "入荷管理" })).toBeInTheDocument();
+    expect(screen.getByText("PO-9001 / 東京フラワー物流")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "入荷を登録する" }));
+
+    expect(await screen.findByText("入荷実績を登録しました。状態: 一部入荷")).toBeInTheDocument();
+  });
+
+  it("出荷対象を確認して結束完了を登録できる", async () => {
+    render(<AdminPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "出荷管理" }));
+
+    expect(await screen.findByRole("heading", { level: 1, name: "出荷管理" })).toBeInTheDocument();
+    expect(screen.getByText("ORD-1002 / 表参道ギャラリー")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "結束完了を登録する" }));
+
+    expect(await screen.findByText("結束完了を登録しました。")).toBeInTheDocument();
+  });
+
   it("花材保存の通信例外を画面で案内する", async () => {
     const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
@@ -485,6 +573,22 @@ describe("AdminPage loading state", () => {
               return;
             }
 
+            if (url.endsWith("/admin/purchase-orders")) {
+              resolve({
+                ok: true,
+                json: async () => [],
+              });
+              return;
+            }
+
+            if (url.includes("/admin/shipping-targets")) {
+              resolve({
+                ok: true,
+                json: async () => [],
+              });
+              return;
+            }
+
             resolve({
               ok: true,
               json: async () => [],
@@ -506,6 +610,12 @@ describe("AdminPage loading state", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "発注管理" }));
     expect(screen.getByText("発注候補を読み込んでいます。")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "入荷管理" }));
+    expect(screen.getByText("入荷対象を読み込んでいます。")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "出荷管理" }));
+    expect(screen.getByText("出荷対象を読み込んでいます。")).toBeInTheDocument();
 
     await vi.runAllTimersAsync();
     vi.useRealTimers();

@@ -40,9 +40,16 @@ const INVENTORY_ITEMS: Array<{ materialId: string; projections: InventoryProject
   },
 ];
 
+type ReceiptRecord = {
+  receiptDate: string;
+  materialId: string;
+  quantity: number;
+};
+
 @Injectable()
 export class InventoryService {
   private readonly materialService: MaterialService;
+  private readonly receipts: ReceiptRecord[] = [];
 
   constructor(@Inject(MaterialService) materialService: MaterialService) {
     this.materialService = materialService;
@@ -57,14 +64,48 @@ export class InventoryService {
         materialId: item.materialId,
         materialName:
           this.materialService.findMaterial(item.materialId)?.materialName ?? item.materialId,
-        projections: item.projections.filter(
-          (projection) => projection.date >= startDate && projection.date <= endDate,
-        ),
+        projections: item.projections
+          .filter((projection) => projection.date >= startDate && projection.date <= endDate)
+          .map((projection) => ({
+            date: projection.date,
+            projectedQuantity:
+              projection.projectedQuantity +
+              this.getReceiptQuantityOnOrBefore(item.materialId, projection.date),
+          })),
       })),
     };
   }
 
   isSupportedRange(startDate: string, endDate: string): boolean {
     return startDate >= INVENTORY_DATES[0] && endDate <= INVENTORY_DATES[INVENTORY_DATES.length - 1];
+  }
+
+  applyReceipt(
+    receiptDate: string,
+    items: Array<{
+      materialId: string;
+      quantity: number;
+    }>,
+  ): void {
+    for (const item of items) {
+      this.receipts.push({
+        receiptDate,
+        materialId: item.materialId,
+        quantity: item.quantity,
+      });
+    }
+  }
+
+  getProjectedQuantity(materialId: string, date: string): number {
+    const target = INVENTORY_ITEMS.find((item) => item.materialId === materialId);
+    const base = target?.projections.find((projection) => projection.date === date)?.projectedQuantity ?? 0;
+
+    return base + this.getReceiptQuantityOnOrBefore(materialId, date);
+  }
+
+  private getReceiptQuantityOnOrBefore(materialId: string, date: string): number {
+    return this.receipts
+      .filter((receipt) => receipt.materialId === materialId && receipt.receiptDate <= date)
+      .reduce((total, receipt) => total + receipt.quantity, 0);
   }
 }

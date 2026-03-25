@@ -1,10 +1,13 @@
-import { Body, Controller, Get, Inject, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, Post, Query } from "@nestjs/common";
 
 import {
   ConfirmPurchaseOrderRequest,
   ConfirmPurchaseOrderResponse,
   PurchaseOrderCandidateGroup,
+  PurchaseOrderSummary,
   PurchaseOrderService,
+  RegisterReceiptRequest,
+  RegisterReceiptResponse,
 } from "./purchase-order.service";
 
 @Controller("admin/purchase-orders")
@@ -23,10 +26,23 @@ export class PurchaseOrderController {
     return this.purchaseOrderService.getCandidates(startDate, endDate);
   }
 
+  @Get()
+  listPurchaseOrders(): PurchaseOrderSummary[] {
+    return this.purchaseOrderService.listPurchaseOrders();
+  }
+
   @Post()
   confirmPurchaseOrder(
     @Body() request: ConfirmPurchaseOrderRequest,
   ): ConfirmPurchaseOrderResponse {
     return this.purchaseOrderService.confirmPurchaseOrder(request);
+  }
+
+  @Post(":purchaseOrderId/receipts")
+  registerReceipt(
+    @Param("purchaseOrderId") purchaseOrderId: string,
+    @Body() request: RegisterReceiptRequest,
+  ): RegisterReceiptResponse {
+    return this.purchaseOrderService.registerReceipt(purchaseOrderId, request);
   }
 }
