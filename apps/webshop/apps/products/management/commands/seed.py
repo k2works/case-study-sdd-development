@@ -22,7 +22,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if Supplier.objects.exists():
-            self.stdout.write(self.style.WARNING("シードデータは既に存在します。スキップします。"))
+            self.stdout.write(
+                self.style.WARNING("シードデータは既に存在します。スキップします。")
+            )
             return
 
         self.stdout.write("シードデータを作成中...")
@@ -35,9 +37,7 @@ class Command(BaseCommand):
                 email="admin@example.com",
                 password=ADMIN_PASSWORD,
             )
-            self.stdout.write(
-                f"管理ユーザー作成: {ADMIN_USERNAME} / {ADMIN_PASSWORD}"
-            )
+            self.stdout.write(f"管理ユーザー作成: {ADMIN_USERNAME} / {ADMIN_PASSWORD}")
 
         # ── 仕入先 ──
         supplier_a = Supplier.objects.create(
