@@ -23,11 +23,13 @@
 | [レビュー](./review/index.md) | 分析・開発レビュー結果の記録 | `index.md` を整備済み |
 | [ADR](./adr/index.md) | Architecture Decision Records の管理 | `index.md` を整備済み |
 | [記事一覧](./article/index.md) | 学習用の記事シリーズ一覧 | `index.md` を整備済み |
-| [リファレンス](./reference/index.md) | 開発ガイドラインやベストプラクティス | 25 件のドキュメントを配置 |
-| [テンプレート](./template/index.md) | 各種ドキュメントの作成テンプレート | 15 件のテンプレートを配置 |
+| [リファレンス](./reference/index.md) | 開発ガイドラインやベストプラクティス | 26 件のドキュメントと `index.md` を配置 |
+| [テンプレート](./template/index.md) | 各種ドキュメントの作成テンプレート | 16 件の Markdown テンプレートと補助ファイルを配置 |
 
 ## 補足
 
-- `strategy/`、`requirements/`、`design/`、`development/`、`operation/` は現時点ではカテゴリ索引が中心です。
+- `strategy/` には [ビジネスアーキテクチャ](./strategy/business_architecture.md) と [インセプションデッキ](./strategy/inception_deck.md) を配置しています。
+- `requirements/`、`design/`、`development/`、`operation/` は現時点ではカテゴリ索引が中心です。
 - `journal/` は作業ログ用の予約ディレクトリです。
+- `shop/` は空の予約ディレクトリのため、現時点ではナビゲーションに含めていません。
 - `assets/` は MkDocs 用のスタイル・スクリプトを格納しています。

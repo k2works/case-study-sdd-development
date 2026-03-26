@@ -65,6 +65,8 @@ nav:
   - Home: index.md
   - 戦略:
       - 概要: strategy/index.md
+      - ビジネスアーキテクチャ: strategy/business_architecture.md
+      - インセプションデッキ: strategy/inception_deck.md
   - 要件:
       - 概要: requirements/index.md
   - 設計:
