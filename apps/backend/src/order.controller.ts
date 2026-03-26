@@ -1,8 +1,11 @@
 import { Body, Controller, Get, Inject, NotFoundException, Param, Post, Query } from "@nestjs/common";
 
 import {
+  ChangeDeliveryDateRequest,
+  ChangeDeliveryDateResponse,
   CreateOrderRequest,
   CreateOrderResponse,
+  DeliveryAddressHistory,
   OrderDetail,
   OrderService,
   OrderSummary,
@@ -21,6 +24,18 @@ export class OrderController {
     return this.orderService.createOrder(request);
   }
 
+  @Get("customer/delivery-addresses")
+  listDeliveryAddresses(
+    @Query("customerEmail") customerEmail?: string,
+    @Query("customerPhone") customerPhone?: string,
+  ): DeliveryAddressHistory[] {
+    if (!customerEmail || !customerPhone) {
+      return [];
+    }
+
+    return this.orderService.listDeliveryAddresses(customerEmail, customerPhone);
+  }
+
   @Get("admin/orders")
   listOrders(@Query("customerName") customerName?: string): OrderSummary[] {
     return this.orderService.listOrders({ customerName });
@@ -35,5 +50,13 @@ export class OrderController {
     }
 
     return order;
+  }
+
+  @Post("admin/orders/:orderId/delivery-date-change")
+  changeDeliveryDate(
+    @Param("orderId") orderId: string,
+    @Body() request: ChangeDeliveryDateRequest,
+  ): ChangeDeliveryDateResponse {
+    return this.orderService.changeDeliveryDate(orderId, request);
   }
 }

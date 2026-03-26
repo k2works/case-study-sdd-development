@@ -25,6 +25,29 @@ describe("AdminPage", () => {
           });
         }
 
+        if (url.endsWith("/admin/orders/ORD-1001/delivery-date-change") && init?.method === "POST") {
+          const payload = JSON.parse(String(init.body ?? "{}")) as { deliveryDate?: string };
+
+          if (payload.deliveryDate === "2026-04-12") {
+            return Promise.resolve({
+              ok: false,
+              json: async () => ({
+                message: "在庫不足のため届け日を変更できません。",
+              }),
+            });
+          }
+
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              orderId: "ORD-1001",
+              deliveryDate: payload.deliveryDate ?? "2026-04-13",
+              shippingDate: "2026-04-12",
+              status: "confirmed",
+            }),
+          });
+        }
+
         if (url.includes("/admin/inventory-projections")) {
           return Promise.resolve({
             ok: true,
@@ -313,6 +336,128 @@ describe("AdminPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("東京都港区南青山 1-2-3")).toBeInTheDocument();
     expect(screen.getByText("2026-04-09")).toBeInTheDocument();
+  });
+
+  it("受注詳細から届け日を変更できる", async () => {
+    render(<AdminPage />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "ORD-1001 の詳細を表示" }));
+    fireEvent.change(await screen.findByLabelText("新しい届け日"), {
+      target: { value: "2026-04-13" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "届け日を変更する" }));
+
+    expect(await screen.findByText("届け日を変更しました。")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("2026-04-13")).toBeInTheDocument();
+    expect(screen.getAllByText("2026-04-12").length).toBeGreaterThan(0);
+  });
+
+  it("在庫不足で届け日変更できない場合は理由を表示する", async () => {
+    render(<AdminPage />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "ORD-1001 の詳細を表示" }));
+    fireEvent.change(await screen.findByLabelText("新しい届け日"), {
+      target: { value: "2026-04-12" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "届け日を変更する" }));
+
+    expect(await screen.findByText("在庫不足のため届け日を変更できません。")).toBeInTheDocument();
+  });
+
+  it("届け日変更後は在庫と出荷系の表示用データを再取得する", async () => {
+    const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+
+      if (url.endsWith("/admin/orders/ORD-1001")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            orderId: "ORD-1001",
+            customerName: "青山フラワー",
+            productName: "ローズガーデン",
+            deliveryDate: "2026-04-10",
+            shippingDate: "2026-04-09",
+            status: "confirmed",
+            deliveryAddress: "東京都港区南青山 1-2-3",
+          }),
+        });
+      }
+
+      if (url.endsWith("/admin/orders/ORD-1001/delivery-date-change") && init?.method === "POST") {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            orderId: "ORD-1001",
+            deliveryDate: "2026-04-13",
+            shippingDate: "2026-04-12",
+            status: "confirmed",
+          }),
+        });
+      }
+
+      if (url.includes("/admin/inventory-projections")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            startDate: "2026-04-10",
+            endDate: "2026-04-12",
+            dates: ["2026-04-10", "2026-04-11", "2026-04-12"],
+            items: [],
+          }),
+        });
+      }
+
+      if (url.includes("/admin/shipping-targets")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [],
+        });
+      }
+
+      if (url.includes("/admin/shipments")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [],
+        });
+      }
+
+      return Promise.resolve({
+        ok: true,
+        json: async () => [
+          {
+            orderId: "ORD-1001",
+            customerName: "青山フラワー",
+            productName: "ローズガーデン",
+            deliveryDate: "2026-04-10",
+            shippingDate: "2026-04-09",
+            status: "confirmed",
+          },
+        ],
+      });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<AdminPage />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "ORD-1001 の詳細を表示" }));
+    fireEvent.change(await screen.findByLabelText("新しい届け日"), {
+      target: { value: "2026-04-13" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "届け日を変更する" }));
+
+    await screen.findByText("届け日を変更しました。");
+
+    await waitFor(() => {
+      expect(
+        fetchMock.mock.calls.filter(([input]) => String(input).includes("/admin/inventory-projections")).length,
+      ).toBeGreaterThan(1);
+      expect(
+        fetchMock.mock.calls.filter(([input]) => String(input).includes("/admin/shipping-targets")).length,
+      ).toBeGreaterThan(1);
+      expect(
+        fetchMock.mock.calls.filter(([input]) => String(input).includes("/admin/shipments")).length,
+      ).toBeGreaterThan(1);
+    });
   });
 
   it("絞り込み結果が 0 件なら空状態を表示する", async () => {

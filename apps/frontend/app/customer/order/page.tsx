@@ -11,6 +11,8 @@ type Product = {
 };
 
 export type OrderFormValues = {
+  customerEmail: string;
+  customerPhone: string;
   deliveryDate: string;
   deliveryAddress: string;
   message: string;
@@ -19,6 +21,8 @@ export type OrderFormValues = {
 export type OrderFormErrors = Partial<Record<keyof OrderFormValues, string>>;
 
 const initialFormValues: OrderFormValues = {
+  customerEmail: "",
+  customerPhone: "",
   deliveryDate: "",
   deliveryAddress: "",
   message: "",
@@ -29,6 +33,15 @@ type OrderStep = "input" | "confirm" | "complete";
 type OrderConfirmation = {
   orderId: string;
   status: string;
+};
+
+type DeliveryAddressHistory = {
+  deliveryAddressId: string;
+  recipientName: string;
+  postalCode: string;
+  deliveryAddress: string;
+  deliveryPhoneNumber: string;
+  lastUsedAt: string;
 };
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
@@ -86,6 +99,9 @@ export default function OrderPage() {
   const [step, setStep] = useState<OrderStep>("input");
   const [confirmation, setConfirmation] = useState<OrderConfirmation | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [deliveryHistory, setDeliveryHistory] = useState<DeliveryAddressHistory[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
   const selectedProduct = products.find((product) => product.productId === productId);
   const productName = selectedProduct?.productName ?? (productId ? "対象外の商品です" : "未選択");
 
@@ -163,6 +179,50 @@ export default function OrderPage() {
   const handleBack = () => {
     setStep("input");
     setSubmitError(null);
+  };
+
+  const handleReuseDeliveryAddress = async () => {
+    if (!values.customerEmail.trim() || !values.customerPhone.trim()) {
+      setHistoryError("注文者メールと電話番号を入力してから履歴を呼び出してください。");
+      setDeliveryHistory([]);
+      return;
+    }
+
+    setHistoryLoading(true);
+    setHistoryError(null);
+
+    try {
+      const query = new URLSearchParams({
+        customerEmail: values.customerEmail,
+        customerPhone: values.customerPhone,
+      });
+      const response = await fetch(`${apiBaseUrl}/customer/delivery-addresses?${query.toString()}`);
+
+      if (!response.ok) {
+        setHistoryError("届け先履歴の取得に失敗しました。時間をおいて再度お試しください。");
+        setDeliveryHistory([]);
+        setHistoryLoading(false);
+        return;
+      }
+
+      const payload = (await response.json()) as DeliveryAddressHistory[];
+      setDeliveryHistory(payload);
+      setHistoryError(payload.length === 0 ? "利用できる届け先履歴がありません。新規入力を続けてください。" : null);
+      setHistoryLoading(false);
+    } catch {
+      setHistoryError("届け先履歴の取得に失敗しました。時間をおいて再度お試しください。");
+      setDeliveryHistory([]);
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleSelectDeliveryAddress = (history: DeliveryAddressHistory) => {
+    setValues((current) => ({
+      ...current,
+      deliveryAddress: history.deliveryAddress,
+    }));
+    setHistoryError(null);
+    setDeliveryHistory([]);
   };
 
   const handleConfirm = async () => {
@@ -285,6 +345,65 @@ export default function OrderPage() {
 
         <section className="order-form-section" aria-label="注文入力フォーム">
           <form className="order-form" onSubmit={handleSubmit} noValidate>
+            <div className="field">
+              <label htmlFor="customer-email">注文者メール</label>
+              <input
+                id="customer-email"
+                name="customerEmail"
+                type="email"
+                value={values.customerEmail}
+                onChange={handleChange("customerEmail")}
+                placeholder="hanako@example.com"
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="customer-phone">注文者電話番号</label>
+              <input
+                id="customer-phone"
+                name="customerPhone"
+                type="tel"
+                value={values.customerPhone}
+                onChange={handleChange("customerPhone")}
+                placeholder="090-1111-2222"
+              />
+              <p className="field-hint">過去の届け先を呼び出すときに使います。</p>
+            </div>
+
+            <div className="field">
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={() => void handleReuseDeliveryAddress()}
+              >
+                届け先を再利用する
+              </button>
+              {historyLoading ? <p>届け先履歴を読み込んでいます。</p> : null}
+              {historyError ? (
+                <p className="field-error" role="alert">
+                  {historyError}
+                </p>
+              ) : null}
+              {deliveryHistory.length > 0 ? (
+                <div className="order-history-list" aria-label="過去の届け先">
+                  {deliveryHistory.map((history) => (
+                    <article key={history.deliveryAddressId} className="order-history-card">
+                      <p>{history.recipientName}</p>
+                      <p>{history.deliveryAddress}</p>
+                      <p>最終利用日: {history.lastUsedAt}</p>
+                      <button
+                        className="secondary-button"
+                        type="button"
+                        onClick={() => handleSelectDeliveryAddress(history)}
+                      >
+                        この届け先を使う
+                      </button>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
             <div className="field">
               <label htmlFor="delivery-date">届け日</label>
               <input

@@ -108,3 +108,72 @@ describe("GET /admin/orders/:orderId", () => {
     expect(response.body.shippingDate).toBe("2026-04-14");
   });
 });
+
+describe("POST /admin/orders/:orderId/delivery-date-change", () => {
+  let app: Awaited<ReturnType<typeof NestFactory.create>>;
+
+  beforeAll(async () => {
+    app = await NestFactory.create(AppModule, new FastifyAdapter());
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it("条件を満たす場合は届け日を更新できる", async () => {
+    const response = await request(app.getHttpServer())
+      .post("/admin/orders/ORD-1001/delivery-date-change")
+      .send({ deliveryDate: "2026-04-13" });
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual({
+      orderId: "ORD-1001",
+      deliveryDate: "2026-04-13",
+      shippingDate: "2026-04-12",
+      status: "confirmed",
+    });
+
+    const detailResponse = await request(app.getHttpServer()).get("/admin/orders/ORD-1001");
+
+    expect(detailResponse.status).toBe(200);
+    expect(detailResponse.body.deliveryDate).toBe("2026-04-13");
+    expect(detailResponse.body.shippingDate).toBe("2026-04-12");
+  });
+
+  it("新しい出荷日に在庫不足がある場合は変更できない", async () => {
+    const response = await request(app.getHttpServer())
+      .post("/admin/orders/ORD-1001/delivery-date-change")
+      .send({ deliveryDate: "2026-04-12" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("在庫不足のため届け日を変更できません。");
+  });
+
+  it("空の届け日は入力エラーとして拒否する", async () => {
+    const response = await request(app.getHttpServer())
+      .post("/admin/orders/ORD-1001/delivery-date-change")
+      .send({ deliveryDate: "" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("届け日は YYYY-MM-DD 形式で入力してください。");
+  });
+
+  it("出荷準備済みの受注は届け日を変更できない", async () => {
+    await request(app.getHttpServer())
+      .post("/admin/purchase-orders/PO-9001/receipts")
+      .send({
+        receiptDate: "2026-04-11",
+        items: [{ materialId: "MAT-001", quantity: 10 }],
+      });
+    await request(app.getHttpServer()).post("/admin/orders/ORD-1002/bundle-completions").send({});
+
+    const response = await request(app.getHttpServer())
+      .post("/admin/orders/ORD-1002/delivery-date-change")
+      .send({ deliveryDate: "2026-04-13" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("出荷準備済みのため届け日を変更できません。");
+  });
+});

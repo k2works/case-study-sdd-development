@@ -76,6 +76,11 @@ describe("CustomerPage", () => {
         "商品情報の取得に失敗したため、既定の商品一覧を表示しています。時間をおいて再度お試しください。",
       ),
     ).toBeInTheDocument();
+    const fallbackRoseGarden = screen.getByRole("article", { name: "ローズガーデン" });
+    expect(fallbackRoseGarden).toBeInTheDocument();
+    expect(
+      within(fallbackRoseGarden).getByRole("link", { name: "この花束を注文する" }),
+    ).toHaveAttribute("href", "/customer/order?product=rose-garden");
     fireEvent.click(screen.getByRole("button", { name: "再試行" }));
 
     expect(await screen.findByText("ローズガーデン プレミアム")).toBeInTheDocument();

@@ -100,6 +100,13 @@ type ReceiptResult = {
   status: string;
 };
 
+type DeliveryDateChangeResult = {
+  orderId: string;
+  deliveryDate: string;
+  shippingDate: string;
+  status: string;
+};
+
 type ShippingTarget = {
   orderId: string;
   customerName: string;
@@ -170,6 +177,8 @@ export default function AdminPage() {
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [customerName, setCustomerName] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
+  const [nextDeliveryDate, setNextDeliveryDate] = useState("");
+  const [deliveryDateFeedback, setDeliveryDateFeedback] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [productsError, setProductsError] = useState<string | null>(null);
   const [productsLoading, setProductsLoading] = useState(true);
@@ -613,7 +622,70 @@ export default function AdminPage() {
       return;
     }
 
-    setSelectedOrder((await response.json()) as OrderDetail);
+    const order = (await response.json()) as OrderDetail;
+    setSelectedOrder(order);
+    setNextDeliveryDate(order.deliveryDate);
+    setDeliveryDateFeedback(null);
+  };
+
+  const handleChangeDeliveryDate = async () => {
+    if (!selectedOrder) {
+      return;
+    }
+
+    setDeliveryDateFeedback(null);
+
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/admin/orders/${selectedOrder.orderId}/delivery-date-change`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            deliveryDate: nextDeliveryDate,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const payload = (await response.json()) as { message?: string };
+        setDeliveryDateFeedback(payload.message ?? "届け日を変更できませんでした。");
+        return;
+      }
+
+      const payload = (await response.json()) as DeliveryDateChangeResult;
+      setSelectedOrder((current) =>
+        current
+          ? {
+              ...current,
+              deliveryDate: payload.deliveryDate,
+              shippingDate: payload.shippingDate,
+              status: payload.status,
+            }
+          : current,
+      );
+      setOrders((current) =>
+        current.map((order) =>
+          order.orderId === payload.orderId
+            ? {
+                ...order,
+                deliveryDate: payload.deliveryDate,
+                shippingDate: payload.shippingDate,
+                status: payload.status,
+              }
+            : order,
+        ),
+      );
+      setNextDeliveryDate(payload.deliveryDate);
+      setDeliveryDateFeedback("届け日を変更しました。");
+      setInventoryReloadKey((current) => current + 1);
+      setShippingReloadKey((current) => current + 1);
+      setShipmentReloadKey((current) => current + 1);
+    } catch {
+      setDeliveryDateFeedback("届け日を変更できませんでした。");
+    }
   };
 
   const handleEditMaterial = (materialId: string) => {
@@ -1094,22 +1166,47 @@ export default function AdminPage() {
                 </div>
 
                 {selectedOrder ? (
-                  <dl className="detail-grid">
-                    <dt>受注番号</dt>
-                    <dd>{selectedOrder.orderId}</dd>
-                    <dt>顧客名</dt>
-                    <dd>{selectedOrder.customerName}</dd>
-                    <dt>商品</dt>
-                    <dd>{selectedOrder.productName}</dd>
-                    <dt>届け日</dt>
-                    <dd>{selectedOrder.deliveryDate}</dd>
-                    <dt>出荷日</dt>
-                    <dd>{selectedOrder.shippingDate}</dd>
-                    <dt>状態</dt>
-                    <dd>{selectedOrder.status}</dd>
-                    <dt>届け先</dt>
-                    <dd>{selectedOrder.deliveryAddress}</dd>
-                  </dl>
+                  <>
+                    <dl className="detail-grid">
+                      <dt>受注番号</dt>
+                      <dd>{selectedOrder.orderId}</dd>
+                      <dt>顧客名</dt>
+                      <dd>{selectedOrder.customerName}</dd>
+                      <dt>商品</dt>
+                      <dd>{selectedOrder.productName}</dd>
+                      <dt>届け日</dt>
+                      <dd>{selectedOrder.deliveryDate}</dd>
+                      <dt>出荷日</dt>
+                      <dd>{selectedOrder.shippingDate}</dd>
+                      <dt>状態</dt>
+                      <dd>{selectedOrder.status}</dd>
+                      <dt>届け先</dt>
+                      <dd>{selectedOrder.deliveryAddress}</dd>
+                    </dl>
+
+                    <div className="detail-actions">
+                      <label className="field" htmlFor="nextDeliveryDate">
+                        <span>新しい届け日</span>
+                        <input
+                          id="nextDeliveryDate"
+                          name="nextDeliveryDate"
+                          type="date"
+                          value={nextDeliveryDate}
+                          onChange={(event) => setNextDeliveryDate(event.target.value)}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="primary-button"
+                        onClick={() => void handleChangeDeliveryDate()}
+                      >
+                        届け日を変更する
+                      </button>
+                      {deliveryDateFeedback ? (
+                        <p className="admin-feedback">{deliveryDateFeedback}</p>
+                      ) : null}
+                    </div>
+                  </>
                 ) : (
                   <p className="admin-empty">一覧から受注を選択すると詳細を表示します。</p>
                 )}

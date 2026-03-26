@@ -122,7 +122,7 @@ export default function CustomerPage() {
             </div>
           ) : null}
 
-          {!loading && !error ? (
+          {!loading ? (
             <div className="product-grid">
               {products.map((product) => (
                 <article

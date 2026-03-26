@@ -43,6 +43,22 @@ describe("OrderPage", () => {
           });
         }
 
+        if (url.includes("/customer/delivery-addresses")) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              {
+                deliveryAddressId: "ADDR-1002",
+                recipientName: "佐藤 一郎",
+                postalCode: "150-0001",
+                deliveryAddress: "東京都渋谷区神宮前 4-5-6",
+                deliveryPhoneNumber: "03-1111-2222",
+                lastUsedAt: "2026-04-12",
+              },
+            ],
+          });
+        }
+
         return Promise.resolve({
           ok: true,
           json: async () => [],
@@ -66,20 +82,44 @@ describe("OrderPage", () => {
     expect(await screen.findByText("ローズガーデン プレミアム")).toBeInTheDocument();
   });
 
-  it("届け日、届け先、メッセージを入力できる", () => {
+  it("注文者情報、届け日、届け先、メッセージを入力できる", () => {
     render(<OrderPage />);
 
+    const customerEmail = screen.getByLabelText("注文者メール");
+    const customerPhone = screen.getByLabelText("注文者電話番号");
     const deliveryDate = screen.getByLabelText("届け日");
     const deliveryAddress = screen.getByLabelText("届け先");
     const message = screen.getByLabelText("メッセージ");
 
+    fireEvent.change(customerEmail, { target: { value: "hanako@example.com" } });
+    fireEvent.change(customerPhone, { target: { value: "090-1111-2222" } });
     fireEvent.change(deliveryDate, { target: { value: "2026-03-31" } });
     fireEvent.change(deliveryAddress, { target: { value: "東京都港区南青山 1-2-3" } });
     fireEvent.change(message, { target: { value: "開店祝いのメッセージを添えてください。" } });
 
+    expect(customerEmail).toHaveValue("hanako@example.com");
+    expect(customerPhone).toHaveValue("090-1111-2222");
     expect(deliveryDate).toHaveValue("2026-03-31");
     expect(deliveryAddress).toHaveValue("東京都港区南青山 1-2-3");
     expect(message).toHaveValue("開店祝いのメッセージを添えてください。");
+  });
+
+  it("注文者情報をもとに過去の届け先を呼び出して反映できる", async () => {
+    render(<OrderPage />);
+
+    fireEvent.change(screen.getByLabelText("注文者メール"), {
+      target: { value: "hanako@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText("注文者電話番号"), {
+      target: { value: "090-1111-2222" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "届け先を再利用する" }));
+
+    expect(await screen.findByText("佐藤 一郎")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "この届け先を使う" }));
+
+    expect(screen.getByLabelText("届け先")).toHaveValue("東京都渋谷区神宮前 4-5-6");
   });
 
   it("必須項目が未入力のまま送信するとエラーを表示する", () => {
@@ -253,6 +293,8 @@ describe("validateOrderForm", () => {
   it("必須項目の未入力を検出する", () => {
     expect(
       validateOrderForm({
+        customerEmail: "",
+        customerPhone: "",
         deliveryDate: "",
         deliveryAddress: " ",
         message: "",
@@ -267,6 +309,8 @@ describe("validateOrderForm", () => {
   it("入力済みの項目はエラーにしない", () => {
     expect(
       validateOrderForm({
+        customerEmail: "hanako@example.com",
+        customerPhone: "090-1111-2222",
         deliveryDate: "2026-03-31",
         deliveryAddress: "東京都港区南青山 1-2-3",
         message: "開店祝いのメッセージを添えてください。",
