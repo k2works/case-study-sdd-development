@@ -17,7 +17,7 @@ theme:
     - search.highlight
 
 extra_css:
-  - docs/mkdocs/assets/css/extra.css
+  - assets/css/extra.css
 
 markdown_extensions:
   - pymdownx.highlight
@@ -46,14 +46,14 @@ markdown_extensions:
 
 extra_javascript:
   - https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js
-  - docs/assets/js/extra.js
+  - assets/js/extra.js
 
 extra:
   plantuml_url: http://www.plantuml.com/plantuml
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/k2works/case-study-sdd-development
-      name: GitHub Repository/case-study-sdd-development
+      link: https://github.com/k2works
+      name: GitHub Repository/claude-code-booster
 
 plugins:
   - search
@@ -63,8 +63,8 @@ exclude_docs: |
 
 nav:
   - Home: index.md
-  - 分析:
-      - 概要: analysis/index.md
+  - 戦略:
+      - 概要: strategy/index.md
   - 要件:
       - 概要: requirements/index.md
   - 設計:
@@ -73,6 +73,16 @@ nav:
       - 概要: development/index.md
   - 運用:
       - 概要: operation/index.md
+  - レビュー:
+      - 概要: review/index.md
+  - ADR:
+      - 概要: adr/index.md
+  - 記事:
+      - 概要: article/index.md
+      - テスト駆動開発から始める XX 入門: article/getting-start-tdd/index.md
+      - Grokking Functional Programming: article/grokkingfp/index.md
+      - Grokking Concurrency: article/grokking-concurrency/index.md
+      - 関数型デザイン - 原則、パターン、実践: article/functional-desgin-ppp/index.md
   - リファレンス:
       - 概要: reference/index.md
       - よいソフトウェアとは: reference/よいソフトウェアとは.md
@@ -96,12 +106,11 @@ nav:
       - 言語別開発ガイド: reference/言語別開発ガイド.md
       - Java アプリケーション環境構築ガイド: reference/Javaアプリケーション環境構築ガイド.md
       - TypeScript アプリケーション環境構築ガイド: reference/TypeScriptアプリケーション環境構築ガイド.md
+      - 運用スクリプト作成ガイド: reference/運用スクリプト作成ガイド.md
       - Codex CLI MCP アプリケーション開発フロー: reference/CodexCLIMCPアプリケーション開発フロー.md
       - Codex CLI MCP サーバー設定手順: reference/CodexCLIMCPサーバー設定手順.md
       - SonarQube ローカル環境セットアップ手順書: reference/SonarQubeローカル環境セットアップ手順書.md
       - Vim 操作マニュアル: reference/Vim操作マニュアル.md
-  - ADR:
-      - 概要: adr/index.md
   - テンプレート:
       - 概要: template/index.md
       - まずこれを読もうリスト: template/まずこれを読もうリスト.md
@@ -114,4 +123,9 @@ nav:
       - イテレーション計画: template/イテレーション計画.md
       - イテレーション完了報告書: template/イテレーション完了報告書.md
       - リリース計画: template/リリース計画.md
+      - リリース完了報告書: template/リリース完了報告書.md
+      - アプリケーション開発環境セットアップ手順書: template/アプリケーション開発環境セットアップ手順書.md
+      - 開発環境セットアップ手順書: template/開発環境セットアップ手順書.md
+      - AWS ステージング環境セットアップ手順書: template/AWSステージング環境セットアップ手順書.md
+      - AWS プロダクション環境セットアップ手順書: template/AWSプロダクション環境セットアップ手順書.md
       - README: template/README.md
