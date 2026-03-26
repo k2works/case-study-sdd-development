@@ -7,6 +7,7 @@
 ### 環境セットアップ
 
 - [アプリケーション開発環境セットアップ手順書](./dev_app_instruction.md) - ローカル開発環境の構築手順
+- [開発環境セットアップ手順書](./dev_instruction.md) - Heroku Container Stack を利用した共有開発環境の構築手順
 
 ### 運用コマンド
 

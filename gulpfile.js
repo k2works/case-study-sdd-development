@@ -7,6 +7,7 @@
 import 'dotenv/config';
 import gulp from 'gulp';
 import developTasks from './ops/scripts/develop.js';
+import deployDevTasks from './ops/scripts/deploy_dev.js';
 import mkdocsTasks from './ops/scripts/mkdocs.js';
 import journalTasks from './ops/scripts/journal.js';
 import vaultTasks from './ops/scripts/vault.js';
@@ -15,6 +16,7 @@ import sonarLocalTasks from './ops/scripts/sonar_local.js';
 
 // Load gulp tasks from script modules
 developTasks(gulp);
+deployDevTasks(gulp);
 mkdocsTasks(gulp);
 journalTasks(gulp);
 vaultTasks(gulp);

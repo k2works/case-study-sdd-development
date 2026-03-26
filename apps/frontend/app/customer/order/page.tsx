@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 type Product = {
@@ -87,7 +87,7 @@ export function validateOrderForm(values: OrderFormValues): OrderFormErrors {
   return errors;
 }
 
-export default function OrderPage() {
+function OrderPageContent() {
   const searchParams = useSearchParams();
   const productId = searchParams.get("product");
   const [products, setProducts] = useState<Product[]>(fallbackProducts);
@@ -466,5 +466,21 @@ export default function OrderPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function OrderPage() {
+  return (
+    <Suspense
+      fallback={
+        <main>
+          <div className="shell">
+            <p>注文画面を読み込んでいます。</p>
+          </div>
+        </main>
+      }
+    >
+      <OrderPageContent />
+    </Suspense>
   );
 }

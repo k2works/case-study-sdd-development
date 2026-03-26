@@ -1,0 +1,17 @@
+.git
+.github
+.idea
+.cursor
+.windsurf
+.claude
+.agents
+.specify
+docs
+node_modules
+apps/backend/node_modules
+apps/frontend/node_modules
+apps/frontend/.next
+apps/frontend/test-results
+coverage
+dist
+npm-debug.log*
