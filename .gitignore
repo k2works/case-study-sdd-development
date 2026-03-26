@@ -25,7 +25,6 @@ build/
 npm-debug.log*
 
 tmp
-.agents
 .claude/agent-memory
 site
 .claude/settings.local.json
