@@ -103,16 +103,16 @@ describe('StockForecastUseCase', () => {
       name: 'ローズブーケ',
       compositions: [{ itemId: 1, quantity: 3 }],
     });
-    await addActiveStockLot({ itemId: 1, quantity: 10, expiryDate: '2026-03-30' });
+    await addActiveStockLot({ itemId: 1, quantity: 10, expiryDate: '2026-04-15' });
     await saveOrder({
       productId: 1,
-      deliveryDate: '2026-03-20',
+      deliveryDate: '2026-04-05',
       status: '注文済み',
     });
 
     const results = await useCase.getForecast(
-      new Date('2026-03-18'),
-      new Date('2026-03-19'),
+      new Date('2026-04-03'),
+      new Date('2026-04-04'),
       1,
     );
 
