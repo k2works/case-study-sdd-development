@@ -13,6 +13,9 @@ const BACKEND_DIR = path.resolve('apps/backend');
 const FRONTEND_DIR = path.resolve('apps/frontend');
 const COMPOSE_FILE = path.join(APPS_DIR, 'docker-compose.yml');
 
+/** ローカル開発用 DATABASE_URL（Docker Compose の DB に接続） */
+const DEV_DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/fleur_memoire_dev';
+
 /** サービス定義 */
 const SERVICES = [
   { name: 'backend', dir: BACKEND_DIR, port: 8080, label: 'バックエンド' },
@@ -55,12 +58,13 @@ function npmRun(dir, script) {
  * サブプロジェクトで npx コマンドを実行する
  * @param {string} dir - サブプロジェクトのディレクトリ
  * @param {string} command - npx コマンド
+ * @param {object} [extraEnv] - 追加の環境変数
  */
-function npxRun(dir, command) {
+function npxRun(dir, command, extraEnv = {}) {
   execSync(`npx ${command}`, {
     cwd: dir,
     stdio: 'inherit',
-    env: cleanDockerEnv(),
+    env: { ...cleanDockerEnv(), ...extraEnv },
   });
 }
 
@@ -117,25 +121,25 @@ export default function (gulp) {
 
   gulp.task('dev:migrate', (done) => {
     console.log('マイグレーションを実行します...');
-    npxRun(BACKEND_DIR, 'prisma migrate dev');
+    npxRun(BACKEND_DIR, 'prisma migrate dev', { DATABASE_URL: DEV_DATABASE_URL });
     done();
   });
 
   gulp.task('dev:migrate:reset', (done) => {
     console.log('データベースをリセットします...');
-    npxRun(BACKEND_DIR, 'prisma migrate reset --force');
+    npxRun(BACKEND_DIR, 'prisma migrate reset --force', { DATABASE_URL: DEV_DATABASE_URL });
     done();
   });
 
   gulp.task('dev:seed', (done) => {
     console.log('シードデータを投入します...');
-    npxRun(BACKEND_DIR, 'prisma db seed');
+    npxRun(BACKEND_DIR, 'prisma db seed', { DATABASE_URL: DEV_DATABASE_URL });
     done();
   });
 
   gulp.task('dev:prisma:generate', (done) => {
     console.log('Prisma Client を生成します...');
-    npxRun(BACKEND_DIR, 'prisma generate');
+    npxRun(BACKEND_DIR, 'prisma generate', { DATABASE_URL: DEV_DATABASE_URL });
     done();
   });
 
@@ -245,7 +249,24 @@ export default function (gulp) {
   // セットアップ
   // ------------------------------------------
 
+  gulp.task('dev:install', (done) => {
+    console.log('バックエンドの依存パッケージをインストールします...');
+    execSync('npm install', {
+      cwd: BACKEND_DIR,
+      stdio: 'inherit',
+      env: cleanDockerEnv(),
+    });
+    console.log('フロントエンドの依存パッケージをインストールします...');
+    execSync('npm install', {
+      cwd: FRONTEND_DIR,
+      stdio: 'inherit',
+      env: cleanDockerEnv(),
+    });
+    done();
+  });
+
   gulp.task('dev:setup', gulp.series(
+    'dev:install',
     'dev:db:start',
     'dev:prisma:generate',
     'dev:migrate',
@@ -298,7 +319,7 @@ export default function (gulp) {
     check                 Lint + 型チェック + テスト（CI 相当）
 
   セットアップ:
-    dev:setup             初回セットアップ（DB起動→生成→マイグレーション→シード→テスト）
+    dev:setup             初回セットアップ（依存インストール→DB起動→Prisma生成→マイグレーション→シード→テスト）
 
   ヘルプ:
     dev:help              このヘルプを表示
