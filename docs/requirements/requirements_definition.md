@@ -454,28 +454,46 @@ title ユースケース複合図 - WEB 受注
 left to right direction
 
 actor 得意先 as customer
+actor "フレール・メモワール\n（スタッフ）" as staff
 
 frame "記念日に花束を贈りたい" as f01
+usecase "会員登録・ログイン" as UC10
 usecase "WEB 受注" as UC1
 usecase "届け先コピー" as UC2
 usecase "届け日変更" as UC3
+usecase "注文キャンセル" as UC11
+usecase "得意先管理" as UC9
+boundary "ログイン画面" as b04
+boundary "会員登録画面" as b05
 boundary "商品一覧画面" as b01
 boundary "注文画面" as b02
 boundary "届け先選択画面" as b03
+boundary "注文確認画面" as b06
+boundary "注文履歴画面" as b07
+boundary "得意先管理画面" as b08
 entity "受注" as e01
 entity "商品" as e02
 entity "届け先" as e03
 entity "得意先" as e04
 control "在庫確認" as c01
 control "届け日検証" as c02
+control "認証" as c03
 
 customer -- f01
+f01 -- UC10
 f01 -- UC1
 f01 -- UC2
 f01 -- UC3
+f01 -- UC11
+
+b04 -- UC10
+b05 -- UC10
+UC10 -- e04
+UC10 -- c03
 
 b01 -- UC1
 b02 -- UC1
+b06 -- UC1
 UC1 -- e01
 UC1 -- e02
 UC1 -- c01
@@ -487,6 +505,15 @@ UC2 -- e04
 b02 -- UC3
 UC3 -- e01
 UC3 -- c02
+
+b07 -- UC1
+b07 -- UC3
+b07 -- UC11
+UC11 -- e01
+
+staff -- UC9
+b08 -- UC9
+UC9 -- e04
 
 @enduml
 ```
@@ -504,27 +531,20 @@ actor "フレール・メモワール\n（スタッフ）" as staff
 
 frame "商品ラインナップを管理したい" as f01
 usecase "商品マスタ管理" as UC1
-usecase "得意先管理" as UC2
 boundary "商品管理画面" as b01
-boundary "得意先管理画面" as b02
 entity "商品" as e01
 entity "商品構成" as e02
 entity "単品" as e03
-entity "得意先" as e04
 control "商品構成検証" as c01
 
 staff -- f01
 f01 -- UC1
-f01 -- UC2
 
 b01 -- UC1
 UC1 -- e01
 UC1 -- e02
 UC1 -- e03
 UC1 -- c01
-
-b02 -- UC2
-UC2 -- e04
 
 @enduml
 ```
@@ -611,8 +631,12 @@ UC1 -- c01
 
 | 画面名 | 概要 | 関連 UC |
 |--------|------|---------|
+| ログイン画面 | メールアドレス・パスワードでログインする | 会員登録・ログイン |
+| 会員登録画面 | 新規会員登録を行う | 会員登録・ログイン |
 | 商品一覧画面 | 花束の一覧を表示し、商品を選択する | WEB 受注 |
 | 注文画面 | 届け日・届け先・メッセージを入力し注文を確定する | WEB 受注、届け日変更 |
+| 注文確認画面 | 注文確定後の内容を表示する | WEB 受注 |
+| 注文履歴画面 | 過去の注文一覧と詳細を参照し、届け日変更・キャンセルへ遷移する | WEB 受注、届け日変更、注文キャンセル |
 | 届け先選択画面 | 過去の届け先一覧から選択してコピーする | 届け先コピー |
 
 **管理画面**
@@ -630,6 +654,26 @@ UC1 -- c01
 ### イベントモデル
 
 外部システム連携はスコープ外のため、該当なし。
+
+### ビジネスルール（詳細定義）
+
+**BR06: 在庫推移計算ロジック**
+
+| 項目 | 定義 |
+|------|------|
+| 日別有効在庫の計算式 | `日別有効在庫 = 現在庫 + 入荷予定 - 受注引当 - 廃棄予定` |
+| 引当方式 | 受注確定時に届け日に対して単品単位で引当する |
+| 品質維持日数の起算日 | 入荷日を Day 0 とする |
+| 品質維持日数の単位 | 日単位でカウントする |
+| 廃棄予定の判定 | 品質維持日数を超過した在庫を廃棄予定とする |
+
+**BR07: 届け日有効範囲** ※要ステークホルダー確認
+
+| 項目 | 定義 |
+|------|------|
+| 最短届け日 | 注文日 + 3日（暫定） |
+| 最長届け日 | 注文日 + 30日（暫定） |
+| 注文受付期限 | 届け日の 3日前（暫定） |
 
 ## システム
 
@@ -654,6 +698,7 @@ entity "単品（花）" as item
 
 ' 仕入関連
 entity "仕入先" as supplier
+entity "発注" as purchase_order
 entity "入荷" as arrival
 
 ' 在庫関連
@@ -667,7 +712,9 @@ order_entity -- delivery_destination : 届け先を指定する
 product -- product_composition : 構成される
 product_composition -- item : 使用する
 item -- supplier : 仕入れる
-item -- arrival : 入荷する
+item -- purchase_order : 発注する
+supplier -- purchase_order : 発注先
+purchase_order -- arrival : 入荷する
 item -- stock : 在庫を持つ
 
 @enduml
