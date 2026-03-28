@@ -161,7 +161,7 @@ package "apps/webapp/src/main/java" {
 
 package "apps/webapp/src/main/resources" {
   package "templates" {
-    [Thymeleaf テンプレート] as templates
+    [Thymeleaf テンプレート] as template
   }
 }
 
@@ -172,6 +172,7 @@ app_services --> domain_services
 jpa_repos --> entities
 boot_config --> controllers
 sec_config --> controllers
+template ..|> controllers
 
 @enduml
 ```

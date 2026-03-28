@@ -75,6 +75,10 @@ nav:
       - ユーザーストーリー: requirements/user_story.md
   - 設計:
       - 概要: design/index.md
+      - アーキテクチャ設計: design/architecture_design.md
+      - データモデル設計: design/data_model.md
+      - ドメインモデル設計: design/domain_model.md
+      - UI 設計: design/ui_design.md
   - 開発:
       - 概要: development/index.md
   - 運用:
@@ -83,6 +87,7 @@ nav:
       - 概要: review/index.md
       - 分析成果物レビュー (2026-03-28): review/analysis_review_20260328.md
       - 分析成果物 再レビュー (2026-03-28): review/analysis_re-review_20260328.md
+      - 設計成果物レビュー (2026-03-28): review/design_review_20260328.md
   - ADR:
       - 概要: adr/index.md
   - 記事:
