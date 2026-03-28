@@ -623,12 +623,20 @@ rectangle "Level 4: nil ベース + 言語機能" #LightCoral {
 ### 発見 2: 合成構文は 4 系統に分類できる
 
 1. **内包表記系**: Scala (for), Haskell (do), C# (LINQ), Clojure (when-let)
+
+
    - ネストが平坦化され、最も可読性が高い
 2. **演算子系**: Rust (`?`)
+
+
    - 最も簡潔で、通常のコードに自然に溶け込む
 3. **パイプ系**: F# (`|>`), Elixir (`with`), TypeScript (`pipe`)
+
+
    - データの流れが明確
 4. **flatMap チェーン系**: Java, Python, Ruby
+
+
    - 糖衣構文がなく、ネストが深くなりやすい
 
 ### 発見 3: Option は Part II の flatMap の延長線上にある

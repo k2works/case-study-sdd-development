@@ -282,6 +282,8 @@ spec = do
 ### 1. 責任の分離
 
 各パターンは単一の責任を持つ：
+
+
 - Strategy: 価格計算方法
 - Decorator: 価格修飾
 - Command: 操作のカプセル化

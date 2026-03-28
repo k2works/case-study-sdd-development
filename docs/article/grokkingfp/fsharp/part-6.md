@@ -758,6 +758,8 @@ p5 --> p6
 ### 問題 1: DataAccess の拡張
 
 以下の要件で `IDataAccess` を拡張してください:
+
+
 - 新しいメソッド `FindHotelsNearLocation` を追加
 - 戻り値は `Async<Result<Hotel list, string>>`
 

@@ -275,6 +275,8 @@ let processItemsEfficiently items =
 ```
 
 `Seq` の利点：
+
+
 - 中間コレクションを作成しない
 - 必要な分だけ処理（遅延評価）
 - メモリ効率が良い

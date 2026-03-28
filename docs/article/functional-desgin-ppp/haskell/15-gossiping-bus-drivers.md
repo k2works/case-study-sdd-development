@@ -55,6 +55,8 @@ makeDrivers routes = zipWith makeDriver [0..] routes
 ```
 
 ポイント:
+
+
 - `cycle` 関数で有限のルートを無限の循環シーケンスに変換
 - 噂は集合（Set）として管理
 - 各ドライバーは自分のIDを初期の噂として持つ

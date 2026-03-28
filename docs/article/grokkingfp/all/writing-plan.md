@@ -177,6 +177,8 @@
 
 1. 全 11 言語の part-2.md の第 3 章部分を読み込む
 2. 不変データ構造の実現方法を 4 カテゴリに分類
+
+
    - 言語組み込み（Haskell, Clojure, Elixir, F#）
    - デフォルト不変（Rust）
    - case class / record（Scala, Java 16+, C# 9+）
@@ -217,6 +219,8 @@
 1. 全 11 言語の part-2.md の第 4 章部分を読み込む
 2. map/filter/fold の共通概念を解説
 3. パイプライン記法の違いを比較
+
+
    - Elixir/F# パイプ演算子 `|>`
    - Haskell 関数合成 `.` / `$`
    - Clojure スレッディングマクロ `->` / `->>`
@@ -258,6 +262,8 @@
 1. 全 11 言語の part-2.md の第 5 章部分を読み込む
 2. flatMap/bind の共通概念（コンテキスト付き計算の連鎖）を解説
 3. 糖衣構文の比較
+
+
    - Scala for 内包表記
    - Haskell do 記法
    - C# LINQ クエリ式
@@ -317,6 +323,8 @@
 1. 全 11 言語の part-3.md の第 6 章部分を読み込む
 2. Option/Maybe の共通概念（null の型安全な代替）を解説
 3. 実装方式を 3 カテゴリに分類
+
+
    - 言語組み込み: Haskell Maybe, Rust Option, F# Option
    - 標準ライブラリ: Scala Option, Java Optional
    - サードパーティ: fp-ts Option, returns Maybe, dry-monads Maybe, LanguageExt Option, Vavr Option
@@ -390,6 +398,8 @@
 
 1. 全 11 言語の part-4.md の第 8 章部分を読み込む
 2. IO の抽象化を 4 レベルに分類
+
+
    - Level 4: 言語組み込み IO モナド（Haskell）
    - Level 3: ライブラリ IO 型（Scala cats-effect, C# LanguageExt Eff）
    - Level 2: 軽量 IO コンテナ（Python returns IO, TypeScript fp-ts Task, Ruby dry Task）
@@ -430,6 +440,8 @@
 1. 全 11 言語の part-4.md の第 9 章部分を読み込む
 2. 遅延評価とストリームの共通概念を解説
 3. ストリーム処理の実装アプローチを比較
+
+
    - 専用ライブラリ: Scala fs2, Haskell conduit
    - 言語組み込み: Elixir Stream, Rust Iterator, Python ジェネレータ, Ruby Enumerator::Lazy
    - ライブラリ拡張: TypeScript AsyncIterable, Java Vavr Stream, C# StreamT, F# Seq
@@ -479,6 +491,8 @@
 
 1. 全 11 言語の part-5.md を読み込む（最大ボリューム）
 2. 並行処理モデルを 5 カテゴリに分類
+
+
    - Actor モデル: Elixir OTP/GenServer
    - STM（Software Transactional Memory）: Haskell STM, Clojure ref
    - Fiber / 軽量スレッド: Scala Fiber, Java Virtual Thread
@@ -521,6 +535,8 @@
 1. 全 11 言語の part-6.md の第 11 章部分を読み込む
 2. TravelGuide アプリの共通アーキテクチャを抽出
 3. DI（依存性注入）の関数型アプローチを比較
+
+
    - Reader モナド: Scala, TypeScript
    - 型クラス / trait: Haskell, Rust
    - Protocol / ビヘイビア: Python, Elixir

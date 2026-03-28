@@ -19,6 +19,8 @@ end
 ```
 
 `dup.freeze` のパターンにより:
+
+
 - `dup` で元の配列を変更しない
 - `freeze` で内部配列の変更を禁止
 
@@ -170,6 +172,8 @@ end
 ```
 
 `then` を使うことで、処理の流れが上から下へ自然に読めます:
+
+
 1. `(1..@count)` — 1 から count の Range を作成
 2. `.map { ... }` — 各数値を FizzBuzzValue に変換
 3. `.then { ... }` — 結果の配列を FizzBuzzList でラップ

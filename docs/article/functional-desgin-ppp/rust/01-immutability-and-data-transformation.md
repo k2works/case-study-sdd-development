@@ -410,6 +410,8 @@ pub fn process_items_efficiently(items: &[Item]) -> Vec<ProcessedItem> {
 ```
 
 Rust イテレータの利点：
+
+
 - **遅延評価**: `collect()` が呼ばれるまで実際の処理は行われない
 - **中間コレクションなし**: 各要素が一度のパスで処理される
 - **ゼロコスト抽象化**: コンパイル時に最適化され、手書きのループと同等の性能

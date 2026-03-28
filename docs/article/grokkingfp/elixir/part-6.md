@@ -858,6 +858,8 @@ p5 --> p6
 ### 問題 1: DataAccess の拡張
 
 以下の要件で `DataAccess` を拡張してください:
+
+
 - 新しいコールバック `find_restaurants_near_location` を追加
 - 戻り値は `{:ok, [Restaurant.t()]} | {:error, String.t()}`
 

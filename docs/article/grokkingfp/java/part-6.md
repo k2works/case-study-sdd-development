@@ -416,6 +416,8 @@ public static int guideScore(Guide guide) {
 ```
 
 重要なポイント:
+
+
 - **オーバーフロー防止**: `long` を使用して大きな数値の合計を安全に計算
 - **上限値の設定**: 各スコア成分に最大値を設定してスコアを 0-100 の範囲に
 
@@ -1165,6 +1167,8 @@ p5 --> p6
 ### 問題 1: DataAccess の拡張
 
 以下の要件で `DataAccess` を拡張してください:
+
+
 - 新しいメソッド `findHotelsNearLocation` を追加
 - 戻り値は `IO<List<Hotel>>`
 

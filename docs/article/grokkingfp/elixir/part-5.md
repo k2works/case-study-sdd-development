@@ -479,6 +479,8 @@ time < 200_000  # true（200ms未満）
 **OTP (Open Telecom Platform)** は、Erlang/Elixir で堅牢な並行システムを構築するためのフレームワークです。
 
 主なコンポーネント:
+
+
 - **GenServer**: 汎用サーバープロセス
 - **Supervisor**: プロセスの監視と再起動
 - **Application**: アプリケーションの管理

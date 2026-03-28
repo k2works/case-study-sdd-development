@@ -659,6 +659,8 @@ p5 --> p6
 ### 問題 1: DataAccess の拡張
 
 以下の要件で `DataAccess` を拡張してください:
+
+
 - 新しいフィールド `findHotelsNearLocation` を追加
 - 戻り値は `IO (Either String [Hotel])`
 

@@ -88,6 +88,8 @@ castTheDie = randomRIO (1, 6)
 ```
 
 Scala との違い:
+
+
 - Scala: `IO.delay(random.nextInt(6) + 1)` で副作用をラップ
 - Haskell: `randomRIO` 自体が `IO Int` を返す
 

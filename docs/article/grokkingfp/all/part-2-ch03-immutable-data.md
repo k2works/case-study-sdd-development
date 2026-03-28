@@ -979,10 +979,16 @@ rectangle "Level 4: 慣習的" #LightCoral {
 ### 発見 2: スライス操作のイディオムは 3 系統に分かれる
 
 1. **take/drop 系**: Haskell, Clojure, Elixir, Scala, Java (Vavr), Ruby
+
+
    - 関数型言語の伝統的なスタイル。意図が明確
 2. **インデックス記法系**: Python `[:]`, Rust `[..]`
+
+
    - 最も簡潔。Python のスライス記法は特に強力
 3. **メソッドチェーン系**: TypeScript `.slice()`, C# `.Skip().Take()`
+
+
    - OOP スタイルとの親和性が高い
 
 ### 発見 3: replan パターンの共通構造

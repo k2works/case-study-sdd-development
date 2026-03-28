@@ -57,6 +57,8 @@ type Driver =
 ```
 
 ポイント:
+
+
 - `Route` はリストで保持し、`Position` でインデックスを管理
 - 噂は `Set<string>` として管理（集合演算が容易）
 

@@ -273,6 +273,8 @@ const getTipPercentage = (names: readonly string[]): number => {
 ```
 
 この関数は:
+
+
 - 6人以上のグループ → 20% のチップ
 - 1-5人のグループ → 10% のチップ
 - 0人（空リスト） → 0% のチップ

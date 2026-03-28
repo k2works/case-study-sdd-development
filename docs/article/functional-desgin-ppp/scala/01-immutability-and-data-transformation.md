@@ -286,6 +286,8 @@ def processItemsWithIterator(items: List[Item]): List[ProcessedItem] =
 ```
 
 Iterator の利点：
+
+
 - 中間コレクションを作成しない
 - 遅延評価により必要な要素のみ処理
 - メモリ効率が良い

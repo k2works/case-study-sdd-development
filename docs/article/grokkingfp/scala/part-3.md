@@ -521,6 +521,8 @@ case class Artist(
 ```
 
 この設計には問題があります:
+
+
 - `isActive` が `true` の場合、`yearsActiveEnd` は何を入れるべき？
 - 無効な状態（`isActive = true` かつ `yearsActiveEnd = 2020`）を作れてしまう
 

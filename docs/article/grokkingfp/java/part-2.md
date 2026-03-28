@@ -628,21 +628,29 @@ List<String> inside = radiuses.flatMap(r ->
 ### 学んだこと
 
 1. **イミュータブルなデータ操作**
+
+
    - Vavr の `List` は不変
    - `take`, `drop`, `append`, `appendAll` で新しいリストを作成
    - 元のデータは変更されない
 
 2. **高階関数**
+
+
    - `map`: 各要素を変換
    - `filter`: 条件に合う要素を抽出
    - `foldLeft`: 畳み込み
    - `sortBy`: ソート基準を関数で指定
 
 3. **関数を返す関数**
+
+
    - `Predicate<T>` を返すことで再利用可能なフィルタを作成
    - 部分適用のような効果を得られる
 
 4. **flatMap**
+
+
    - ネストしたリストを平坦化
    - `map` + `flatten` の組み合わせ
    - リストサイズが増減する変換に対応

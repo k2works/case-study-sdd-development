@@ -76,6 +76,8 @@ type AccountOO(id: string, initialBalance: decimal) =
 ```
 
 **問題点**:
+
+
 - 内部状態が可変
 - テストが困難（状態に依存）
 - 履歴の追跡が難しい
@@ -130,6 +132,8 @@ module Account =
 ```
 
 **改善点**:
+
+
 - 状態が不変
 - 元のデータは変更されない
 - Result 型でエラーを表現
@@ -172,6 +176,8 @@ let getName (animal: Animal) : string =
 ```
 
 **利点**:
+
+
 - 新しい動物を追加すると、コンパイラがすべての `match` を更新するよう警告
 - 関数を追加しても既存のコードに影響なし
 - パターンマッチングによる網羅性チェック
@@ -212,6 +218,8 @@ let createInMemoryRepo<'T> (getId: 'T -> string) : Repository<'T> =
 ```
 
 **利点**:
+
+
 - テスト用のモックが簡単
 - 部分的な実装が可能
 - 関数を引数として渡せる
@@ -255,6 +263,8 @@ let replay (events: AccountEvent list) : Account =
 ```
 
 **利点**:
+
+
 - 完全な履歴を保持
 - 任意の時点の状態を再構築可能
 - 監査ログとして使用可能
