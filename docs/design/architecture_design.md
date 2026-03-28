@@ -172,7 +172,7 @@ app_services --> domain_services
 jpa_repos --> entities
 boot_config --> controllers
 sec_config --> controllers
-template ..|> controllers
+controllers --> template
 
 @enduml
 ```
@@ -219,6 +219,31 @@ end note
 
 @enduml
 ```
+
+## 依存性逆転の段階的導入方針
+
+現在はアプリケーション層（Service）がインフラ層（Repository 実装）を直接参照する構成としている。これは初期の直接依存で開始し、コードの追跡を容易にするための判断である。
+
+テスタビリティが課題になった時点で、依存性逆転原則（DIP）を段階的に導入する。具体的には、ドメイン層に Repository インターフェースを配置し、インフラ層がそれを実装する形に移行する。この判断は ADR として記録する。
+
+| フェーズ | 依存方向 | 導入条件 |
+|---------|---------|---------|
+| 初期（現在） | Service → Repository 実装（直接参照） | - |
+| DIP 導入後 | Service → Repository インターフェース（ドメイン層） ← Repository 実装（インフラ層） | テスタビリティの課題が顕在化した時点 |
+
+## 認証・認可方針
+
+顧客向けと管理向けの URL パスを分離し、ロールベースの認証・認可を Spring Security で実装する。
+
+| 区分 | URL パス | 認証要件 | ロール |
+|------|---------|---------|--------|
+| 顧客向け | `/products`, `/orders/**` | 顧客ユーザー認証 | ROLE_CUSTOMER |
+| 管理向け | `/admin/**` | 管理者認証 | ROLE_ADMIN |
+| 公開 | `/login`, `/register` | 認証不要 | - |
+
+- 顧客向け画面（`/products`, `/orders/**`）はログイン済みの顧客ユーザーのみアクセス可能
+- 管理画面（`/admin/**`）は管理者ロールを持つユーザーのみアクセス可能
+- ログイン画面・会員登録画面は認証不要
 
 ## トレーサビリティ
 

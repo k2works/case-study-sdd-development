@@ -140,6 +140,8 @@ entity "product_compositions（商品構成）" as product_compositions {
   * product_id : BIGINT <<FK>>
   * item_id : BIGINT <<FK>>
   * quantity : INT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
 }
 
 entity "items（単品）" as items {
@@ -248,14 +250,14 @@ items ||--o{ arrivals : item_id
 |---------|-----|------|------|
 | order_id | BIGINT | PK, AUTO_INCREMENT | 受注 ID |
 | customer_id | BIGINT | FK (customers) | 得意先 ID |
-| product_id | BIGINT | FK (products) | 商品 ID |
+| product_id | BIGINT | FK (products) | 商品 ID（BR01: 1受注=1商品。数量の概念なし） |
 | destination_id | BIGINT | FK (delivery_destinations) | 届け先 ID |
 | delivery_date | DATE | NOT NULL | 届け日 |
 | shipping_date | DATE | NOT NULL | 出荷日（= 届け日 - 1日、BR02） |
 | message | VARCHAR(1000) | | メッセージ |
 | order_status | VARCHAR(20) | NOT NULL | 受注ステータス |
 | order_date | DATE | NOT NULL | 注文日 |
-| total_amount | DECIMAL(10,0) | NOT NULL | 合計金額 |
+| total_amount | DECIMAL(10,0) | NOT NULL | 合計金額（= products.price。BR01: 1受注=1商品のため商品価格と同値） |
 | created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 作成日時 |
 | updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 更新日時 |
 
@@ -279,6 +281,8 @@ items ||--o{ arrivals : item_id
 | product_id | BIGINT | FK (products) | 商品 ID |
 | item_id | BIGINT | FK (items) | 単品 ID |
 | quantity | INT | NOT NULL | 数量 |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 作成日時 |
+| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 更新日時 |
 
 ### items（単品テーブル）
 
