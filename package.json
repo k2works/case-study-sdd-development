@@ -34,6 +34,7 @@
   "homepage": "https://github.com/k2works/case-study-bouquet#readme",
   "type": "module",
   "dependencies": {
+    "@k2works/claude-code-booster": "^3.2.1",
     "dotenv": "^17.2.3",
     "gulp": "^5.0.0"
   }
